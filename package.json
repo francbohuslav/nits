@@ -1,5 +1,5 @@
 {
-    "name": "sprinter",
+    "name": "nits",
     "version": "1.0.0",
     "description": "",
     "main": "dist/server/server/server.js",

@@ -5,14 +5,18 @@ import os from "os";
 import http from "http";
 const json = require("body-parser").json;
 import path = require("path");
-// import { Authentication } from "./modules/uu/authentication";
+import { Authentication } from "./modules/uu/authentication";
 import { Response } from "express-serve-static-core";
+import { UserRequester } from "./requesters/user-requester";
+import { ProjectConfigurer } from "./project-config";
+import { Crypt } from "./modules/crypt";
 
-// const projectConfig = new ProjectConfigurer().getProjectConfig(join(__dirname, "../../../userdata/project-config.json"));
-// const auth = new Authentication(projectConfig);
-// const crypt = new Crypt(projectConfig.cryptoSalt);
+const projectConfig = new ProjectConfigurer().getProjectConfig(path.join(__dirname, "../../../userdata/project-config.json"));
+const auth = new Authentication(projectConfig);
+const crypt = new Crypt(projectConfig.cryptoSalt);
 // const tokenAuthorizer = new TokenAuthorizer(crypt);
 // const tokenAuthorize = tokenAuthorizer.tokenAuthorize.bind(tokenAuthorizer);
+const userRequester = new UserRequester(auth, crypt, projectConfig);
 
 const isDevelopment = os.hostname().toLowerCase() == "msi";
 
@@ -50,12 +54,10 @@ function sendError(res: Response, ex: any) {
     );
 }
 
-const methods: any[] = [
-    //["post","/server/login",  userRequester.login.bind(userRequester)]
-];
+const methods: any[] = [["post", "/server/login", userRequester.login.bind(userRequester)]];
 
 methods.forEach((method) => {
-    const postOrGet = (app as any)[method[0]];
+    const postOrGet = (app as any)[method[0]].bind(app);
     postOrGet(method[1], async (req: express.Request, res: express.Response) => {
         try {
             const result = await method[2](req, res);

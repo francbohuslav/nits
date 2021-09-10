@@ -1,5 +1,4 @@
 import axios from "axios";
-import dateUtils from "../../../common/date-utils";
 import { IProjectConfig } from "../../project-config";
 
 //TODO: BF: clean/verify
@@ -10,7 +9,7 @@ export class Authentication {
     private authenticatedUsers: IUserCredentials[] = [];
 
     constructor(private projectConfig: IProjectConfig) {}
-
+    /*
     public async getToken(): Promise<string> {
         const now = dateUtils.getActualTimestamp();
         if (this.lastToken && now < this.expirationTimestamp) {
@@ -27,7 +26,7 @@ export class Authentication {
         console.log("Token loaded, will expire at", dateUtils.formatDateTime(this.expirationTimestamp));
         return this.lastToken;
     }
-
+*/
     public async getUserUid(accessCode1: string, accessCode2: string): Promise<string> {
         const userRecord = this.authenticatedUsers.filter((a) => a.accessCode1 == accessCode1 && a.accessCode2 == accessCode2)[0];
         if (userRecord) {

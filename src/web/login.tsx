@@ -40,7 +40,7 @@ export const Login = () => {
         <>
             <Container maxWidth="sm" style={{ marginTop: "20vh" }}>
                 <Typography component="h1" variant="h3" align="center">
-                    Sprinter territory
+                    NITS territory
                 </Typography>
                 <Box mt={2} my={3}>
                     <Typography component="h2" variant="h5" align="center">
