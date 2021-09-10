@@ -18,25 +18,11 @@ const crypt = new Crypt(projectConfig.cryptoSalt);
 // const tokenAuthorize = tokenAuthorizer.tokenAuthorize.bind(tokenAuthorizer);
 const userRequester = new UserRequester(auth, crypt);
 
-const isDevelopment = os.hostname().toLowerCase() == "msi";
+//const isDevelopment = os.hostname().toLowerCase() == "msi";
 
 const app = express();
 app.use(compression());
 app.use(json());
-
-if (!isDevelopment) {
-    // redirect http to https
-    app.use((req, res, next) => {
-        if (!req.url.startsWith("/server/") && !req.secure) {
-            console.log("Redirect from " + req.url);
-            res.redirect("https://" + req.headers.host.replace(/:\d+$/, "") + req.url);
-            res.send("");
-        } else {
-            next();
-        }
-    });
-}
-//TODO: BF: clean/verify
 
 function sendError(res: Response, ex: any) {
     console.log(ex);
