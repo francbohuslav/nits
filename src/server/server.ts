@@ -16,7 +16,7 @@ const auth = new Authentication(projectConfig);
 const crypt = new Crypt(projectConfig.cryptoSalt);
 // const tokenAuthorizer = new TokenAuthorizer(crypt);
 // const tokenAuthorize = tokenAuthorizer.tokenAuthorize.bind(tokenAuthorizer);
-const userRequester = new UserRequester(auth, crypt, projectConfig);
+const userRequester = new UserRequester(auth, crypt);
 
 const isDevelopment = os.hostname().toLowerCase() == "msi";
 
