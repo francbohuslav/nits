@@ -1,0 +1,7 @@
+﻿/node_modules/
+/dist
+/cache/*.cache
+/debug.log
+/cache/*.json
+/userdata/*.json
+/userdata/attachments/
