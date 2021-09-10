@@ -1,5 +1,5 @@
 import React = require("react");
-import { Drawer, Link, ListItem, ListItemIcon, ListItemText, Tooltip } from "@material-ui/core";
+import { Drawer, ListItem, ListItemIcon, ListItemText } from "@material-ui/core";
 import List from "@material-ui/core/List";
 import ExitToApp from "@material-ui/icons/ExitToApp";
 import loginProvider from "../login-provider";

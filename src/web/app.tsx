@@ -1,10 +1,11 @@
-import { Box, createTheme, ThemeProvider } from "@material-ui/core";
+import { createTheme, ThemeProvider } from "@material-ui/core";
 import React = require("react");
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import { AppProvider } from "./app-provider";
 import { DataProvider } from "./data-context";
 import { LoggedUser } from "./logged-user";
 import { Login } from "./login";
+import { MainLayout } from "./main-layout";
 import { Router } from "./router";
 
 const theme = createTheme({
@@ -20,13 +21,11 @@ export const App = () => {
                 <AppProvider>
                     <Switch>
                         <Route path={Router.PageMain}>
-                            <Box m={1}>
-                                <LoggedUser>
-                                    <DataProvider>
-                                        Some component
-                                    </DataProvider>
-                                </LoggedUser>
-                            </Box>
+                            <LoggedUser>
+                                <DataProvider>
+                                    <MainLayout />
+                                </DataProvider>
+                            </LoggedUser>
                         </Route>
                         <Route path="/">
                             <Login />
