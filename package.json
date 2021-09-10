@@ -7,7 +7,7 @@
         "start": "node dist/server/server/server.js",
         "build": "tsc --project tsconfig.server.json && webpack",
         "watch-server": "tsc --watch --project tsconfig.server.json",
-        "watch-node": "nodemon",
+        "watch-node": "set NITS_CRYPTO_SALT=developmentSalt & nodemon",
         "build-web": "webpack",
         "watch-web": "webpack --watch",
         "watch": "concurrently --kill-others \"npm run watch-server\" \"npm run watch-web\"  \"npm run browser-sync\" ",

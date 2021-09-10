@@ -15,9 +15,9 @@ class Ajax {
         return await this.processResult<T>(response, throwException);
     }
 
-    public async postFormData<T>(url: string, formData: FormData, throwException: boolean = false): Promise<T> {
+    public async postFormData<T>(url: string, formData: FormData): Promise<T> {
         return new Promise((resolve) => {
-            var request = new XMLHttpRequest();
+            const request = new XMLHttpRequest();
             request.open("POST", url);
             request.setRequestHeader("LoginToken", loginProvider.getToken());
             request.onreadystatechange = function () {

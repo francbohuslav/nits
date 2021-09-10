@@ -1,5 +1,4 @@
 import crypto from "crypto";
-import { IProjectConfig } from "../project-config";
 
 export class Crypt {
     private algorithm = "aes-192-cbc";

@@ -1,5 +1,5 @@
 export class Router<TQueryParams> {
-    public static PageMain = "/page/tickets/";
+    public static PageMain = "/page/main/";
 
     constructor(public route: string, public history: any, public location: any) {}
 

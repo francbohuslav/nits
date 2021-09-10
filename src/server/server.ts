@@ -11,7 +11,7 @@ import { UserRequester } from "./requesters/user-requester";
 import { ProjectConfigurer } from "./project-config";
 import { Crypt } from "./modules/crypt";
 
-const projectConfig = new ProjectConfigurer().getProjectConfig(path.join(__dirname, "../../../userdata/project-config.json"));
+const projectConfig = new ProjectConfigurer().getProjectConfig();
 const auth = new Authentication(projectConfig);
 const crypt = new Crypt(projectConfig.cryptoSalt);
 // const tokenAuthorizer = new TokenAuthorizer(crypt);

@@ -1,15 +1,16 @@
-import fs from "fs";
-
 export interface IProjectConfig {
     cryptoSalt: string;
 }
 export class ProjectConfigurer {
-    public getProjectConfig(path: string): IProjectConfig {
+    public getProjectConfig(): IProjectConfig {
         try {
-            const projectConfig: IProjectConfig = JSON.parse(fs.readFileSync(path, { encoding: "utf-8" }));
-            if (!projectConfig.cryptoSalt) {
-                throw Error("Set cryptoSalt in project-config.json");
+            if (!process.env.NITS_CRYPTO_SALT) {
+                throw Error("Set NITS_CRYPTO_SALT in in env");
             }
+            const projectConfig: IProjectConfig = {
+                cryptoSalt: process.env.NITS_CRYPTO_SALT,
+            };
+
             return projectConfig;
         } catch (err) {
             console.error(err);

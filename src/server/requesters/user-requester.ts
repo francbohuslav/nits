@@ -2,10 +2,9 @@ import { Request } from "express";
 import { ILoginRequest, ILoginResponse } from "../../common/ajax-interfaces";
 import { Crypt } from "../modules/crypt";
 import { Authentication } from "../modules/uu/authentication";
-import { IProjectConfig } from "../project-config";
 
 export class UserRequester {
-    constructor(private auth: Authentication, private crypt: Crypt, private projectConfig: IProjectConfig) {}
+    constructor(private auth: Authentication, private crypt: Crypt) {}
 
     public async login(req: Request): Promise<ILoginResponse> {
         const request = req.body as ILoginRequest;
