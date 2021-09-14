@@ -1,6 +1,6 @@
 import fs from "fs";
-import path from "path";
-import { IUserData } from "../controllers/user-controller";
+import { join } from "path";
+import { IUserData } from "../../common/interfaces";
 import { Crypt } from "../helpers/crypt";
 const fsp = fs.promises;
 
@@ -36,6 +36,6 @@ export class UserDataModel {
     }
 
     private getUserFilePath(uid: string): string {
-        return path.join(this.storageDir, uid + ".data");
+        return join(this.storageDir, uid + ".data");
     }
 }

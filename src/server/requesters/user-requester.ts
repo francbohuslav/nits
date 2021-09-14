@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { ILoginRequest, ILoginResponse, IUserDataResponse } from "../../common/ajax-interfaces";
-import { IUserData, UserController } from "../controllers/user-controller";
+import { IUserData } from "../../common/interfaces";
+import { UserController } from "../controllers/user-controller";
 import { Crypt } from "../helpers/crypt";
 
 export class UserRequester {

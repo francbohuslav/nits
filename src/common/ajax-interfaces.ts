@@ -1,4 +1,4 @@
-import { IUserData } from "../server/controllers/user-controller";
+import { IUserData } from "./interfaces";
 
 interface IBaseResponse {
     result?: null | "error";

@@ -1,3 +1,4 @@
+import { IUserData } from "../../common/interfaces";
 import { UserDataModel } from "../models/user-data-model";
 import { IUserIdentity, UserModel } from "../models/user-model";
 
@@ -28,9 +29,4 @@ export class UserController {
     public setUserData(uid: string, userData: IUserData): Promise<void> {
         return this.userDataModel.setUserData(uid, userData);
     }
-}
-
-export interface IUserData {
-    jiraUserName: string;
-    jiraPassword: string;
 }
