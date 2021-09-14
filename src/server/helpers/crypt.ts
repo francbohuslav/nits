@@ -2,7 +2,7 @@ import crypto from "crypto";
 
 export class Crypt {
     private algorithm = "aes-192-cbc";
-    private iv = Buffer.from("gdfgsd1gsfd1fgdf"); // do not change
+    private iv = Buffer.from("gdfgsd1gsfd1fgda"); // do not change
 
     constructor(private salt: string) {}
 

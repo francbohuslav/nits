@@ -17,13 +17,11 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 export interface IAlertProps {
     message?: string;
     stack?: string;
-    type?: string;
 }
 interface IAlertState {
     open: boolean;
     message?: string;
     stack?: string;
-    type?: string;
 }
 
 export const Alert = (props: IAlertProps) => {

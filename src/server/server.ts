@@ -5,20 +5,24 @@ import os from "os";
 import http from "http";
 const json = require("body-parser").json;
 import path = require("path");
-import { Authentication } from "./modules/uu/authentication";
 import { Response } from "express-serve-static-core";
 import { UserRequester } from "./requesters/user-requester";
 import { ProjectConfigurer } from "./project-config";
-import { Crypt } from "./modules/crypt";
+import { Crypt } from "./helpers/crypt";
+import { UserController } from "./controllers/user-controller";
+import { UserModel } from "./models/user-model";
+import { UuIdendtityApi } from "./apis/uu-identity-api";
 
+const isDevelopment = os.hostname().toLowerCase() == "msi";
+if (isDevelopment) {
+    process.env.NITS_CRYPTO_SALT = "developmentSalt";
+}
 const projectConfig = new ProjectConfigurer().getProjectConfig();
-const auth = new Authentication(projectConfig);
 const crypt = new Crypt(projectConfig.cryptoSalt);
+const userController = new UserController(new UserModel(new UuIdendtityApi(), {}));
 // const tokenAuthorizer = new TokenAuthorizer(crypt);
 // const tokenAuthorize = tokenAuthorizer.tokenAuthorize.bind(tokenAuthorizer);
-const userRequester = new UserRequester(auth, crypt);
-
-//const isDevelopment = os.hostname().toLowerCase() == "msi";
+const userRequester = new UserRequester(userController, crypt);
 
 const app = express();
 app.use(compression());
