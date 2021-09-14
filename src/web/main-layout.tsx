@@ -4,6 +4,7 @@ import React = require("react");
 import { SideMenu } from "./layout/side-menu";
 import MenuIcon from "@material-ui/icons/Menu";
 import TimerIcon from "@material-ui/icons/Timer";
+import { UserJiraSettings } from "./components/user-jira-settings";
 
 const useStyles = makeStyles({
     alignCenter: {
@@ -33,6 +34,9 @@ export const MainLayout = () => {
                 </Toolbar>
             </AppBar>
             <SideMenu open={sideMenu} onClose={() => setSideMenu(false)} />
+            <Box p={3} style={{ maxWidth: "500px" }}>
+                <UserJiraSettings />
+            </Box>
         </>
     );
 };

@@ -3,10 +3,10 @@ import { TextField, Button, Typography, Container, Box } from "@material-ui/core
 import { useHistory, useLocation } from "react-router-dom";
 import { useState } from "react";
 import Ajax from "./ajax";
-import { IThisApp } from "./app-provider";
 import { Router } from "./router";
 import { ILoginRequest, ILoginResponse } from "../common/ajax-interfaces";
 import loginProvider from "./login-provider";
+import { thisApp } from "./app-provider";
 
 export const Login = () => {
     const [accessCodes, setAccessCodes] = useState<ILoginRequest>({ accessCode1: null, accessCode2: null });
@@ -25,8 +25,7 @@ export const Login = () => {
             history.push(Router.PageMain);
         } else {
             loginProvider.logout();
-            const thisApp: IThisApp = (window as any).thisApp;
-            thisApp.alert(response.message || "Sorry bro, your access codes are wrong.");
+            thisApp().alert(response.message || "Sorry bro, your access codes are wrong.");
         }
     };
     const accCode1Changed = (e: any) => setAccessCodes({ ...accessCodes, accessCode1: e.target.value });

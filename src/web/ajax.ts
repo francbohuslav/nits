@@ -1,4 +1,4 @@
-import { IThisApp } from "./app-provider";
+import { thisApp } from "./app-provider";
 import loginProvider from "./login-provider";
 
 class Ajax {
@@ -47,13 +47,12 @@ class Ajax {
     }
 
     private async processResult<T>(response: any, throwException: boolean) {
-        const thisApp: IThisApp = (window as any).thisApp;
         if (!response.ok) {
             if (response.status == 401) {
                 this.goToLogin();
                 return null;
             }
-            thisApp.alert(response.statusText);
+            thisApp().alert(response.statusText);
             if (throwException) {
                 throw response.statusText;
             }
@@ -61,7 +60,7 @@ class Ajax {
         }
         const json = await response.json();
         if (json.result === "error") {
-            thisApp.alert(json);
+            thisApp().alert(json);
             if (throwException) {
                 throw json;
             }

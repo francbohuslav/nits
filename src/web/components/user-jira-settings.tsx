@@ -1,0 +1,75 @@
+import { Box, Button, LinearProgress, TextField, Typography } from "@material-ui/core";
+import { ChangeEvent, useEffect, useState } from "react";
+import React = require("react");
+import { IUserDataResponse } from "../../common/ajax-interfaces";
+import ajax from "../ajax";
+import { thisApp } from "../app-provider";
+
+export const UserJiraSettings = () => {
+    const [userData, setUserData] = useState<IUserDataResponse>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const loadData = async () => {
+        setIsLoading(true);
+        const data = await ajax.get<IUserDataResponse>("/server/get-user-data");
+        setUserData(data);
+        setIsLoading(false);
+    };
+
+    const saveData = async () => {
+        setIsLoading(true);
+        await ajax.post<IUserDataResponse>("/server/set-user-data", userData);
+        setIsLoading(false);
+        thisApp().toast("Data saved");
+    };
+
+    const dataChanged = (property: string) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+        setUserData({ ...userData, [property]: e.target.value });
+
+    const onSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        saveData();
+    };
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    return (
+        <>
+            {isLoading && <LinearProgress></LinearProgress>}
+            {userData && (
+                <div>
+                    <Typography component="h1" variant="h5">
+                        Jira credentials
+                    </Typography>
+                    <form noValidate onSubmit={onSubmit}>
+                        <TextField
+                            id="jiraUserName"
+                            label="Username"
+                            value={userData.jiraUserName}
+                            fullWidth
+                            margin="dense"
+                            onChange={dataChanged("jiraUserName")}
+                        />
+                        <TextField
+                            id="jiraPassword"
+                            label="Password"
+                            value={userData.jiraPassword}
+                            type="password"
+                            fullWidth
+                            margin="dense"
+                            onChange={dataChanged("jiraPassword")}
+                        />
+                        <Box mt={2}>
+                            <Button type="submit" color="primary" variant="contained">
+                                Save
+                            </Button>
+                        </Box>
+                    </form>
+                </div>
+            )}
+            {/* {JSON.stringify(userData)} */}
+        </>
+    );
+};

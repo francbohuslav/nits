@@ -1,6 +1,6 @@
 import dateUtils from "../../common/date-utils";
 import { IIdentityResponse_Identity, ITokenResponse, UuIdendtityApi } from "../apis/uu-identity-api";
-import md5 from "md5";
+const md5 = require("md5");
 
 export class UserModel {
     constructor(private uuIdendtityApi: UuIdendtityApi, private tokenCache: ITokensMemory) {}
@@ -9,7 +9,7 @@ export class UserModel {
         console.log("Auth: request");
         const tokenResponse = await this.getToken(accessCode1, accessCode2);
         if (!tokenResponse.id_token) {
-            throw Error("Token not obtained");
+            throw new Error("Token not obtained");
         }
 
         const identityResponse = await this.uuIdendtityApi.getIdentity(tokenResponse.id_token);

@@ -1,3 +1,5 @@
+import { IUserData } from "../server/controllers/user-controller";
+
 interface IBaseResponse {
     result?: null | "error";
     message?: string;
@@ -12,3 +14,5 @@ export interface ILoginRequest {
 export interface ILoginResponse extends IBaseResponse {
     loginToken: string;
 }
+
+export interface IUserDataResponse extends IBaseResponse, IUserData {}

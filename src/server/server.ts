@@ -12,6 +12,8 @@ import { Crypt } from "./helpers/crypt";
 import { UserController } from "./controllers/user-controller";
 import { UserModel } from "./models/user-model";
 import { UuIdendtityApi } from "./apis/uu-identity-api";
+import { TokenAuthorizer } from "./helpers/token-authorizer";
+import { UserDataModel } from "./models/user-data-model";
 
 const isDevelopment = os.hostname().toLowerCase() == "msi";
 if (isDevelopment) {
@@ -19,9 +21,10 @@ if (isDevelopment) {
 }
 const projectConfig = new ProjectConfigurer().getProjectConfig();
 const crypt = new Crypt(projectConfig.cryptoSalt);
-const userController = new UserController(new UserModel(new UuIdendtityApi(), {}));
-// const tokenAuthorizer = new TokenAuthorizer(crypt);
-// const tokenAuthorize = tokenAuthorizer.tokenAuthorize.bind(tokenAuthorizer);
+const userDataModel = new UserDataModel(path.join(__dirname, "../../../userdata/users"), crypt);
+const userController = new UserController(new UserModel(new UuIdendtityApi(), {}), userDataModel);
+const tokenAuthorizer = new TokenAuthorizer(crypt);
+const tokenAuthorize = tokenAuthorizer.tokenAuthorize.bind(tokenAuthorizer);
 const userRequester = new UserRequester(userController, crypt);
 
 const app = express();
@@ -36,7 +39,7 @@ function sendError(res: Response, ex: any) {
                 result: "error",
                 message: ex.message,
                 statusText: ex.response?.statusText,
-                stack: ex.response?.data,
+                stack: ex.response?.data || ex.stack,
             },
             null,
             2
@@ -44,18 +47,28 @@ function sendError(res: Response, ex: any) {
     );
 }
 
-const methods: any[] = [["post", "/server/login", userRequester.login.bind(userRequester)]];
+const methods: any[] = [
+    ["post", "/server/login", userRequester.login.bind(userRequester)],
+    ["get", "/server/get-user-data", userRequester.getUserData.bind(userRequester), tokenAuthorize],
+    ["post", "/server/set-user-data", userRequester.setUserData.bind(userRequester), tokenAuthorize],
+];
+
+const processRequest = (method: (req: express.Request, res: express.Response) => any) => async (req: express.Request, res: express.Response) => {
+    try {
+        const result = await method(req, res);
+        res.send(JSON.stringify(result));
+    } catch (ex) {
+        sendError(res, ex);
+    }
+};
 
 methods.forEach((method) => {
     const postOrGet = (app as any)[method[0]].bind(app);
-    postOrGet(method[1], async (req: express.Request, res: express.Response) => {
-        try {
-            const result = await method[2](req, res);
-            res.send(JSON.stringify(result));
-        } catch (ex) {
-            sendError(res, ex);
-        }
-    });
+    if (method[3]) {
+        postOrGet(method[1], method[3], processRequest(method[2]));
+    } else {
+        postOrGet(method[1], processRequest(method[2]));
+    }
 });
 
 app.get("/page/*", async (req, res) => {

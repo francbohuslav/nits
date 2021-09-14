@@ -5,7 +5,7 @@ export class ProjectConfigurer {
     public getProjectConfig(): IProjectConfig {
         try {
             if (!process.env.NITS_CRYPTO_SALT) {
-                throw Error("Set NITS_CRYPTO_SALT in in env");
+                throw new Error("Set NITS_CRYPTO_SALT in in env");
             }
             const projectConfig: IProjectConfig = {
                 cryptoSalt: process.env.NITS_CRYPTO_SALT,
