@@ -39,7 +39,7 @@ const tokenAuthorize = tokenAuthorizer.tokenAuthorize.bind(tokenAuthorizer);
 const jiraApi = new JiraApi({
     ...jiraConnectionSettings,
     username: "bohuslav.franc@unicorn.com",
-    password: "S9YB43tvhNtua0puhoCEB54D",
+    password: "******",
 });
 const jiraModel = new JiraModel(jiraApi);
 const userController = new UserController(new UserModel(new UuIdendtityApi(), {}), userDataModel, jiraConnectionSettings);
