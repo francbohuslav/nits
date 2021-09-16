@@ -12,7 +12,7 @@ export class UserRequester {
         const response: ILoginResponse = {
             loginToken: null,
         };
-        const uid = await this.userController.getUserUid(request.accessCode1, request.accessCode2);
+        const uid = await this.userController.login(request.accessCode1, request.accessCode2);
         if (!uid) {
             throw new Error("Wrong credentials");
         }

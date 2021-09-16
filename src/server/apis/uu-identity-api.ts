@@ -36,4 +36,15 @@ export interface IIdentityResponse {
 
 export interface IIdentityResponse_Identity {
     uuIdentity: string;
+    surname: string; //  "Franc",
+    name: string; //  "Bohuslav",
+    email: string; //  "bohuslav.franc@unicornuniverse.eu",
+    language: string; //  "cs",
+    timezone: string; //  "Europe/Prague",
+    creationTime: string; //   "2019-06-17T12:11:47.205Z",
+    type: string; //  "uuPerson",
+    state: string; //  "active",
+    awid: string; //  "a9b105aff2744771be4daa8361954677",
+    photo: string; //   "fad9baf9224ecf889c60ea889dfdfec3",
+    id: string; //   "5d07838394a4140028b99c33",
 }

@@ -14,6 +14,8 @@ import { UserModel } from "./models/user-model";
 import { UuIdendtityApi } from "./apis/uu-identity-api";
 import { TokenAuthorizer } from "./helpers/token-authorizer";
 import { UserDataModel } from "./models/user-data-model";
+import { SyncRequester } from "./requesters/sync-requester";
+import { SyncController } from "./controllers/sync-controller";
 
 const isDevelopment = os.hostname().toLowerCase() == "msi";
 if (isDevelopment) {
@@ -21,11 +23,16 @@ if (isDevelopment) {
 }
 const projectConfig = new ProjectConfigurer().getProjectConfig();
 const crypt = new Crypt(projectConfig.cryptoSalt);
-const userDataModel = new UserDataModel(path.join(__dirname, "../../../userdata/users"), crypt);
+const userDataModel = new UserDataModel(path.join(__dirname, "../../../userdata/users"), crypt, projectConfig);
 const userController = new UserController(new UserModel(new UuIdendtityApi(), {}), userDataModel);
 const tokenAuthorizer = new TokenAuthorizer(crypt);
 const tokenAuthorize = tokenAuthorizer.tokenAuthorize.bind(tokenAuthorizer);
 const userRequester = new UserRequester(userController, crypt);
+const syncController = new SyncController(userDataModel);
+const syncRequester = new SyncRequester(syncController);
+
+// remove
+(() => syncController.sync())();
 
 const app = express();
 app.use(compression());
@@ -51,6 +58,7 @@ const methods: any[] = [
     ["post", "/server/login", userRequester.login.bind(userRequester)],
     ["get", "/server/get-user-data", userRequester.getUserData.bind(userRequester), tokenAuthorize],
     ["post", "/server/set-user-data", userRequester.setUserData.bind(userRequester), tokenAuthorize],
+    ["get", "/server/sync", syncRequester.sync.bind(syncRequester)],
 ];
 
 const processRequest = (method: (req: express.Request, res: express.Response) => any) => async (req: express.Request, res: express.Response) => {

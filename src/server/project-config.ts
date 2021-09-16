@@ -1,5 +1,6 @@
 export interface IProjectConfig {
     cryptoSalt: string;
+    userDataEncrypted: boolean;
 }
 export class ProjectConfigurer {
     public getProjectConfig(): IProjectConfig {
@@ -9,6 +10,7 @@ export class ProjectConfigurer {
             }
             const projectConfig: IProjectConfig = {
                 cryptoSalt: process.env.NITS_CRYPTO_SALT,
+                userDataEncrypted: false,
             };
 
             return projectConfig;

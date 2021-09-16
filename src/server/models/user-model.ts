@@ -5,7 +5,7 @@ const md5 = require("md5");
 export class UserModel {
     constructor(private uuIdendtityApi: UuIdendtityApi, private tokenCache: ITokensMemory) {}
 
-    public async getUserIdentity(accessCode1: string, accessCode2: string): Promise<IUserIdentity> {
+    public async getUuUserIdentity(accessCode1: string, accessCode2: string): Promise<IUserIdentity> {
         console.log("Auth: request");
         const tokenResponse = await this.getToken(accessCode1, accessCode2);
         if (!tokenResponse.id_token) {
