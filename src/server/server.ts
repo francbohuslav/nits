@@ -16,6 +16,8 @@ import { TokenAuthorizer } from "./helpers/token-authorizer";
 import { UserDataModel } from "./models/user-data-model";
 import { SyncRequester } from "./requesters/sync-requester";
 import { SyncController } from "./controllers/sync-controller";
+import { JiraModel } from "./models/jira/jira-model";
+import { DummyTimesheetModel } from "./models/uu/dummy-timesheet-model";
 
 const isDevelopment = os.hostname().toLowerCase() == "msi";
 if (isDevelopment) {
@@ -28,7 +30,9 @@ const userController = new UserController(new UserModel(new UuIdendtityApi(), {}
 const tokenAuthorizer = new TokenAuthorizer(crypt);
 const tokenAuthorize = tokenAuthorizer.tokenAuthorize.bind(tokenAuthorizer);
 const userRequester = new UserRequester(userController, crypt);
-const syncController = new SyncController(userDataModel);
+const jiraModel = new JiraModel();
+const timesheetModel = new DummyTimesheetModel();
+const syncController = new SyncController(userDataModel, jiraModel, timesheetModel);
 const syncRequester = new SyncRequester(syncController);
 
 // remove
@@ -64,7 +68,8 @@ const methods: any[] = [
 const processRequest = (method: (req: express.Request, res: express.Response) => any) => async (req: express.Request, res: express.Response) => {
     try {
         const result = await method(req, res);
-        res.send(JSON.stringify(result));
+        //TODO: BF: indentovani odebrat, at to neni velke
+        res.send(JSON.stringify(result, null, 2));
     } catch (ex) {
         sendError(res, ex);
     }

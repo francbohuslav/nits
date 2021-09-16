@@ -49,8 +49,7 @@ export class UserDataModel {
         const fileList = await fsp.readdir(this.storageDir);
         const userUidList = fileList.filter((f) => f.match(/^[\d-]+\.data$/)).map((f) => f.match(/^([\d-]+)\.data$/)[1]);
         const userDataList: IUserData[] = [];
-        for (let i = 0; i < userUidList.length; i++) {
-            const uid = userUidList[i];
+        for (const uid of userUidList) {
             const userData = await this.getUserData(uid);
             if (userData.jiraUserName && userData.jiraPassword) {
                 userDataList.push(userData);
