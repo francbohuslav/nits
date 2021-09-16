@@ -18,25 +18,38 @@ import { SyncRequester } from "./requesters/sync-requester";
 import { SyncController } from "./controllers/sync-controller";
 import { JiraModel } from "./models/jira/jira-model";
 import { DummyTimesheetModel } from "./models/uu/dummy-timesheet-model";
+import { JiraApi } from "./apis/jira-api";
+import { JiraApiOptions } from "jira-client";
 
 const isDevelopment = os.hostname().toLowerCase() == "msi";
 if (isDevelopment) {
     process.env.NITS_CRYPTO_SALT = "developmentSalt";
 }
+const jiraConnectionSettings: JiraApiOptions = {
+    protocol: "https",
+    host: "intelis.atlassian.net",
+    apiVersion: "3",
+    strictSSL: true,
+};
 const projectConfig = new ProjectConfigurer().getProjectConfig();
 const crypt = new Crypt(projectConfig.cryptoSalt);
 const userDataModel = new UserDataModel(path.join(__dirname, "../../../userdata/users"), crypt, projectConfig);
-const userController = new UserController(new UserModel(new UuIdendtityApi(), {}), userDataModel);
 const tokenAuthorizer = new TokenAuthorizer(crypt);
 const tokenAuthorize = tokenAuthorizer.tokenAuthorize.bind(tokenAuthorizer);
+const jiraApi = new JiraApi({
+    ...jiraConnectionSettings,
+    username: "bohuslav.franc@unicorn.com",
+    password: "S9YB43tvhNtua0puhoCEB54D",
+});
+const jiraModel = new JiraModel(jiraApi);
+const userController = new UserController(new UserModel(new UuIdendtityApi(), {}), userDataModel, jiraConnectionSettings);
 const userRequester = new UserRequester(userController, crypt);
-const jiraModel = new JiraModel();
 const timesheetModel = new DummyTimesheetModel();
 const syncController = new SyncController(userDataModel, jiraModel, timesheetModel);
 const syncRequester = new SyncRequester(syncController);
 
-// remove
-(() => syncController.sync())();
+//TODO: BF: remove
+// (() => syncController.sync())();
 
 const app = express();
 app.use(compression());

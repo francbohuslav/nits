@@ -1,5 +1,5 @@
 import { ISyncReport } from "../models/interfaces";
-import { IJiraModel } from "../models/jira/interfaces";
+import { IJiraModel, Worklog } from "../models/jira/interfaces";
 import { UserDataModel } from "../models/user-data-model";
 import { ITimesheetModel } from "../models/uu/interfaces";
 
@@ -9,15 +9,26 @@ export class SyncController {
     public async sync(): Promise<ISyncReport[]> {
         const userDataList = await this.userDataModel.getAllValidUserData();
         const reportList: ISyncReport[] = [];
-        for (const userData of userDataList) {
+        const worklogList = await this.jiraModel.getLastWorklogs();
+        const worklogListPerAccountId: { [accountId: string]: Worklog[] } = {};
+        worklogList.forEach((w) => {
+            const accountId = w.author.accountId;
+            worklogListPerAccountId[accountId] = worklogListPerAccountId[accountId] || [];
+            worklogListPerAccountId[accountId].push(w);
+        });
+        for (const [accountId, worklogList] of Object.entries(worklogListPerAccountId)) {
+            const userData = userDataList.find((u) => u.jiraAccountId == accountId);
             const report: ISyncReport = {
-                name: userData.name,
-                uid: userData.uid,
+                name: userData?.name,
+                uid: userData?.uid || worklogList[0].author.displayName,
                 log: [],
             };
             reportList.push(report);
+            if (!userData) {
+                report.log.push("User is not logged into NITS, skipped.");
+                continue;
+            }
             try {
-                const worklogList = await this.jiraModel.getLastUserWorklogs(userData);
                 const newTimesheets = this.timesheetModel.convertWorklogsToTimesheets(worklogList);
                 const timesheets = await this.timesheetModel.getLastUserTimesheets(userData);
                 await this.timesheetModel.removeTimesheets(timesheets, report);

@@ -18,9 +18,13 @@ export const UserJiraSettings = () => {
 
     const saveData = async () => {
         setIsLoading(true);
-        await ajax.post<IUserDataResponse>("/server/set-user-data", userData);
+        const res = await ajax.post<string>("/server/set-user-data", userData);
         setIsLoading(false);
-        thisApp().toast("Data saved");
+        if (res == "ok") {
+            thisApp().toast("Data saved");
+        } else {
+            thisApp().toast("Data not saved", "error");
+        }
     };
 
     const dataChanged = (property: string) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -54,7 +58,7 @@ export const UserJiraSettings = () => {
                         />
                         <TextField
                             id="jiraPassword"
-                            label="Password"
+                            label="API token"
                             value={userData.jiraPassword}
                             type="password"
                             fullWidth

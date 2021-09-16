@@ -7,31 +7,25 @@ export type IToastSeverity = "success" | "warning" | "error";
 export interface IToastProps {
     message?: string;
     severity?: IToastSeverity;
-}
-interface IToastState extends IToastProps {
-    open: boolean;
-    msToShow: number;
+    time: Date;
 }
 
 export const Toast = (props: IToastProps) => {
-    const [state, setState] = useState<IToastState>({
-        open: false,
-        message: "",
-        severity: "success",
-        msToShow: 3000,
-    });
+    const [open, setOpen] = useState(false);
+    const [lastViewTime, setLastViewTime] = useState(new Date());
     useEffect(() => {
-        if (props.message) {
-            setState({ ...state, ...props, open: true });
+        if (props.message && lastViewTime.getTime() != props.time.getTime()) {
+            setOpen(true);
+            setLastViewTime(props.time);
         }
     }, [props]);
 
-    const handleClose = () => setState({ ...state, message: "", open: false });
+    const handleClose = () => setOpen(false);
 
     return (
-        <Snackbar open={state.open} autoHideDuration={state.msToShow} anchorOrigin={{ horizontal: "center", vertical: "top" }} onClose={handleClose}>
-            <MuiAlert elevation={3} variant="filled" severity={state.severity}>
-                {state.message}
+        <Snackbar open={open} autoHideDuration={3000} anchorOrigin={{ horizontal: "center", vertical: "top" }} onClose={handleClose}>
+            <MuiAlert elevation={3} variant="filled" severity={props.severity}>
+                {props.message}
             </MuiAlert>
         </Snackbar>
     );

@@ -10,8 +10,16 @@ export interface ITimesheetModel {
 }
 
 export class Timesheet {
+    public datetimeFrom: Date;
+    public datetimeTo: Date;
+    public subject: string;
+    public supplierContract: string;
+    public category: string;
+    public highRate: boolean;
+    public description: string;
+
     public toString(): string {
         //TODO: BF: dodat nejakou identifikac
-        return "UU Timesheet";
+        return `UU Timesheet: ${this.description}`;
     }
 }

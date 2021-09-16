@@ -15,19 +15,19 @@ export interface IThisApp {
 const firstRun = true;
 
 export const AppProvider = (props: IAppProviderProps) => {
-    const [alert, setAlert] = useState<IAlertProps>({});
-    const [toast, setToast] = useState<IToastProps>({});
+    const [alert, setAlert] = useState<IAlertProps>({ time: new Date() });
+    const [toast, setToast] = useState<IToastProps>({ time: new Date() });
     if (firstRun) {
         (window as any).thisApp = {
             alert(error: IAlertProps | string) {
                 if (typeof error === "object") {
-                    setAlert(error);
+                    setAlert({ ...error, time: new Date() });
                 } else {
-                    setAlert({ message: error });
+                    setAlert({ message: error, time: new Date() });
                 }
             },
             toast(message: string, severity: IToastSeverity) {
-                setToast({ message, severity });
+                setToast({ message, severity, time: new Date() });
             },
         };
     }

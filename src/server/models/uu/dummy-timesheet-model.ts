@@ -1,3 +1,4 @@
+import dateUtils from "../../../common/date-utils";
 import { IUserData } from "../../../common/interfaces";
 import { ISyncReport } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
@@ -23,6 +24,10 @@ export class DummyTimesheetModel implements ITimesheetModel {
     convertWorklogsToTimesheets(worklogList: Worklog[]): Timesheet[] {
         return worklogList.map((w) => {
             const ts = new Timesheet();
+            ts.description = w.commentAsText;
+            ts.datetimeFrom = w.startedDate;
+            ts.datetimeTo = new Date(dateUtils.increase(w.startedDate, "seconds", w.timeSpentSeconds));
+            console.log(ts); //
             return ts;
         });
     }

@@ -17,30 +17,24 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 export interface IAlertProps {
     message?: string;
     stack?: string;
-}
-interface IAlertState {
-    open: boolean;
-    message?: string;
-    stack?: string;
+    time: Date;
 }
 
 export const Alert = (props: IAlertProps) => {
-    const [state, setState] = useState<IAlertState>({
-        open: false,
-        message: "",
-        stack: "",
-    });
+    const [open, setOpen] = useState(false);
+    const [lastViewTime, setLastViewTime] = useState(new Date());
     useEffect(() => {
-        if (props.message) {
-            setState({ ...props, open: true });
+        if (props.message && lastViewTime.getTime() != props.time.getTime()) {
+            setOpen(true);
+            setLastViewTime(props.time);
         }
     }, [props]);
 
-    const handleClose = () => setState({ open: false });
-    const stack = typeof state.stack === "string" ? state.stack : JSON.stringify(state.stack, null, 2);
+    const handleClose = () => setOpen(false);
+    const stack = typeof props.stack === "string" ? props.stack : JSON.stringify(props.stack, null, 2);
 
     return (
-        <Dialog open={state.open}>
+        <Dialog open={open}>
             <DialogTitle id="alert-dialog-title">Error</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
@@ -48,7 +42,7 @@ export const Alert = (props: IAlertProps) => {
                         return (
                             <Accordion>
                                 <AccordionSummary expandIcon={stack && <ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
-                                    <Typography>{state.message}</Typography>
+                                    <Typography>{props.message}</Typography>
                                 </AccordionSummary>
                                 {stack && (
                                     <AccordionDetails>

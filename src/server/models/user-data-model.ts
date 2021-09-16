@@ -18,6 +18,7 @@ export class UserDataModel {
             name: "",
             uuAccessCode1: "",
             uuAccessCode2: "",
+            jiraAccountId: "",
             jiraUserName: "",
             jiraPassword: "",
         };
@@ -51,7 +52,7 @@ export class UserDataModel {
         const userDataList: IUserData[] = [];
         for (const uid of userUidList) {
             const userData = await this.getUserData(uid);
-            if (userData.jiraUserName && userData.jiraPassword) {
+            if (userData.jiraAccountId) {
                 userDataList.push(userData);
             }
         }

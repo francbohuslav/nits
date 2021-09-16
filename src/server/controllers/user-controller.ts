@@ -1,11 +1,14 @@
 import { IUserData } from "../../common/interfaces";
+import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
 import { IUserIdentity, UserModel } from "../models/user-model";
+import { JiraApiOptions } from "jira-client";
+import { JiraApi } from "../apis/jira-api";
 
 export class UserController {
     private authenticatedUsers: IUserIdentity[] = [];
 
-    constructor(private userModel: UserModel, private userDataModel: UserDataModel) {}
+    constructor(private userModel: UserModel, private userDataModel: UserDataModel, private jiraDefaultSettings: JiraApiOptions) {}
 
     /**
      * @returns UID
@@ -35,7 +38,20 @@ export class UserController {
         return await this.userDataModel.getUserData(uid);
     }
 
-    public setUserData(uid: string, userData: IUserData): Promise<void> {
+    public async setUserData(uid: string, userData: IUserData): Promise<void> {
+        if (userData.jiraUserName && userData.jiraPassword) {
+            const jiraModel = new JiraModel(
+                new JiraApi({
+                    ...this.jiraDefaultSettings,
+                    username: userData.jiraUserName,
+                    password: userData.jiraPassword,
+                })
+            );
+            const jiraUser = await jiraModel.getCurrentUser();
+            userData.jiraAccountId = jiraUser.accountId;
+        } else {
+            userData.jiraAccountId = "";
+        }
         return this.userDataModel.setUserData(uid, userData);
     }
 }

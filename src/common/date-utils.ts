@@ -24,20 +24,20 @@ class DateUtils {
         return `${d.getDate()}.${d.getMonth() + 1}.${year}`;
     }
 
-    public increase(unit: string, unitCount: number = 1): string {
-        return moment(new Date()).add(unitCount, unit).toDate().toISOString();
+    public increase(date: Date, unit: string, unitCount: number = 1): string {
+        return moment(date).add(unitCount, unit).toDate().toISOString();
     }
 
-    public increaseDay(days: number = 1): string {
-        return this.increase("days", days);
+    public increaseDay(date: Date, days: number = 1): string {
+        return this.increase(date, "days", days);
     }
 
-    public substract(unit: string, unitCount: number = 1): string {
-        return this.increase(unit, -unitCount);
+    public substract(date: Date, unit: string, unitCount: number = 1): string {
+        return this.increase(date, unit, -unitCount);
     }
 
-    public substractDay(days: number = 1): string {
-        return this.increase("days", -days);
+    public substractDay(date: Date, days: number = 1): string {
+        return this.increase(date, "days", -days);
     }
 }
 
