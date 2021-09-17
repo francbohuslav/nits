@@ -1,10 +1,11 @@
 import { ISyncReport } from "../models/interfaces";
-import { IJiraModel, Worklog } from "../models/jira/interfaces";
+import { Worklog } from "../models/jira/interfaces";
+import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
 import { ITimesheetModel } from "../models/uu/interfaces";
 
 export class SyncController {
-    constructor(private userDataModel: UserDataModel, private jiraModel: IJiraModel, private timesheetModel: ITimesheetModel) {}
+    constructor(private userDataModel: UserDataModel, private jiraModel: JiraModel, private timesheetModel: ITimesheetModel) {}
 
     public async sync(): Promise<ISyncReport[]> {
         const userDataList = await this.userDataModel.getAllValidUserData();

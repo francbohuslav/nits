@@ -1,7 +1,7 @@
 import { JiraApi } from "../../apis/jira-api";
-import { IAccount, IJiraModel, Worklog } from "./interfaces";
+import { IAccount, Worklog } from "./interfaces";
 
-export class JiraModel implements IJiraModel {
+export class JiraModel {
     constructor(private jiraApi: JiraApi) {}
     public async getLastWorklogs(): Promise<Worklog[]> {
         const worklogIdList = await this.jiraApi.getUpdatedWorklogIds();

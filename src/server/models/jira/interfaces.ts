@@ -1,7 +1,3 @@
-export interface IJiraModel {
-    getLastWorklogs(): Promise<Worklog[]>;
-}
-
 export class Worklog {
     public author: IAccount;
     public created: string; // "2021-09-16T12:19:36.231+0200",

@@ -10,7 +10,7 @@ export class JiraApi {
 
     public async getUpdatedWorklogIds(): Promise<number[]> {
         //TODO: BF:
-        let since = (dateUtils.getActualTimestamp() - 10 * 3600) * 1000;
+        let since = (dateUtils.getActualTimestamp() - 1 * 24 * 3600) * 1000;
         // let since = (dateUtils.getActualTimestamp() - 5 * 24 * 3600) * 1000;
         const worklogIdList = new Set<number>();
         let isLastPage = false;
