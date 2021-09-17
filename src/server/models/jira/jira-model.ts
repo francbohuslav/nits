@@ -17,6 +17,7 @@ export class JiraModel {
         return await this.jiraApi.getCurrentUser();
     }
 
+    //TODO: BF: vice vykazu nenaslo
     private convertCommentToText(worklog: Worklog): string {
         worklog.commentAsTextErrors = [];
         const comment = worklog.comment;

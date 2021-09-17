@@ -2,6 +2,8 @@ import { IUserData } from "../../../common/interfaces";
 import { ISyncReport } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
 
+export type TimesheetFactoryHandler = (accessCode1: string, accessCode2: string) => ITimesheetModel;
+
 export interface ITimesheetModel {
     saveTimesheets(newTimesheets: Timesheet[], report: ISyncReport): Promise<void>;
     removeTimesheets(timesheets: Timesheet[], report: ISyncReport): Promise<void>;

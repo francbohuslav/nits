@@ -2,10 +2,10 @@ import { ISyncReport } from "../models/interfaces";
 import { Worklog } from "../models/jira/interfaces";
 import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
-import { ITimesheetModel } from "../models/uu/interfaces";
+import { TimesheetFactoryHandler } from "../models/uu/interfaces";
 
 export class SyncController {
-    constructor(private userDataModel: UserDataModel, private jiraModel: JiraModel, private timesheetModel: ITimesheetModel) {}
+    constructor(private userDataModel: UserDataModel, private jiraModel: JiraModel, private timesheetModelFactory: TimesheetFactoryHandler) {}
 
     public async sync(): Promise<ISyncReport[]> {
         const userDataList = await this.userDataModel.getAllValidUserData();
@@ -30,10 +30,11 @@ export class SyncController {
                 continue;
             }
             try {
-                const newTimesheets = this.timesheetModel.convertWorklogsToTimesheets(worklogList);
-                const timesheets = await this.timesheetModel.getLastUserTimesheets(userData);
-                await this.timesheetModel.removeTimesheets(timesheets, report);
-                await this.timesheetModel.saveTimesheets(newTimesheets, report);
+                const timesheetModel = this.timesheetModelFactory(userData.uuAccessCode1, userData.uuAccessCode2);
+                const newTimesheets = timesheetModel.convertWorklogsToTimesheets(worklogList);
+                const timesheets = await timesheetModel.getLastUserTimesheets(userData);
+                await timesheetModel.removeTimesheets(timesheets, report);
+                await timesheetModel.saveTimesheets(newTimesheets, report);
             } catch (err) {
                 if (err instanceof Error) {
                     report.log.push(err.message + "\n" + err.stack);

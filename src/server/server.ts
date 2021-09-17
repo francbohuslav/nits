@@ -44,8 +44,7 @@ const jiraApi = new JiraApi({
 const jiraModel = new JiraModel(jiraApi);
 const userController = new UserController(new UserModel(new UuIdendtityApi(), {}), userDataModel, jiraConnectionSettings);
 const userRequester = new UserRequester(userController, crypt);
-const timesheetModel = new DummyTimesheetModel();
-const syncController = new SyncController(userDataModel, jiraModel, timesheetModel);
+const syncController = new SyncController(userDataModel, jiraModel, (_acc1, _acc2) => new DummyTimesheetModel());
 const syncRequester = new SyncRequester(syncController);
 
 //TODO: BF: remove
