@@ -1,5 +1,6 @@
 export class Router<TQueryParams> {
     public static PageMain = "/page/main/";
+    public static PageJiraSettings = "/page/jira-settings/";
 
     constructor(public route: string, public history: any, public location: any) {}
 

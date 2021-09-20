@@ -4,6 +4,8 @@ import List from "@material-ui/core/List";
 import ExitToApp from "@material-ui/icons/ExitToApp";
 import loginProvider from "../login-provider";
 import { useHistory } from "react-router-dom";
+import { Router } from "../router";
+import SettingsIcon from "@material-ui/icons/Settings";
 
 interface ISideMenuProps {
     open: boolean;
@@ -21,6 +23,12 @@ export const SideMenu = (props: ISideMenuProps) => {
     return (
         <Drawer anchor="right" open={props.open} onClose={props.onClose}>
             <List>
+                <ListItem button onClick={() => history.push(Router.PageJiraSettings)}>
+                    <ListItemIcon>
+                        <SettingsIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="JIRA settings" />
+                </ListItem>
                 <ListItem button onClick={logout}>
                     <ListItemIcon>
                         <ExitToApp />

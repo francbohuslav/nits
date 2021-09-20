@@ -1,13 +1,16 @@
 import { Box, Button, LinearProgress, TextField, Typography } from "@material-ui/core";
 import { ChangeEvent, useEffect, useState } from "react";
 import React = require("react");
+import { useHistory } from "react-router-dom";
 import { IUserDataResponse } from "../../common/ajax-interfaces";
 import ajax from "../ajax";
 import { thisApp } from "../app-provider";
+import { Router } from "../router";
 
 export const UserJiraSettings = () => {
     const [userData, setUserData] = useState<IUserDataResponse>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const history = useHistory();
 
     const loadData = async () => {
         setIsLoading(true);
@@ -21,7 +24,8 @@ export const UserJiraSettings = () => {
         const res = await ajax.post<string>("/server/set-user-data", userData);
         setIsLoading(false);
         if (res == "ok") {
-            thisApp().toast("Data saved");
+            thisApp().toast("Credentials successfully tested and saved");
+            history.push(Router.PageMain);
         } else {
             thisApp().toast("Data not saved", "error");
         }

@@ -43,7 +43,7 @@ export const Login = () => {
                 </Typography>
                 <Box mt={2} my={3}>
                     <Typography component="h2" variant="h5" align="center">
-                        Prove that you are worthy!
+                        Prove that you are worthy and enter UU credentials!
                     </Typography>
                 </Box>
                 <form noValidate onSubmit={onClick}>
