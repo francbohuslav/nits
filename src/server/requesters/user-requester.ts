@@ -1,39 +1,45 @@
-import { Request, Response } from "express";
-import { ILoginRequest, ILoginResponse, IUserDataResponse } from "../../common/ajax-interfaces";
+import { Request } from "express";
+import { ILoginRequest } from "../../common/ajax-interfaces";
 import { IUserData } from "../../common/interfaces";
 import { UserController } from "../controllers/user-controller";
-import { Crypt } from "../helpers/crypt";
+import { BaseRequester } from "./base-requester";
 
-export class UserRequester {
-    constructor(private userController: UserController, private crypt: Crypt) {}
+export class UserRequester extends BaseRequester {
+    constructor(private userController: UserController) {
+        super();
+    }
 
-    public async login(req: Request): Promise<ILoginResponse> {
+    public async login(req: Request): Promise<boolean> {
         const request = req.body as ILoginRequest;
-        const response: ILoginResponse = {
-            loginToken: null,
-        };
         const uid = await this.userController.login(request.accessCode1, request.accessCode2);
         if (!uid) {
             throw new Error("Wrong credentials");
         }
-        response.loginToken = this.crypt.encrypt(uid);
-        return response;
+        this.getSession(req).uid = uid;
+        return true;
     }
 
-    public async getUserData(_req: Request, res: Response): Promise<IUserDataResponse> {
-        if (!res.locals?.uid) {
+    public async logout(req: Request): Promise<boolean> {
+        this.getSession(req).uid = null;
+        return true;
+    }
+
+    public async getUserData(req: Request): Promise<IUserData> {
+        const uid = this.getSession(req).uid;
+        if (!uid) {
             throw new Error("UID not set");
         }
-        const userData = await this.userController.getUserData(res.locals.uid);
-        return { ...userData };
+        const userData = await this.userController.getUserData(uid);
+        return userData;
     }
 
-    public async setUserData(req: Request, res: Response): Promise<string> {
+    public async setUserData(req: Request): Promise<boolean> {
+        const uid = this.getSession(req).uid;
         const request = req.body as IUserData;
-        if (!res.locals?.uid) {
+        if (!uid) {
             throw new Error("UID not set");
         }
-        await this.userController.setUserData(res.locals.uid, request);
-        return "ok";
+        await this.userController.setUserData(uid, request);
+        return true;
     }
 }

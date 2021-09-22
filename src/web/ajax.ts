@@ -1,25 +1,26 @@
+import { useHistory } from "react-router";
+import { IBaseResponse } from "../common/ajax-interfaces";
 import { thisApp } from "./app-provider";
-import loginProvider from "./login-provider";
 
 class Ajax {
-    public async post<T>(url: string, data = {}, throwException: boolean = false): Promise<T> {
+    constructor(private history: any) {}
+
+    public async post<T>(url: string, data = {}, throwException: boolean = false): Promise<IBaseResponse<T>> {
         const response = await fetch(url, {
             method: "POST",
             cache: "no-cache",
             headers: {
                 "Content-Type": "application/json",
-                LoginToken: loginProvider.getToken(),
             },
             body: JSON.stringify(data),
         });
         return await this.processResult<T>(response, throwException);
     }
 
-    public async postFormData<T>(url: string, formData: FormData): Promise<T> {
+    public async postFormData<T>(url: string, formData: FormData): Promise<IBaseResponse<T>> {
         return new Promise((resolve) => {
             const request = new XMLHttpRequest();
             request.open("POST", url);
-            request.setRequestHeader("LoginToken", loginProvider.getToken());
             request.onreadystatechange = function () {
                 if (request.readyState === 4) {
                     resolve(request.response);
@@ -29,45 +30,41 @@ class Ajax {
         });
     }
 
-    public async get<T>(url: string): Promise<T> {
+    public async get<T>(url: string): Promise<IBaseResponse<T>> {
         const response = await fetch(url, {
             method: "GET",
             cache: "no-cache",
             headers: {
                 "Content-Type": "application/json",
-                LoginToken: loginProvider.getToken(),
             },
         });
         return await this.processResult<T>(response, false);
     }
 
     private goToLogin() {
-        loginProvider.logout();
-        location.reload();
+        this.history.push("/");
     }
 
-    private async processResult<T>(response: any, throwException: boolean) {
+    private async processResult<T>(response: any, throwException: boolean): Promise<IBaseResponse<T>> {
         if (!response.ok) {
             if (response.status == 401) {
                 this.goToLogin();
                 return null;
             }
-            thisApp().alert(response.statusText);
-            if (throwException) {
-                throw response.statusText;
-            }
-            return null;
         }
-        const json = await response.json();
-        if (json.result === "error") {
-            thisApp().alert(json);
+        const json: IBaseResponse<T> = await response.json();
+        json.isOk = response.ok;
+        if (!json.isOk) {
+            thisApp().alert({ ...json, time: new Date() });
             if (throwException) {
                 throw json;
             }
-            return null;
         }
-        return json as T;
+        return json;
     }
 }
 
-export default new Ajax();
+export const useAjax = () => {
+    const history = useHistory();
+    return new Ajax(history);
+};

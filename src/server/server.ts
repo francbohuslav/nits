@@ -1,5 +1,6 @@
 import express = require("express");
 import compression from "compression";
+import session = require("express-session");
 import fs from "fs";
 import os from "os";
 import http from "http";
@@ -12,7 +13,7 @@ import { Crypt } from "./helpers/crypt";
 import { UserController } from "./controllers/user-controller";
 import { UserModel } from "./models/user-model";
 import { UuIdendtityApi } from "./apis/uu-identity-api";
-import { TokenAuthorizer } from "./helpers/token-authorizer";
+import { LoginAuthorizer } from "./helpers/login-authorizer";
 import { UserDataModel } from "./models/user-data-model";
 import { SyncRequester } from "./requesters/sync-requester";
 import { SyncController } from "./controllers/sync-controller";
@@ -20,6 +21,7 @@ import { JiraModel } from "./models/jira/jira-model";
 import { DummyTimesheetModel } from "./models/uu/dummy-timesheet-model";
 import { JiraApi } from "./apis/jira-api";
 import { JiraApiOptions } from "jira-client";
+import { IBaseResponse } from "../common/ajax-interfaces";
 
 const isDevelopment = os.hostname().toLowerCase() == "msi";
 if (isDevelopment) {
@@ -34,8 +36,8 @@ const jiraConnectionSettings: JiraApiOptions = {
 const projectConfig = new ProjectConfigurer().getProjectConfig();
 const crypt = new Crypt(projectConfig.cryptoSalt);
 const userDataModel = new UserDataModel(path.join(__dirname, "../../../userdata/users"), crypt, projectConfig);
-const tokenAuthorizer = new TokenAuthorizer(crypt);
-const tokenAuthorize = tokenAuthorizer.tokenAuthorize.bind(tokenAuthorizer);
+const loginAuthorizer = new LoginAuthorizer();
+const loginAuthorize = loginAuthorizer.loginAuthorize.bind(loginAuthorizer);
 const jiraApi = new JiraApi({
     ...jiraConnectionSettings,
     username: "bohuslav.franc@unicorn.com",
@@ -43,7 +45,7 @@ const jiraApi = new JiraApi({
 });
 const jiraModel = new JiraModel(jiraApi);
 const userController = new UserController(new UserModel(new UuIdendtityApi(), {}), userDataModel, jiraConnectionSettings);
-const userRequester = new UserRequester(userController, crypt);
+const userRequester = new UserRequester(userController);
 const syncController = new SyncController(userDataModel, jiraModel, (_acc1, _acc2) => new DummyTimesheetModel());
 const syncRequester = new SyncRequester(syncController);
 
@@ -52,18 +54,25 @@ const syncRequester = new SyncRequester(syncController);
 
 const app = express();
 app.use(compression());
+app.use(
+    session({
+        secret: "verySecretSession",
+        resave: false,
+        saveUninitialized: true,
+    })
+);
 app.use(json());
 
 function sendError(res: Response, ex: any) {
     console.log(ex);
+    res.status(400);
     res.send(
         JSON.stringify(
             {
-                result: "error",
                 message: ex.message,
                 statusText: ex.response?.statusText,
                 stack: ex.response?.data || ex.stack,
-            },
+            } as IBaseResponse<unknown>,
             null,
             2
         )
@@ -72,16 +81,19 @@ function sendError(res: Response, ex: any) {
 
 const methods: any[] = [
     ["post", "/server/login", userRequester.login.bind(userRequester)],
-    ["get", "/server/get-user-data", userRequester.getUserData.bind(userRequester), tokenAuthorize],
-    ["post", "/server/set-user-data", userRequester.setUserData.bind(userRequester), tokenAuthorize],
+    ["post", "/server/logout", userRequester.logout.bind(userRequester)],
+    ["get", "/server/get-user-data", userRequester.getUserData.bind(userRequester), loginAuthorize],
+    ["post", "/server/set-user-data", userRequester.setUserData.bind(userRequester), loginAuthorize],
     ["get", "/server/sync", syncRequester.sync.bind(syncRequester)],
 ];
 
 const processRequest = (method: (req: express.Request, res: express.Response) => any) => async (req: express.Request, res: express.Response) => {
     try {
-        const result = await method(req, res);
-        //TODO: BF: indentovani odebrat, at to neni velke
-        res.send(JSON.stringify(result, null, 2));
+        const dataResult = await method(req, res);
+        const result: IBaseResponse<unknown> = {
+            data: dataResult,
+        };
+        res.send(isDevelopment ? JSON.stringify(result, null, 2) : JSON.stringify(result));
     } catch (ex) {
         sendError(res, ex);
     }

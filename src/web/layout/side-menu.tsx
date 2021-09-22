@@ -2,10 +2,10 @@ import React = require("react");
 import { Drawer, ListItem, ListItemIcon, ListItemText } from "@material-ui/core";
 import List from "@material-ui/core/List";
 import ExitToApp from "@material-ui/icons/ExitToApp";
-import loginProvider from "../login-provider";
 import { useHistory } from "react-router-dom";
 import { Router } from "../router";
 import SettingsIcon from "@material-ui/icons/Settings";
+import { useAjax } from "../ajax";
 
 interface ISideMenuProps {
     open: boolean;
@@ -14,9 +14,10 @@ interface ISideMenuProps {
 
 export const SideMenu = (props: ISideMenuProps) => {
     const history = useHistory();
+    const ajax = useAjax();
 
     const logout = async () => {
-        loginProvider.logout();
+        await ajax.post<boolean>("/server/logout/");
         history.push("/");
     };
 

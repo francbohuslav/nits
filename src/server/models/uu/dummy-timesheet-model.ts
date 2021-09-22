@@ -17,7 +17,7 @@ export class DummyTimesheetModel implements ITimesheetModel {
             report.log.push(`Removing timesheet ${ts}`);
         }
     }
-    public async getLastUserTimesheets(userData: IUserData): Promise<Timesheet[]> {
+    public async getLastUserTimesheets(_userData: IUserData): Promise<Timesheet[]> {
         //TODO: BF: nejaka pekna data
         return [new Timesheet(), new Timesheet()];
     }

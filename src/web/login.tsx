@@ -1,39 +1,29 @@
 import React = require("react");
 import { TextField, Button, Typography, Container, Box } from "@material-ui/core";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { useState } from "react";
-import Ajax from "./ajax";
 import { Router } from "./router";
-import { ILoginRequest, ILoginResponse } from "../common/ajax-interfaces";
-import loginProvider from "./login-provider";
+import { ILoginRequest } from "../common/ajax-interfaces";
 import { thisApp } from "./app-provider";
+import { useAjax } from "./ajax";
 
 export const Login = () => {
     const [accessCodes, setAccessCodes] = useState<ILoginRequest>({ accessCode1: null, accessCode2: null });
     const history = useHistory();
-    const location = useLocation();
+    const ajax = useAjax();
 
     const onClick = async (e: React.FormEvent) => {
         e.preventDefault();
-        const response = await Ajax.post<ILoginResponse>("/server/login/", accessCodes);
-        processResponse(response);
-    };
-
-    const processResponse = (response: ILoginResponse) => {
-        if (response.loginToken) {
-            loginProvider.login(response.loginToken);
+        const response = await ajax.post<boolean>("/server/login/", accessCodes);
+        if (response.isOk) {
             history.push(Router.PageMain);
         } else {
-            loginProvider.logout();
             thisApp().alert(response.message || "Sorry bro, your access codes are wrong.");
         }
     };
+
     const accCode1Changed = (e: any) => setAccessCodes({ ...accessCodes, accessCode1: e.target.value });
     const accCode2Changed = (e: any) => setAccessCodes({ ...accessCodes, accessCode2: e.target.value });
-
-    if (loginProvider.isLogged()) {
-        history.push(Router.PageMain + location.search);
-    }
 
     return (
         <>

@@ -4,7 +4,6 @@ import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import { AppProvider } from "./app-provider";
 import { UserJiraSettings } from "./components/user-jira-settings";
 import { DataProvider } from "./data-context";
-import { LoggedUser } from "./logged-user";
 import { Login } from "./login";
 import { MainLayout } from "./main-layout";
 import { Router } from "./router";
@@ -22,27 +21,23 @@ export const App = () => {
                 <AppProvider>
                     <Switch>
                         <Route path={Router.PageMain}>
-                            <LoggedUser>
-                                <DataProvider>
-                                    <MainLayout>
-                                        <Typography variant="h1">Welcome to NITS</Typography>
-                                        <Typography variant="body1">
-                                            The only thing you can do here is set up <Link to={Router.PageJiraSettings}>access to Jira</Link>.
-                                        </Typography>
-                                    </MainLayout>
-                                </DataProvider>
-                            </LoggedUser>
+                            <DataProvider>
+                                <MainLayout>
+                                    <Typography variant="h1">Welcome to NITS</Typography>
+                                    <Typography variant="body1">
+                                        The only thing you can do here is set up <Link to={Router.PageJiraSettings}>access to Jira</Link>.
+                                    </Typography>
+                                </MainLayout>
+                            </DataProvider>
                         </Route>
                         <Route path={Router.PageJiraSettings}>
-                            <LoggedUser>
-                                <DataProvider>
-                                    <MainLayout>
-                                        <Box style={{ maxWidth: "500px" }}>
-                                            <UserJiraSettings />
-                                        </Box>
-                                    </MainLayout>
-                                </DataProvider>
-                            </LoggedUser>
+                            <DataProvider>
+                                <MainLayout>
+                                    <Box style={{ maxWidth: "500px" }}>
+                                        <UserJiraSettings />
+                                    </Box>
+                                </MainLayout>
+                            </DataProvider>
                         </Route>
                         <Route path="/">
                             <Login />

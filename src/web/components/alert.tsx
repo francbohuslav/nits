@@ -17,7 +17,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 export interface IAlertProps {
     message?: string;
     stack?: string;
-    time: Date;
+    time?: Date;
 }
 
 export const Alert = (props: IAlertProps) => {

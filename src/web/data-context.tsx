@@ -1,7 +1,7 @@
 import React = require("react");
 import { useState } from "react";
-import ajax from "./ajax";
-import { IUserDataResponse } from "../common/ajax-interfaces";
+import { IUserData } from "../common/interfaces";
+import { useAjax } from "./ajax";
 
 interface IDataContextProps {
     children: any;
@@ -16,11 +16,14 @@ export const DataContext = React.createContext<IDataContextValue>(null);
 export const DataProvider = (props: IDataContextProps) => {
     const [isLoading, setLoading] = useState<boolean>(false);
     const [name, setName] = useState<string>(null);
+    const ajax = useAjax();
 
     const loadName = async () => {
         setLoading(true);
-        const userData = await ajax.get<IUserDataResponse>("/server/get-user-data");
-        setName(userData.name);
+        const res = await ajax.get<IUserData>("/server/get-user-data");
+        if (res.isOk) {
+            setName(res.data.name);
+        }
         setLoading(false);
     };
 

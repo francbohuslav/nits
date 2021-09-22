@@ -2,28 +2,31 @@ import { Box, Button, LinearProgress, TextField, Typography } from "@material-ui
 import { ChangeEvent, useEffect, useState } from "react";
 import React = require("react");
 import { useHistory } from "react-router-dom";
-import { IUserDataResponse } from "../../common/ajax-interfaces";
-import ajax from "../ajax";
+import { IUserData } from "../../common/interfaces";
+import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
 import { Router } from "../router";
 
 export const UserJiraSettings = () => {
-    const [userData, setUserData] = useState<IUserDataResponse>(null);
+    const [userData, setUserData] = useState<IUserData>(null);
     const [isLoading, setIsLoading] = useState(false);
     const history = useHistory();
+    const ajax = useAjax();
 
     const loadData = async () => {
         setIsLoading(true);
-        const data = await ajax.get<IUserDataResponse>("/server/get-user-data");
-        setUserData(data);
+        const res = await ajax.get<IUserData>("/server/get-user-data");
+        if (res.isOk) {
+            setUserData(res.data);
+        }
         setIsLoading(false);
     };
 
     const saveData = async () => {
         setIsLoading(true);
-        const res = await ajax.post<string>("/server/set-user-data", userData);
+        const res = await ajax.post<boolean>("/server/set-user-data", userData);
         setIsLoading(false);
-        if (res == "ok") {
+        if (res.isOk) {
             thisApp().toast("Credentials successfully tested and saved");
             history.push(Router.PageMain);
         } else {
