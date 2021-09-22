@@ -27,6 +27,9 @@ const isDevelopment = os.hostname().toLowerCase() == "msi";
 if (isDevelopment) {
     process.env.NITS_CRYPTO_SALT = "developmentSalt";
 }
+process.env.NITS_JIRA_USERNAME = process.env.NITS_JIRA_USERNAME.trim();
+process.env.NITS_JIRA_PASSWORD = process.env.NITS_JIRA_PASSWORD.trim();
+console.log(`Using JIRA username ${process.env.NITS_JIRA_USERNAME}`);
 const jiraConnectionSettings: JiraApiOptions = {
     protocol: "https",
     host: "intelis.atlassian.net",
@@ -40,8 +43,8 @@ const loginAuthorizer = new LoginAuthorizer();
 const loginAuthorize = loginAuthorizer.loginAuthorize.bind(loginAuthorizer);
 const jiraApi = new JiraApi({
     ...jiraConnectionSettings,
-    username: "bohuslav.franc@unicorn.com",
-    password: "******",
+    username: process.env.NITS_JIRA_USERNAME,
+    password: process.env.NITS_JIRA_PASSWORD,
 });
 const jiraModel = new JiraModel(jiraApi);
 const userController = new UserController(new UserModel(new UuIdendtityApi(), {}), userDataModel, jiraConnectionSettings);

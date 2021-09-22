@@ -1,3 +1,5 @@
+import { useHistory, useLocation } from "react-router";
+
 export class Router<TQueryParams> {
     public static PageMain = "/page/main/";
     public static PageJiraSettings = "/page/jira-settings/";
@@ -19,4 +21,8 @@ export class Router<TQueryParams> {
         const newUrl = this.route + "?" + new URLSearchParams(newQuery as any).toString();
         this.history.push(newUrl);
     }
+}
+
+export function useRouter<TQueryParams>(route: string): Router<TQueryParams> {
+    return new Router<TQueryParams>(route, useHistory(), useLocation());
 }
