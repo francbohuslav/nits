@@ -22,14 +22,13 @@ import { DummyTimesheetModel } from "./models/uu/dummy-timesheet-model";
 import { JiraApi } from "./apis/jira-api";
 import { JiraApiOptions } from "jira-client";
 import { IBaseResponse } from "../common/ajax-interfaces";
+import dotenv from "dotenv";
+dotenv.config();
 
 const isDevelopment = os.hostname().toLowerCase() == "msi";
-if (isDevelopment) {
-    process.env.NITS_CRYPTO_SALT = "developmentSalt";
-}
-process.env.NITS_JIRA_USERNAME = process.env.NITS_JIRA_USERNAME.trim();
-process.env.NITS_JIRA_PASSWORD = process.env.NITS_JIRA_PASSWORD.trim();
-console.log(`Using JIRA username ${process.env.NITS_JIRA_USERNAME}`);
+
+console.log(`Using JIRA username '${process.env.NITS_JIRA_USERNAME}'`);
+
 const jiraConnectionSettings: JiraApiOptions = {
     protocol: "https",
     host: "intelis.atlassian.net",

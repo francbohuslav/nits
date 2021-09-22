@@ -6,3 +6,4 @@
 /userdata/*.json
 /userdata/attachments/
 /userdata/users/*.data
+/.env
