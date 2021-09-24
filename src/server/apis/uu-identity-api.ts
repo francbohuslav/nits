@@ -9,8 +9,7 @@ export class UuIdendtityApi {
             accessCode2,
             scope: "openid https://",
         });
-        const now = dateUtils.getActualTimestamp();
-        return { ...response.data, expirationTimestamp: now + response.data.expires_in - 3 * 60 };
+        return { ...response.data, expirationTimestamp: dateUtils.toTimestamp() + response.data.expires_in - 3 * 60 };
     }
 
     public async getIdentity(token: string): Promise<IIdentityResponse> {

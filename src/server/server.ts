@@ -11,18 +11,19 @@ import { UserRequester } from "./requesters/user-requester";
 import { ProjectConfigurer } from "./project-config";
 import { Crypt } from "./helpers/crypt";
 import { UserController } from "./controllers/user-controller";
-import { UserModel } from "./models/user-model";
 import { UuIdendtityApi } from "./apis/uu-identity-api";
 import { LoginAuthorizer } from "./helpers/login-authorizer";
 import { UserDataModel } from "./models/user-data-model";
 import { SyncRequester } from "./requesters/sync-requester";
 import { SyncController } from "./controllers/sync-controller";
 import { JiraModel } from "./models/jira/jira-model";
-import { DummyTimesheetModel } from "./models/uu/dummy-timesheet-model";
 import { JiraApi } from "./apis/jira-api";
 import { JiraApiOptions } from "jira-client";
 import { IBaseResponse } from "../common/ajax-interfaces";
 import dotenv from "dotenv";
+import { ReadOnlyTimesheetModel } from "./models/uu/readonly-timesheet-model";
+import { UuUserModel } from "./models/uu-user-model";
+import { WtmApi } from "./apis/wtm-api";
 dotenv.config();
 
 const isDevelopment = os.hostname().toLowerCase() == "msi";
@@ -46,13 +47,11 @@ const jiraApi = new JiraApi({
     password: process.env.NITS_JIRA_PASSWORD,
 });
 const jiraModel = new JiraModel(jiraApi);
-const userController = new UserController(new UserModel(new UuIdendtityApi(), {}), userDataModel, jiraConnectionSettings);
+const uuUserModel = new UuUserModel(new UuIdendtityApi(), {});
+const userController = new UserController(uuUserModel, userDataModel, jiraConnectionSettings);
 const userRequester = new UserRequester(userController);
-const syncController = new SyncController(userDataModel, jiraModel, (_acc1, _acc2) => new DummyTimesheetModel());
+const syncController = new SyncController(userDataModel, jiraModel, (acc1, acc2) => new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi()));
 const syncRequester = new SyncRequester(syncController);
-
-//TODO: BF: remove
-// (() => syncController.sync())();
 
 const app = express();
 app.use(compression());

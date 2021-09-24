@@ -14,8 +14,7 @@ export class Worklog {
     public startedDate: Date;
 
     public toString(): string {
-        //TODO: BF: dodat nejakou identifikac
-        return "JIRA Worklog";
+        return `JIRA Worklog ${this.author.displayName} ${this.started}`;
     }
 }
 

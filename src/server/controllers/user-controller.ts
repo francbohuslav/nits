@@ -1,14 +1,14 @@
 import { IUserData } from "../../common/interfaces";
 import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
-import { IUserIdentity, UserModel } from "../models/user-model";
+import { IUserIdentity, UuUserModel } from "../models/uu-user-model";
 import { JiraApiOptions } from "jira-client";
 import { JiraApi } from "../apis/jira-api";
 
 export class UserController {
     private authenticatedUsers: IUserIdentity[] = [];
 
-    constructor(private userModel: UserModel, private userDataModel: UserDataModel, private jiraDefaultSettings: JiraApiOptions) {}
+    constructor(private uuUserModel: UuUserModel, private userDataModel: UserDataModel, private jiraDefaultSettings: JiraApiOptions) {}
 
     /**
      * @returns UID
@@ -20,7 +20,7 @@ export class UserController {
         }
         let identity: IUserIdentity;
         try {
-            identity = await this.userModel.getUuUserIdentity(accessCode1, accessCode2);
+            identity = await this.uuUserModel.getUuUserIdentity(accessCode1, accessCode2);
         } catch (err) {
             console.log("Auth: not worthy");
             return null;

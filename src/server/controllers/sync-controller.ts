@@ -2,10 +2,10 @@ import { ISyncReport } from "../models/interfaces";
 import { Worklog } from "../models/jira/interfaces";
 import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
-import { TimesheetFactoryHandler } from "../models/uu/interfaces";
+import { TimesheetModelFactoryHandler } from "../models/uu/interfaces";
 
 export class SyncController {
-    constructor(private userDataModel: UserDataModel, private jiraModel: JiraModel, private timesheetModelFactory: TimesheetFactoryHandler) {}
+    constructor(private userDataModel: UserDataModel, private jiraModel: JiraModel, private timesheetModelFactory: TimesheetModelFactoryHandler) {}
 
     public async sync(): Promise<ISyncReport[]> {
         const userDataList = await this.userDataModel.getAllValidUserData();
@@ -24,11 +24,11 @@ export class SyncController {
                 uid: userData?.uid || worklogList[0].author.displayName,
                 log: [],
             };
-            reportList.push(report);
             if (!userData) {
-                report.log.push("User is not logged into NITS, skipped.");
+                //report.log.push("User is not logged into NITS, skipped.");
                 continue;
             }
+            reportList.push(report);
             try {
                 const timesheetModel = this.timesheetModelFactory(userData.uuAccessCode1, userData.uuAccessCode2);
                 const newTimesheets = timesheetModel.convertWorklogsToTimesheets(worklogList);

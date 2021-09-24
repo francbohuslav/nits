@@ -2,7 +2,7 @@ import { IUserData } from "../../../common/interfaces";
 import { ISyncReport } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
 
-export type TimesheetFactoryHandler = (accessCode1: string, accessCode2: string) => ITimesheetModel;
+export type TimesheetModelFactoryHandler = (accessCode1: string, accessCode2: string) => ITimesheetModel;
 
 export interface ITimesheetModel {
     saveTimesheets(newTimesheets: Timesheet[], report: ISyncReport): Promise<void>;
@@ -12,8 +12,8 @@ export interface ITimesheetModel {
 }
 
 export class Timesheet {
-    public datetimeFrom: Date;
-    public datetimeTo: Date;
+    public datetimeFrom: string;
+    public datetimeTo: string;
     public subject: string;
     public supplierContract: string;
     public category: string;
@@ -21,7 +21,6 @@ export class Timesheet {
     public description: string;
 
     public toString(): string {
-        //TODO: BF: dodat nejakou identifikac
-        return `UU Timesheet: ${this.description}`;
+        return `UU Timesheet: ${this.datetimeFrom} - ${this.description}`;
     }
 }

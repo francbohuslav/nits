@@ -2,7 +2,7 @@ import dateUtils from "../../common/date-utils";
 import { IIdentityResponse_Identity, ITokenResponse, UuIdendtityApi } from "../apis/uu-identity-api";
 const md5 = require("md5");
 
-export class UserModel {
+export class UuUserModel {
     constructor(private uuIdendtityApi: UuIdendtityApi, private tokenCache: ITokensMemory) {}
 
     public async getUuUserIdentity(accessCode1: string, accessCode2: string): Promise<IUserIdentity> {
@@ -22,10 +22,9 @@ export class UserModel {
         };
     }
 
-    private async getToken(accessCode1: string, accessCode2: string): Promise<ITokenResponse> {
+    public async getToken(accessCode1: string, accessCode2: string): Promise<ITokenResponse> {
         const key = md5(accessCode1 + "|" + accessCode2);
-        const now = dateUtils.getActualTimestamp();
-        if (this.tokenCache[key] && now < this.tokenCache[key].expirationTimestamp) {
+        if (this.tokenCache[key] && dateUtils.toTimestamp() < this.tokenCache[key].expirationTimestamp) {
             return this.tokenCache[key];
         }
         const tokenResponse = await this.uuIdendtityApi.getToken(accessCode1, accessCode2);
