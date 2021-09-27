@@ -1,5 +1,5 @@
 const path = require("path"),
-    //  CopyPlugin = require("copy-webpack-plugin"),
+    CopyPlugin = require("copy-webpack-plugin"),
     HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
@@ -58,11 +58,9 @@ module.exports = {
             favicon: path.resolve(__dirname, "src", "web", "images", "favicon.png"),
             hash: true,
         }),
-        /*new CopyPlugin({
-            patterns: [
-                 { from: "src/web/scripts", to: "scripts" },
-            ],
-        }),*/
+        new CopyPlugin({
+            patterns: [{ from: "src/web/images", to: "images" }],
+        }),
     ],
 
     // When importing a module whose path matches one of the following, just

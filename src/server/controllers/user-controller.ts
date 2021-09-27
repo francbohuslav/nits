@@ -38,8 +38,8 @@ export class UserController {
         return await this.userDataModel.getUserData(uid);
     }
 
-    public async setUserData(uid: string, userData: IUserData): Promise<void> {
-        if (userData.jiraUserName && userData.jiraPassword) {
+    public async setUserData(uid: string, userData: IUserData): Promise<boolean> {
+        if (userData.jiraUserName) {
             const jiraModel = new JiraModel(
                 new JiraApi({
                     ...this.jiraDefaultSettings,
@@ -52,6 +52,7 @@ export class UserController {
         } else {
             userData.jiraAccountId = "";
         }
-        return this.userDataModel.setUserData(uid, userData);
+        this.userDataModel.setUserData(uid, userData);
+        return !!userData.jiraAccountId;
     }
 }

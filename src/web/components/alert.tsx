@@ -35,7 +35,7 @@ export const Alert = (props: IAlertProps) => {
 
     return (
         <Dialog open={open}>
-            <DialogTitle id="alert-dialog-title">Error</DialogTitle>
+            <DialogTitle id="alert-dialog-title">Chyba</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
                     {(() => {
@@ -58,7 +58,7 @@ export const Alert = (props: IAlertProps) => {
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose} color="secondary" autoFocus>
-                    Close
+                    Zavřít
                 </Button>
             </DialogActions>
         </Dialog>

@@ -18,7 +18,7 @@ export const Login = () => {
         if (response.isOk) {
             history.push(Router.PageMain);
         } else {
-            thisApp().alert(response.message || "Sorry bro, your access codes are wrong.");
+            thisApp().alert(response.message || "Nesprávné přihlašovací údaje.");
         }
     };
 
@@ -29,18 +29,18 @@ export const Login = () => {
         <>
             <Container maxWidth="sm" style={{ marginTop: "20vh" }}>
                 <Typography component="h1" variant="h3" align="center">
-                    NITS territory
+                    NITS
                 </Typography>
                 <Box mt={2} my={3}>
                     <Typography component="h2" variant="h5" align="center">
-                        Prove that you are worthy and enter UU credentials!
+                        Pro přihlášení použij UU údaje
                     </Typography>
                 </Box>
                 <form noValidate onSubmit={onClick}>
                     <TextField
                         margin="normal"
                         id="accessCode1"
-                        label="Access Code 1"
+                        label="Přístupový kód 1"
                         value={accessCodes.accessCode1}
                         type="password"
                         fullWidth
@@ -49,7 +49,7 @@ export const Login = () => {
                     <TextField
                         margin="normal"
                         id="accessCode2"
-                        label="Access Code 2"
+                        label="Přístupový kód 1"
                         value={accessCodes.accessCode2}
                         type="password"
                         fullWidth
@@ -58,7 +58,7 @@ export const Login = () => {
                     <Box mt={2}>
                         <Typography variant="body1" align="center">
                             <Button type="submit" color="primary" variant="contained">
-                                Login
+                                Přihlásit se
                             </Button>
                         </Typography>
                     </Box>

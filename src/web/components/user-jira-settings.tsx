@@ -27,10 +27,14 @@ export const UserJiraSettings = () => {
         const res = await ajax.post<boolean>("/server/set-user-data", userData);
         setIsLoading(false);
         if (res.isOk) {
-            thisApp().toast("Credentials successfully tested and saved");
+            if (res.data) {
+                thisApp().toast("Údaje úspěšně ověřeny a uloženy");
+            } else {
+                thisApp().toast("Údaje nebyly vyplněny. Synchronizace nebude použita.", "warning");
+            }
             history.push(Router.PageMain);
         } else {
-            thisApp().toast("Data not saved", "error");
+            thisApp().toast("Data nebyla uložena", "error");
         }
     };
 
@@ -51,13 +55,13 @@ export const UserJiraSettings = () => {
             {isLoading && <LinearProgress></LinearProgress>}
             {userData && (
                 <div>
-                    <Typography component="h1" variant="h5">
-                        Jira credentials
+                    <Typography component="h1" variant="h5" paragraph>
+                        JIRA údaje
                     </Typography>
                     <form noValidate onSubmit={onSubmit}>
                         <TextField
                             id="jiraUserName"
-                            label="Username"
+                            label="Uživatelské jméno"
                             value={userData.jiraUserName}
                             fullWidth
                             margin="dense"
@@ -74,7 +78,7 @@ export const UserJiraSettings = () => {
                         />
                         <Box mt={2}>
                             <Button type="submit" color="primary" variant="contained">
-                                Save
+                                Uložit
                             </Button>
                         </Box>
                     </form>

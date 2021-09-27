@@ -13,7 +13,7 @@ export class UserRequester extends BaseRequester {
         const request = req.body as ILoginRequest;
         const uid = await this.userController.login(request.accessCode1, request.accessCode2);
         if (!uid) {
-            throw new Error("Wrong credentials");
+            throw new Error("Nesprávné přihlašovací údaje");
         }
         this.getSession(req).uid = uid;
         return true;
@@ -27,7 +27,7 @@ export class UserRequester extends BaseRequester {
     public async getUserData(req: Request): Promise<IUserData> {
         const uid = this.getSession(req).uid;
         if (!uid) {
-            throw new Error("UID not set");
+            throw new Error("UID není nastaveno");
         }
         const userData = await this.userController.getUserData(uid);
         return userData;
@@ -37,9 +37,8 @@ export class UserRequester extends BaseRequester {
         const uid = this.getSession(req).uid;
         const request = req.body as IUserData;
         if (!uid) {
-            throw new Error("UID not set");
+            throw new Error("UID není nastaveno");
         }
-        await this.userController.setUserData(uid, request);
-        return true;
+        return await this.userController.setUserData(uid, request);
     }
 }
