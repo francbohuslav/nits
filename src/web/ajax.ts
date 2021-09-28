@@ -45,22 +45,27 @@ class Ajax {
         this.history.push("/");
     }
 
-    private async processResult<T>(response: any, throwException: boolean): Promise<IBaseResponse<T>> {
+    private async processResult<T>(response: Response, throwException: boolean): Promise<IBaseResponse<T>> {
         if (!response.ok) {
             if (response.status == 401) {
                 this.goToLogin();
                 return null;
             }
         }
-        const json: IBaseResponse<T> = await response.json();
-        json.isOk = response.ok;
-        if (!json.isOk) {
-            thisApp().alert({ ...json, time: new Date() });
-            if (throwException) {
-                throw json;
+        const text = await response.text();
+        try {
+            const json: IBaseResponse<T> = JSON.parse(text);
+            json.isOk = response.ok;
+            if (!json.isOk) {
+                thisApp().alert({ ...json, time: new Date() });
+                if (throwException) {
+                    throw json;
+                }
             }
+            return json;
+        } catch (err) {
+            thisApp().alert({ message: text, time: new Date() });
         }
-        return json;
     }
 }
 

@@ -24,6 +24,8 @@ import dotenv from "dotenv";
 import { ReadOnlyTimesheetModel } from "./models/uu/readonly-timesheet-model";
 import { UuUserModel } from "./models/uu-user-model";
 import { WtmApi } from "./apis/wtm-api";
+import { JiraRequester } from "./requesters/jira-requester";
+import { JiraController } from "./controllers/jira-controller";
 dotenv.config();
 
 const isDevelopment = os.hostname().toLowerCase() == "msi";
@@ -49,7 +51,9 @@ const jiraApi = new JiraApi({
 const jiraModel = new JiraModel(jiraApi);
 const uuUserModel = new UuUserModel(new UuIdendtityApi(), {});
 const userController = new UserController(uuUserModel, userDataModel, jiraConnectionSettings);
-const userRequester = new UserRequester(userController);
+const jiraController = new JiraController(userDataModel, crypt, jiraConnectionSettings);
+const userRequester = new UserRequester(userController, crypt);
+const jiraRequester = new JiraRequester(jiraController, crypt);
 const syncController = new SyncController(userDataModel, jiraModel, (acc1, acc2) => new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi()));
 const syncRequester = new SyncRequester(syncController);
 
@@ -83,8 +87,10 @@ function sendError(res: Response, ex: any) {
 const methods: any[] = [
     ["post", "/server/login", userRequester.login.bind(userRequester)],
     ["post", "/server/logout", userRequester.logout.bind(userRequester)],
-    ["get", "/server/get-user-data", userRequester.getUserData.bind(userRequester), loginAuthorize],
-    ["post", "/server/set-user-data", userRequester.setUserData.bind(userRequester), loginAuthorize],
+    ["get", "/server/get-user-public-data", userRequester.getUserPublicData.bind(userRequester), loginAuthorize],
+    ["get", "/server/get-user-session", userRequester.getUserSession.bind(userRequester), loginAuthorize],
+    ["post", "/server/logout-jira", userRequester.logoutJira.bind(userRequester), loginAuthorize],
+    ["get", "/server/jira/oauth", jiraRequester.oauth.bind(jiraRequester) , loginAuthorize],
     ["get", "/server/sync", syncRequester.sync.bind(syncRequester)],
 ];
 

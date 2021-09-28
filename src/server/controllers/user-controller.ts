@@ -1,9 +1,7 @@
 import { IUserData } from "../../common/interfaces";
-import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
 import { IUserIdentity, UuUserModel } from "../models/uu-user-model";
 import { JiraApiOptions } from "jira-client";
-import { JiraApi } from "../apis/jira-api";
 
 export class UserController {
     private authenticatedUsers: IUserIdentity[] = [];
@@ -38,21 +36,7 @@ export class UserController {
         return await this.userDataModel.getUserData(uid);
     }
 
-    public async setUserData(uid: string, userData: IUserData): Promise<boolean> {
-        if (userData.jiraUserName) {
-            const jiraModel = new JiraModel(
-                new JiraApi({
-                    ...this.jiraDefaultSettings,
-                    username: userData.jiraUserName,
-                    password: userData.jiraPassword,
-                })
-            );
-            const jiraUser = await jiraModel.getCurrentUser();
-            userData.jiraAccountId = jiraUser.accountId;
-        } else {
-            userData.jiraAccountId = "";
-        }
+    public async setUserData(uid: string, userData: IUserData): Promise<void> {
         this.userDataModel.setUserData(uid, userData);
-        return !!userData.jiraAccountId;
     }
 }

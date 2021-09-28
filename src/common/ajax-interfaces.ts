@@ -13,3 +13,10 @@ export interface ILoginRequest {
     accessCode1: string;
     accessCode2: string;
 }
+
+export interface IUserPublicData {
+    jiraAccountId: string;
+    jiraName: string;
+    uid: string;
+    name: string;
+}

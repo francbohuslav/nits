@@ -1,11 +1,12 @@
 import { Request } from "express";
-import { ILoginRequest } from "../../common/ajax-interfaces";
-import { IUserData } from "../../common/interfaces";
+import { ILoginRequest, IUserPublicData } from "../../common/ajax-interfaces";
+import dateUtils from "../../common/date-utils";
 import { UserController } from "../controllers/user-controller";
+import { Crypt } from "../helpers/crypt";
 import { BaseRequester } from "./base-requester";
 
 export class UserRequester extends BaseRequester {
-    constructor(private userController: UserController) {
+    constructor(private userController: UserController, private crypt: Crypt) {
         super();
     }
 
@@ -24,21 +25,27 @@ export class UserRequester extends BaseRequester {
         return true;
     }
 
-    public async getUserData(req: Request): Promise<IUserData> {
-        const uid = this.getSession(req).uid;
-        if (!uid) {
-            throw new Error("UID není nastaveno");
-        }
+    public async getUserPublicData(req: Request): Promise<IUserPublicData> {
+        const uid = this.getUid(req);
         const userData = await this.userController.getUserData(uid);
-        return userData;
+        return {
+            jiraAccountId: userData.jiraAccountId,
+            jiraName: userData.jiraName,
+            name: userData.name,
+            uid: userData.uid,
+        };
     }
 
-    public async setUserData(req: Request): Promise<boolean> {
-        const uid = this.getSession(req).uid;
-        const request = req.body as IUserData;
-        if (!uid) {
-            throw new Error("UID není nastaveno");
-        }
-        return await this.userController.setUserData(uid, request);
+    public async logoutJira(req: Request): Promise<void> {
+        const uid = this.getUid(req);
+        const userData = await this.userController.getUserData(uid);
+        userData.jiraAccountId = null;
+        await this.userController.setUserData(uid, userData);
+    }
+
+    public async getUserSession(req: Request): Promise<string> {
+        const uid = this.getUid(req);
+        const pattern = uid + "|" + dateUtils.toIsoFormat();
+        return this.crypt.encrypt(pattern);
     }
 }

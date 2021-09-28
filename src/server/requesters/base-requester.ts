@@ -1,8 +1,16 @@
 import { Request } from "express";
 
 export abstract class BaseRequester {
-    public getSession(req: Request): ISession {
+    protected getSession(req: Request): ISession {
         return req.session as any;
+    }
+
+    protected getUid(req: Request): string {
+        const uid = this.getSession(req).uid;
+        if (!uid) {
+            throw new Error("UID není nastaveno");
+        }
+        return uid;
     }
 }
 

@@ -13,14 +13,13 @@ export class UserDataModel {
     }
 
     public async getUserData(uid: string): Promise<IUserData> {
-        const emptyUserData = {
+        const emptyUserData: IUserData = {
             uid,
             name: "",
             uuAccessCode1: "",
             uuAccessCode2: "",
             jiraAccountId: "",
-            jiraUserName: "",
-            jiraPassword: "",
+            jiraName: "",
         };
         const filePath = this.getUserFilePath(uid);
         try {
