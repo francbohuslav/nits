@@ -36,7 +36,7 @@ export const DataProvider = (props: IDataContextProps) => {
 
     //console.log("DataProvider");
     return (
-        <DataContext.Provider value={{ isLoading, name: userData?.name, isJiraOk: !!userData?.jiraAccountId, isAdmin: userData?.uid == "12-8835-1" }}>
+        <DataContext.Provider value={{ isLoading, name: userData?.name, isJiraOk: !!userData?.jiraAccountId, isAdmin: userData?.isAdmin }}>
             {props.children}
         </DataContext.Provider>
     );

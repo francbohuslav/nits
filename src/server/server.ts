@@ -41,8 +41,6 @@ const jiraConnectionSettings: JiraApiOptions = {
 const projectConfig = new ProjectConfigurer().getProjectConfig();
 const crypt = new Crypt(projectConfig.cryptoSalt);
 const userDataModel = new UserDataModel(path.join(__dirname, "../../../userdata/users"), crypt, projectConfig);
-const loginAuthorizer = new LoginAuthorizer();
-const loginAuthorize = loginAuthorizer.loginAuthorize.bind(loginAuthorizer);
 const jiraApi = new JiraApi({
     ...jiraConnectionSettings,
     username: process.env.NITS_JIRA_USERNAME,
@@ -52,6 +50,10 @@ const jiraModel = new JiraModel(jiraApi);
 const uuUserModel = new UuUserModel(new UuIdendtityApi(), {});
 const userController = new UserController(uuUserModel, userDataModel, jiraConnectionSettings);
 const jiraController = new JiraController(userDataModel, crypt, jiraConnectionSettings);
+// Requests
+const loginAuthorizer = new LoginAuthorizer(userController);
+const loginAuthorize = loginAuthorizer.loginAuthorize.bind(loginAuthorizer);
+const adminAuthorize = loginAuthorizer.adminAuthorize.bind(loginAuthorizer);
 const userRequester = new UserRequester(userController, crypt);
 const jiraRequester = new JiraRequester(jiraController, crypt);
 const syncController = new SyncController(userDataModel, jiraModel, (acc1, acc2) => new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi()));
@@ -92,6 +94,9 @@ const methods: any[] = [
     ["post", "/server/logout-jira", userRequester.logoutJira.bind(userRequester), loginAuthorize],
     ["get", "/server/jira/oauth", jiraRequester.oauth.bind(jiraRequester)],
     ["get", "/server/sync", syncRequester.sync.bind(syncRequester)],
+
+    // admin commands
+    //["get", "/server/get-project-settings", projectsRequester.sync.bind(projectsRequester), adminAuthorize],
 ];
 
 const processRequest = (method: (req: express.Request, res: express.Response) => any) => async (req: express.Request, res: express.Response) => {

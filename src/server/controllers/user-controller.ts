@@ -39,4 +39,9 @@ export class UserController {
     public async setUserData(uid: string, userData: IUserData): Promise<void> {
         this.userDataModel.setUserData(uid, userData);
     }
+
+    public isAdmin(uid: string): boolean {
+        const admins = process.env.NITS_ADMIN_UIDS.trim().split(/\s*,\s*/);
+        return admins.indexOf(uid) > -1;
+    }
 }

@@ -37,9 +37,8 @@ export const MainPage = () => {
     const history = useHistory();
     const ajax = useAjax();
 
-    const onJira = () => {
-        history.push(Router.PageJiraSettings);
-    };
+    const onJira = () => history.push(Router.PageJiraSettings);
+    const onProjectSetting = () => history.push(Router.PageProjectSettings);
 
     const onLogout = async () => {
         await ajax.post<boolean>(Router.PageLogout);
@@ -108,7 +107,7 @@ export const MainPage = () => {
             </Box>
             {isAdmin && (
                 <ButtonRow>
-                    <Button disabled className={classes.button} variant="contained" startIcon={<SettingsIcon />} fullWidth>
+                    <Button className={classes.button} variant="contained" startIcon={<SettingsIcon />} fullWidth onClick={onProjectSetting}>
                         Nastavení
                     </Button>
                 </ButtonRow>

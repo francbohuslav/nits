@@ -33,6 +33,7 @@ export class UserRequester extends BaseRequester {
             jiraName: userData.jiraName,
             name: userData.name,
             uid: userData.uid,
+            isAdmin: this.userController.isAdmin(uid),
         };
     }
 

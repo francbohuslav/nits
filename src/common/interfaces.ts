@@ -6,3 +6,9 @@ export interface IUserData {
     uid: string;
     name: string;
 }
+
+export interface IProjectSettings {
+    jiraProjectCode: string;
+    jiraNitsField: string;
+    uuArtifact: string;
+}

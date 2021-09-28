@@ -19,4 +19,5 @@ export interface IUserPublicData {
     jiraName: string;
     uid: string;
     name: string;
+    isAdmin: boolean;
 }
