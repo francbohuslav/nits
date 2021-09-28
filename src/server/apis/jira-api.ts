@@ -54,7 +54,7 @@ export class JiraApi {
         response.projects.forEach((project: any) => {
             project.issuetypes.forEach((issuetype: any) => {
                 const nitsFiled = issuetype?.fields[this.projectConfig.nitsCustomField];
-                nitsFiled.allowedValues?.forEach((field: any) => {
+                nitsFiled?.allowedValues?.forEach((field: any) => {
                     values[field.id] = field.value;
                 });
             });

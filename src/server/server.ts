@@ -56,7 +56,7 @@ const jiraApi = new JiraApi(
 const jiraModel = new JiraModel(jiraApi);
 const uuUserModel = new UuUserModel(new UuIdendtityApi(), {});
 const userController = new UserController(uuUserModel, userDataModel, jiraConnectionSettings);
-const jiraController = new JiraController(userDataModel, crypt, jiraConnectionSettings);
+const jiraController = new JiraController(userDataModel, crypt, projectConfig);
 const projectController = new ProjectController(projectDataModel, jiraApi);
 // Requests
 const loginAuthorizer = new LoginAuthorizer(userController);

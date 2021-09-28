@@ -1,5 +1,6 @@
 import { Box, Button, IconButton, LinearProgress, Tooltip, Typography } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
+import AddIcon from "@material-ui/icons/AddCircleRounded";
 import { useEffect, useState } from "react";
 import React = require("react");
 import { IProjectSettings } from "../../common/interfaces";
@@ -77,6 +78,13 @@ export const ProjectSettingsPage = () => {
         {
             field: "action",
             headerName: " ",
+            renderHeader: (_params) => (
+                <Tooltip title="Přidat záznam">
+                    <IconButton color="primary" size="small" onClick={onAdd}>
+                        <AddIcon />
+                    </IconButton>
+                </Tooltip>
+            ),
             renderCell: (params) => (
                 <Tooltip title="Smazat záznam">
                     <IconButton size="small" onClick={() => onDelete(params.row.id)}>
@@ -115,11 +123,7 @@ export const ProjectSettingsPage = () => {
                         />
                     </Typography>
                     <Box display="flex">
-                        <Box flexGrow={1}>
-                            <Button variant="contained" color="primary" onClick={onAdd}>
-                                Přidat záznam
-                            </Button>
-                        </Box>
+                        <Box flexGrow={1}></Box>
                         <Box>
                             <Button variant="contained" color="primary" onClick={onSave}>
                                 Uložit

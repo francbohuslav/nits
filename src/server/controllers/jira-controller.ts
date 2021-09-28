@@ -1,12 +1,12 @@
 import axios from "axios";
-import { JiraApiOptions } from "jira-client";
 import dateUtils from "../../common/date-utils";
 import { JiraApi } from "../apis/jira-api";
 import { Crypt } from "../helpers/crypt";
 import { UserDataModel } from "../models/user-data-model";
+import { IProjectConfig } from "../project-config";
 
 export class JiraController {
-    constructor(private userDataModel: UserDataModel, private crypt: Crypt, private jiraConnectionSettings: JiraApiOptions) {}
+    constructor(private userDataModel: UserDataModel, private crypt: Crypt, private projectConfig: IProjectConfig) {}
 
     public async processOAth(jiraAuthorizationCode: string, state: string) {
         const pattern = this.crypt.decrypt(state);
@@ -25,13 +25,16 @@ export class JiraController {
         const accessToken = response.data.access_token;
         console.log("accessToken", accessToken);
 
-        const jiraApi = new JiraApi({
-            protocol: "https",
-            host: "api.atlassian.com/ex/jira/15ab9731-71ff-4f9a-86ee-91d06e58fa50",
-            apiVersion: "3",
-            strictSSL: true,
-            bearer: accessToken,
-        });
+        const jiraApi = new JiraApi(
+            {
+                protocol: "https",
+                host: "api.atlassian.com/ex/jira/15ab9731-71ff-4f9a-86ee-91d06e58fa50",
+                apiVersion: "3",
+                strictSSL: true,
+                bearer: accessToken,
+            },
+            this.projectConfig
+        );
         console.log("Get current user");
         const account = await jiraApi.getCurrentUser();
 
