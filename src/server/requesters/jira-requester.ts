@@ -9,8 +9,7 @@ export class JiraRequester extends BaseRequester {
     }
 
     public async oauth(req: Request, res: Response): Promise<void> {
-        const uid = this.getUid(req);
-        await this.jiraController.processOAth(uid, req.query.code as string, req.query.state as string);
+        await this.jiraController.processOAth(req.query.code as string, req.query.state as string);
         res.redirect("/page/main/");
     }
 }

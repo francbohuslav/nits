@@ -90,7 +90,7 @@ const methods: any[] = [
     ["get", "/server/get-user-public-data", userRequester.getUserPublicData.bind(userRequester), loginAuthorize],
     ["get", "/server/get-user-session", userRequester.getUserSession.bind(userRequester), loginAuthorize],
     ["post", "/server/logout-jira", userRequester.logoutJira.bind(userRequester), loginAuthorize],
-    ["get", "/server/jira/oauth", jiraRequester.oauth.bind(jiraRequester) , loginAuthorize],
+    ["get", "/server/jira/oauth", jiraRequester.oauth.bind(jiraRequester)],
     ["get", "/server/sync", syncRequester.sync.bind(syncRequester)],
 ];
 

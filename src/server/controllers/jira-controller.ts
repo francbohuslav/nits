@@ -8,14 +8,11 @@ import { UserDataModel } from "../models/user-data-model";
 export class JiraController {
     constructor(private userDataModel: UserDataModel, private crypt: Crypt, private jiraConnectionSettings: JiraApiOptions) {}
 
-    public async processOAth(uid: string, jiraAuthorizationCode: string, state: string) {
+    public async processOAth(jiraAuthorizationCode: string, state: string) {
         const pattern = this.crypt.decrypt(state);
-        const [sUid, date] = pattern.split("|");
+        const [uid, date] = pattern.split("|");
         if (date !== dateUtils.toIsoFormat()) {
             throw new Error(`Authorization expired. Pattern: ${pattern}.`);
-        }
-        if (uid !== sUid) {
-            throw new Error(`This authorization is not for currently logged user ${uid}. Pattern: ${pattern}.`);
         }
         console.log("https://auth.atlassian.com/oauth/token");
         const response = await axios.post("https://auth.atlassian.com/oauth/token", {
