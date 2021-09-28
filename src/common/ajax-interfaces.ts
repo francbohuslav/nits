@@ -1,3 +1,5 @@
+import { IProjectSettings } from "./interfaces";
+
 export interface IBaseResponse<T> {
     message?: string;
     stack?: string;
@@ -20,4 +22,8 @@ export interface IUserPublicData {
     uid: string;
     name: string;
     isAdmin: boolean;
+}
+export interface IProjectSettingsResponse {
+    records: IProjectSettings[];
+    nitsFiledValues: { [key: string]: string };
 }

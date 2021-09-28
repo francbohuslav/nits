@@ -26,6 +26,9 @@ import { UuUserModel } from "./models/uu-user-model";
 import { WtmApi } from "./apis/wtm-api";
 import { JiraRequester } from "./requesters/jira-requester";
 import { JiraController } from "./controllers/jira-controller";
+import { ProjectRequester } from "./requesters/project-requester";
+import { ProjectController } from "./controllers/project-controller";
+import { ProjectDataModel } from "./models/project-data-model";
 dotenv.config();
 
 const isDevelopment = os.hostname().toLowerCase() == "msi";
@@ -41,15 +44,20 @@ const jiraConnectionSettings: JiraApiOptions = {
 const projectConfig = new ProjectConfigurer().getProjectConfig();
 const crypt = new Crypt(projectConfig.cryptoSalt);
 const userDataModel = new UserDataModel(path.join(__dirname, "../../../userdata/users"), crypt, projectConfig);
-const jiraApi = new JiraApi({
-    ...jiraConnectionSettings,
-    username: process.env.NITS_JIRA_USERNAME,
-    password: process.env.NITS_JIRA_PASSWORD,
-});
+const projectDataModel = new ProjectDataModel(path.join(__dirname, "../../../userdata/projects"));
+const jiraApi = new JiraApi(
+    {
+        ...jiraConnectionSettings,
+        username: process.env.NITS_JIRA_USERNAME,
+        password: process.env.NITS_JIRA_PASSWORD,
+    },
+    projectConfig
+);
 const jiraModel = new JiraModel(jiraApi);
 const uuUserModel = new UuUserModel(new UuIdendtityApi(), {});
 const userController = new UserController(uuUserModel, userDataModel, jiraConnectionSettings);
 const jiraController = new JiraController(userDataModel, crypt, jiraConnectionSettings);
+const projectController = new ProjectController(projectDataModel, jiraApi);
 // Requests
 const loginAuthorizer = new LoginAuthorizer(userController);
 const loginAuthorize = loginAuthorizer.loginAuthorize.bind(loginAuthorizer);
@@ -58,6 +66,7 @@ const userRequester = new UserRequester(userController, crypt);
 const jiraRequester = new JiraRequester(jiraController, crypt);
 const syncController = new SyncController(userDataModel, jiraModel, (acc1, acc2) => new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi()));
 const syncRequester = new SyncRequester(syncController);
+const projectReqester = new ProjectRequester(projectController);
 
 const app = express();
 app.use(compression());
@@ -96,7 +105,8 @@ const methods: any[] = [
     ["get", "/server/sync", syncRequester.sync.bind(syncRequester)],
 
     // admin commands
-    //["get", "/server/get-project-settings", projectsRequester.sync.bind(projectsRequester), adminAuthorize],
+    ["get", "/server/project-settings/get", projectReqester.getProjectSettings.bind(projectReqester), adminAuthorize],
+    ["post", "/server/project-settings/set", projectReqester.setProjectSettings.bind(projectReqester), adminAuthorize],
 ];
 
 const processRequest = (method: (req: express.Request, res: express.Response) => any) => async (req: express.Request, res: express.Response) => {

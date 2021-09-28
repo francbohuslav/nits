@@ -1,27 +1,20 @@
-import { Button, LinearProgress, Typography } from "@material-ui/core";
+import { Box, Button, IconButton, LinearProgress, Tooltip, Typography } from "@material-ui/core";
+import CloseIcon from "@material-ui/icons/Close";
 import { useEffect, useState } from "react";
 import React = require("react");
 import { IProjectSettings } from "../../common/interfaces";
 import { useAjax } from "../ajax";
-import { DataGrid, GridCellEditCommitParams, GridColumns, GridEditRowsModel, sortedGridRowsSelector } from "@material-ui/data-grid";
+import { DataGrid, GridCellEditCommitParams, GridColumns } from "@material-ui/data-grid";
 import { useHistory } from "react-router";
 import { Router } from "../router";
+import { thisApp } from "../app-provider";
+import { IProjectSettingsResponse } from "../../common/ajax-interfaces";
 
 export const ProjectSettingsPage = () => {
-    const [projectSettings, setProjectSettings] = useState<IProjectSettings[]>([
-        {
-            jiraProjectCode: "CET",
-            jiraNitsField: "",
-            uuArtifact: "",
-        },
-        {
-            jiraProjectCode: "SUP",
-            jiraNitsField: "",
-            uuArtifact: "",
-        },
-    ]);
-    projectSettings.sort((p1, p2) => p1.jiraProjectCode.localeCompare(p2.jiraProjectCode) || p1.jiraNitsField.localeCompare(p2.jiraNitsField));
-    const rows = projectSettings ? projectSettings.map((p, index) => ({ ...p, id: index })) : null;
+    const [projectSettings, setProjectSettings] = useState<IProjectSettings[]>(null);
+    const [nitsFieldValues, setNitsFieldValues] = useState<{ [id: string]: string }>({});
+    projectSettings?.sort((p1, p2) => p1.jiraProjectCode.localeCompare(p2.jiraProjectCode) || p1.jiraNitsField.localeCompare(p2.jiraNitsField));
+    const rows = projectSettings?.map((p, index) => ({ ...p, id: index }));
 
     const [isLoading, setIsLoading] = useState(false);
     const ajax = useAjax();
@@ -37,24 +30,64 @@ export const ProjectSettingsPage = () => {
 
     const loadData = async () => {
         setIsLoading(true);
-        const res = await ajax.get<IProjectSettings[]>("/server/get-project-settings");
+        const res = await ajax.get<IProjectSettingsResponse>("/server/project-settings/get");
         if (res.isOk) {
-            setProjectSettings(res.data);
+            setProjectSettings(res.data.records);
+            setNitsFieldValues(res.data.nitsFiledValues);
         }
         setIsLoading(false);
     };
 
-    const onSave = async () => {};
+    const onSave = async () => {
+        setIsLoading(true);
+        const res = await ajax.post<boolean>("/server/project-settings/set", projectSettings);
+        setIsLoading(false);
+        if (res.isOk) {
+            thisApp().toast("Uloženo");
+            // history.push(Router.PageMain);
+        } else {
+            thisApp().toast("Data nebyla uložena", "error");
+        }
+    };
+
+    const onAdd = () => setProjectSettings([...projectSettings, { jiraNitsField: "", jiraProjectCode: "", uuArtifact: "" }]);
+    const onDelete = (index: number) => {
+        if (confirm("Opravdu smazat tento záznam?")) {
+            setProjectSettings(projectSettings.filter((_v, i) => index != i));
+        }
+    };
 
     useEffect(() => {
-        //TODO: BF:   loadData();
+        loadData();
     }, []);
 
     const columns: GridColumns = [
-        { field: "jiraProjectCode", headerName: "JIRA project code" },
-        { field: "jiraNitsField", headerName: "JIRA NITS" },
+        { field: "jiraProjectCode", headerName: "JIRA project code", renderCell: (params) => params.value || "vyplnit prosím" },
+        {
+            field: "jiraNitsField",
+            headerName: "JIRA NITS",
+            type: "singleSelect",
+            valueOptions: Object.entries(nitsFieldValues).map(([k, v]) => ({
+                value: k,
+                label: v,
+            })),
+            renderCell: (params) => (params.value ? nitsFieldValues[params.value.toString()] || "neznámá hodnota " + params.value : "nevyplněno"),
+        },
         { field: "uuArtifact", headerName: "UU artefakt" },
+        {
+            field: "action",
+            headerName: " ",
+            renderCell: (params) => (
+                <Tooltip title="Smazat záznam">
+                    <IconButton size="small" onClick={() => onDelete(params.row.id)}>
+                        <CloseIcon />
+                    </IconButton>
+                </Tooltip>
+            ),
+            flex: 0.4,
+        },
     ];
+
     columns.forEach((c) => {
         c.editable = true;
         c.flex = c.flex || 1;
@@ -81,14 +114,21 @@ export const ProjectSettingsPage = () => {
                             onCellEditCommit={handleCellEditCommit}
                         />
                     </Typography>
-                    <Typography paragraph align="right">
-                        <Button variant="contained" color="primary" onClick={onSave}>
-                            Uložit
-                        </Button>{" "}
-                        <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
-                            Zpět
-                        </Button>
-                    </Typography>
+                    <Box display="flex">
+                        <Box flexGrow={1}>
+                            <Button variant="contained" color="primary" onClick={onAdd}>
+                                Přidat záznam
+                            </Button>
+                        </Box>
+                        <Box>
+                            <Button variant="contained" color="primary" onClick={onSave}>
+                                Uložit
+                            </Button>{" "}
+                            <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
+                                Zpět
+                            </Button>
+                        </Box>
+                    </Box>
                 </>
             )}
         </>

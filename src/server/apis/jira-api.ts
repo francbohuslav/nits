@@ -1,10 +1,11 @@
 import JiraClientApi, { JiraApiOptions } from "jira-client";
 import dateUtils from "../../common/date-utils";
 import { IAccount, Worklog } from "../models/jira/interfaces";
+import { IProjectConfig } from "../project-config";
 
 export class JiraApi {
     private client: JiraClientApi;
-    constructor(options: JiraApiOptions) {
+    constructor(options: JiraApiOptions, private projectConfig: IProjectConfig) {
         this.client = new JiraClientApi(options);
     }
 
@@ -43,5 +44,21 @@ export class JiraApi {
         console.log("JIRA get current user");
         const response = await this.client.getCurrentUser();
         return response as IAccount;
+    }
+
+    public async getNitsFiledValues(): Promise<{ [key: string]: string }> {
+        const response = await this.client.getIssueCreateMetadata({
+            expand: "projects.issuetypes.fields",
+        });
+        const values: { [key: string]: string } = {};
+        response.projects.forEach((project: any) => {
+            project.issuetypes.forEach((issuetype: any) => {
+                const nitsFiled = issuetype?.fields[this.projectConfig.nitsCustomField];
+                nitsFiled.allowedValues?.forEach((field: any) => {
+                    values[field.id] = field.value;
+                });
+            });
+        });
+        return values;
     }
 }

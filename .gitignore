@@ -7,3 +7,4 @@
 /userdata/attachments/
 /userdata/users/*.data
 /.env
+/userdata/projects/project-settings.data
