@@ -20,6 +20,7 @@ export class UserDataModel {
             uuAccessCode2: "",
             jiraAccountId: "",
             jiraName: "",
+            notificationEmail: "",
         };
         const filePath = this.getUserFilePath(uid);
         try {

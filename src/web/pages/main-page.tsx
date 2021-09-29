@@ -32,12 +32,13 @@ const useStyles = makeStyles({
 });
 
 export const MainPage = () => {
-    const { isJiraOk, isAdmin } = useContext<IDataContextValue>(DataContext);
+    const { isJiraOk, isAdmin, notificationEmail } = useContext<IDataContextValue>(DataContext);
     const classes = useStyles();
     const history = useHistory();
     const ajax = useAjax();
 
     const onJira = () => history.push(Router.PageJiraSettings);
+    const onNotify = () => history.push(Router.PageNotification);
     const onProjectSetting = () => history.push(Router.PageProjectSettings);
 
     const onLogout = async () => {
@@ -48,7 +49,7 @@ export const MainPage = () => {
     return (
         <>
             <Typography variant="body1" paragraph>
-                {/*  //TODO: BF: <img className={classes.img} src="https://source.unsplash.com/random/600x300" /> */}
+                <img className={classes.img} src="https://source.unsplash.com/random/600x300" />
             </Typography>
             <Typography variant="h6" align="center" paragraph>
                 Vítejte v aplikaci Network Inventory Time Sheets (NITS)
@@ -96,12 +97,20 @@ export const MainPage = () => {
                 <Grid container alignItems="center" spacing={1}>
                     <Grid item xs={3} sm={4}></Grid>
                     <Grid item xs={6} sm={4}>
-                        <Button disabled className={classes.button} variant="contained" startIcon={<EmailIcon />} fullWidth>
+                        <Button className={classes.button} variant="contained" startIcon={<EmailIcon />} fullWidth onClick={onNotify}>
                             Notifikace
                         </Button>
                     </Grid>
                     <Grid item xs={3} sm={4}>
-                        {/* <CloseIcon className={classes.redIcon} /> */}
+                        {notificationEmail ? (
+                            <Tooltip title="Notifikační e-mail je nastaven">
+                                <CheckIcon className={classes.greenIcon} />
+                            </Tooltip>
+                        ) : (
+                            <Tooltip title="Notifikační e-mail není nastaven">
+                                <CloseIcon className={classes.redIcon} />
+                            </Tooltip>
+                        )}
                     </Grid>
                 </Grid>
             </Box>

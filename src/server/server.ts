@@ -29,6 +29,7 @@ import { JiraController } from "./controllers/jira-controller";
 import { ProjectRequester } from "./requesters/project-requester";
 import { ProjectController } from "./controllers/project-controller";
 import { ProjectDataModel } from "./models/project-data-model";
+import { NotifyRequester } from "./requesters/notify-requester";
 dotenv.config();
 
 const isDevelopment = os.hostname().toLowerCase() == "msi";
@@ -67,6 +68,7 @@ const jiraRequester = new JiraRequester(jiraController, crypt);
 const syncController = new SyncController(userDataModel, jiraModel, (acc1, acc2) => new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi()));
 const syncRequester = new SyncRequester(syncController);
 const projectReqester = new ProjectRequester(projectController);
+const notifyRequester = new NotifyRequester(userController);
 
 const app = express();
 app.use(compression());
@@ -103,6 +105,7 @@ const methods: any[] = [
     ["post", "/server/logout-jira", userRequester.logoutJira.bind(userRequester), loginAuthorize],
     ["get", "/server/jira/oauth", jiraRequester.oauth.bind(jiraRequester)],
     ["get", "/server/sync", syncRequester.sync.bind(syncRequester)],
+    ["post", "/server/notify/set", notifyRequester.setNotificationEmail.bind(notifyRequester), loginAuthorize],
 
     // admin commands
     ["get", "/server/project-settings/get", projectReqester.getProjectSettings.bind(projectReqester), adminAuthorize],

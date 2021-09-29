@@ -11,6 +11,7 @@ export interface IDataContextValue {
     name: string;
     isJiraOk: boolean;
     isAdmin: boolean;
+    notificationEmail: string;
 }
 
 export const DataContext = React.createContext<IDataContextValue>(null);
@@ -36,7 +37,15 @@ export const DataProvider = (props: IDataContextProps) => {
 
     //console.log("DataProvider");
     return (
-        <DataContext.Provider value={{ isLoading, name: userData?.name, isJiraOk: !!userData?.jiraAccountId, isAdmin: userData?.isAdmin }}>
+        <DataContext.Provider
+            value={{
+                isLoading,
+                name: userData?.name,
+                isJiraOk: !!userData?.jiraAccountId,
+                isAdmin: userData?.isAdmin,
+                notificationEmail: userData?.notificationEmail,
+            }}
+        >
             {props.children}
         </DataContext.Provider>
     );

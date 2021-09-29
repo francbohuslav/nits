@@ -5,6 +5,7 @@ export interface IUserData {
     uuAccessCode2: string;
     uid: string;
     name: string;
+    notificationEmail: string;
 }
 
 export interface IProjectSettings {

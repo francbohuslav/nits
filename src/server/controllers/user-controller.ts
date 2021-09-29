@@ -40,6 +40,12 @@ export class UserController {
         this.userDataModel.setUserData(uid, userData);
     }
 
+    public async setNotificationEmail(uid: string, email: string): Promise<void> {
+        const userData = await this.userDataModel.getUserData(uid);
+        userData.notificationEmail = email;
+        await this.userDataModel.setUserData(uid, userData);
+    }
+
     public isAdmin(uid: string): boolean {
         const admins = process.env.NITS_ADMIN_UIDS.trim().split(/\s*,\s*/);
         return admins.indexOf(uid) > -1;

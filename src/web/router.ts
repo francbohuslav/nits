@@ -3,6 +3,7 @@ import { useHistory, useLocation } from "react-router";
 export class Router<TQueryParams> {
     public static PageMain = "/page/main/";
     public static PageJiraSettings = "/page/jira-settings/";
+    public static PageNotification = "/page/notification/";
     public static PageProjectSettings = "/page/project-settings/";
     public static PageLogout = "/server/logout/";
 

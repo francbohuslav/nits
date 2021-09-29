@@ -7,6 +7,7 @@ import { Login } from "./login";
 import { MainLayout } from "./main-layout";
 import { JiraSettingsPage } from "./pages/jira-settings-page";
 import { MainPage } from "./pages/main-page";
+import { NotifySettingsPage } from "./pages/notify-settings-page";
 import { ProjectSettingsPage } from "./pages/project-settings-page";
 import { Router } from "./router";
 
@@ -16,7 +17,7 @@ const theme = createTheme({
     },
 });
 
-const pages = { [Router.PageMain]: "sm", [Router.PageJiraSettings]: "sm", [Router.PageProjectSettings]: "md" };
+const pages = { [Router.PageMain]: "sm", [Router.PageJiraSettings]: "sm", [Router.PageNotification]: "sm", [Router.PageProjectSettings]: "md" };
 
 export const App = () => {
     return (
@@ -30,6 +31,7 @@ export const App = () => {
                                     <MainLayout containerSize={size as any}>
                                         {path == Router.PageMain ? <MainPage /> : ""}
                                         {path == Router.PageJiraSettings ? <JiraSettingsPage /> : ""}
+                                        {path == Router.PageNotification ? <NotifySettingsPage /> : ""}
                                         {path == Router.PageProjectSettings ? <ProjectSettingsPage /> : ""}
                                     </MainLayout>
                                 </DataProvider>

@@ -21,6 +21,7 @@ export interface IUserPublicData {
     jiraName: string;
     uid: string;
     name: string;
+    notificationEmail: string;
     isAdmin: boolean;
 }
 export interface IProjectSettingsResponse {
