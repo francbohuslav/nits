@@ -14,6 +14,7 @@ import { IProjectSettingsResponse } from "../../common/ajax-interfaces";
 export const ProjectSettingsPage = () => {
     const [projectSettings, setProjectSettings] = useState<IProjectSettings[]>(null);
     const [nitsFieldValues, setNitsFieldValues] = useState<{ [id: string]: string }>({});
+    const [projects, setProjects] = useState<{ [id: string]: string }>({});
     projectSettings?.sort((p1, p2) => p1.jiraProjectCode.localeCompare(p2.jiraProjectCode) || p1.jiraNitsField.localeCompare(p2.jiraNitsField));
     const rows = projectSettings?.map((p, index) => ({ ...p, id: index }));
 
@@ -35,6 +36,7 @@ export const ProjectSettingsPage = () => {
         if (res.isOk) {
             setProjectSettings(res.data.records);
             setNitsFieldValues(res.data.nitsFiledValues);
+            setProjects(res.data.projects);
         }
         setIsLoading(false);
     };
@@ -63,7 +65,16 @@ export const ProjectSettingsPage = () => {
     }, []);
 
     const columns: GridColumns = [
-        { field: "jiraProjectCode", headerName: "JIRA project code", renderCell: (params) => params.value || "vyplnit prosím" },
+        {
+            field: "jiraProjectCode",
+            headerName: "JIRA project code",
+            type: "singleSelect",
+            valueOptions: Object.entries(projects).map(([k, v]) => ({
+                value: k,
+                label: v,
+            })),
+            renderCell: (params) => (params.value ? projects[params.value.toString()] || "neznámá hodnota " + params.value : "nevyplněno"),
+        },
         {
             field: "jiraNitsField",
             headerName: "JIRA NITS",
@@ -92,7 +103,7 @@ export const ProjectSettingsPage = () => {
                     </IconButton>
                 </Tooltip>
             ),
-            flex: 0.4,
+            flex: 0.2,
         },
     ];
 
@@ -100,8 +111,6 @@ export const ProjectSettingsPage = () => {
         c.editable = true;
         c.flex = c.flex || 1;
         c.sortable = false;
-        c.align = c.align || "center";
-        c.headerAlign = "center";
     });
 
     return isLoading ? (

@@ -16,7 +16,7 @@ const theme = createTheme({
     },
 });
 
-const pages = [Router.PageMain, Router.PageJiraSettings, Router.PageProjectSettings];
+const pages = { [Router.PageMain]: "sm", [Router.PageJiraSettings]: "sm", [Router.PageProjectSettings]: "md" };
 
 export const App = () => {
     return (
@@ -24,10 +24,10 @@ export const App = () => {
             <BrowserRouter>
                 <AppProvider>
                     <Switch>
-                        {pages.map((path) => (
+                        {Object.entries(pages).map(([path, size]) => (
                             <Route key={path} path={path}>
                                 <DataProvider>
-                                    <MainLayout>
+                                    <MainLayout containerSize={size as any}>
                                         {path == Router.PageMain ? <MainPage /> : ""}
                                         {path == Router.PageJiraSettings ? <JiraSettingsPage /> : ""}
                                         {path == Router.PageProjectSettings ? <ProjectSettingsPage /> : ""}

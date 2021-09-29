@@ -26,4 +26,5 @@ export interface IUserPublicData {
 export interface IProjectSettingsResponse {
     records: IProjectSettings[];
     nitsFiledValues: { [key: string]: string };
+    projects: { [key: string]: string };
 }

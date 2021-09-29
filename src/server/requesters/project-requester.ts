@@ -11,6 +11,7 @@ export class ProjectRequester {
         const nitsFiledValues = await this.projectController.getNitsFieldValues();
         return {
             records,
+            projects: await this.projectController.getJiraProjects(),
             nitsFiledValues,
         } as IProjectSettingsResponse;
     }

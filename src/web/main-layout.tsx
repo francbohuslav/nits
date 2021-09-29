@@ -20,6 +20,7 @@ const useStyles = makeStyles({
 
 interface IMainLayoutProps {
     children: React.ReactNode;
+    containerSize: "xs" | "sm" | "md" | "lg" | "xl" | false;
 }
 
 export const MainLayout = (props: IMainLayoutProps) => {
@@ -43,7 +44,7 @@ export const MainLayout = (props: IMainLayoutProps) => {
                     <Typography variant="h6">{name}</Typography>
                 </Toolbar>
             </AppBar>
-            <Container maxWidth="sm">
+            <Container maxWidth={props.containerSize || "sm"}>
                 <Box py={3}>{props.children}</Box>
             </Container>
         </>

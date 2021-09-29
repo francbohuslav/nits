@@ -1,5 +1,6 @@
 import JiraClientApi, { JiraApiOptions } from "jira-client";
 import dateUtils from "../../common/date-utils";
+import arrayUtils from "../../common/array-utils";
 import { IAccount, Worklog } from "../models/jira/interfaces";
 import { IProjectConfig } from "../project-config";
 
@@ -44,6 +45,16 @@ export class JiraApi {
         console.log("JIRA get current user");
         const response = await this.client.getCurrentUser();
         return response as IAccount;
+    }
+
+    public async getProjects(): Promise<{ [key: string]: string }> {
+        const response = await this.client.listProjects();
+        response.sort((a, b) => a.name.localeCompare(b.name));
+        return arrayUtils.toDictionary(
+            response,
+            (r) => r.key,
+            (r) => r.name
+        );
     }
 
     public async getNitsFiledValues(): Promise<{ [key: string]: string }> {
