@@ -1,8 +1,9 @@
 import { JiraApi } from "../../apis/jira-api";
-import { IAccount, Worklog } from "./interfaces";
+import { IProjectConfig } from "../../project-config";
+import { IAccount, IIssue, Worklog } from "./interfaces";
 
 export class JiraModel {
-    constructor(private jiraApi: JiraApi) {}
+    constructor(private jiraApi: JiraApi, private projectConfig: IProjectConfig) {}
     public async getLastWorklogs(): Promise<Worklog[]> {
         const worklogIdList = await this.jiraApi.getUpdatedWorklogIds();
         const worklogList = await this.jiraApi.getWorklogs(worklogIdList);
@@ -15,6 +16,11 @@ export class JiraModel {
 
     public async getCurrentUser(): Promise<IAccount> {
         return await this.jiraApi.getCurrentUser();
+    }
+
+    public async getIssuesById(ids: string[]): Promise<IIssue[]> {
+        const uniqIds = ids.filter((id, index) => ids.indexOf(id) == index);
+        return await this.jiraApi.searchIssues("id in (" + uniqIds.join(",") + ")", ["project", "parent", this.projectConfig.nitsCustomField]);
     }
 
     //TODO: BF: vice vykazu nenaslo

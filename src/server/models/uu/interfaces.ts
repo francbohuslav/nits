@@ -1,12 +1,12 @@
 import { IUserData } from "../../../common/interfaces";
-import { ISyncReport } from "../interfaces";
+import { ISyncReportUser } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
 
 export type TimesheetModelFactoryHandler = (accessCode1: string, accessCode2: string) => ITimesheetModel;
 
 export interface ITimesheetModel {
-    saveTimesheets(newTimesheets: Timesheet[], report: ISyncReport): Promise<void>;
-    removeTimesheets(timesheets: Timesheet[], report: ISyncReport): Promise<void>;
+    saveTimesheets(newTimesheets: Timesheet[], report: ISyncReportUser): Promise<void>;
+    removeTimesheets(timesheets: Timesheet[], report: ISyncReportUser): Promise<void>;
     getLastUserTimesheets(userData: IUserData): Promise<Timesheet[]>;
     convertWorklogsToTimesheets(worklogList: Worklog[]): Timesheet[];
 }

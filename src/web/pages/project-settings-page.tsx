@@ -53,7 +53,7 @@ export const ProjectSettingsPage = () => {
         }
     };
 
-    const onAdd = () => setProjectSettings([...projectSettings, { jiraNitsField: "", jiraProjectCode: "", uuArtifact: "" }]);
+    const onAdd = () => setProjectSettings([...projectSettings, { jiraNitsField: "", jiraProjectCode: "", wtmArtifact: "" }]);
     const onDelete = (index: number) => {
         if (confirm("Opravdu smazat tento záznam?")) {
             setProjectSettings(projectSettings.filter((_v, i) => index != i));
@@ -85,7 +85,7 @@ export const ProjectSettingsPage = () => {
             })),
             renderCell: (params) => (params.value ? nitsFieldValues[params.value.toString()] || "neznámá hodnota " + params.value : "nevyplněno"),
         },
-        { field: "uuArtifact", headerName: "UU artefakt" },
+        { field: "wtmArtifact", headerName: "WTM artefakt" },
         {
             field: "action",
             headerName: " ",

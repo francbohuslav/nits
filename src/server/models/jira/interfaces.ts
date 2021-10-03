@@ -41,3 +41,22 @@ export interface ISegments {
     type: "text";
     text: string;
 }
+
+export interface IIssue {
+    key: string;
+    id: string;
+    fields: IIssueFields;
+}
+export interface IIssueFields {
+    [key: string]: any;
+    project: {
+        id: string;
+        key: string;
+        name: string;
+    };
+    parent?: IIssue;
+}
+export interface IIssueCustomField {
+    value: string; // "NI 2.0";
+    id: string; // "10115";
+}

@@ -5,7 +5,7 @@ import { ISyncReport } from "../models/interfaces";
 export class SyncRequester {
     constructor(private syncController: SyncController) {}
 
-    public sync(_req: Request, res: Response): Promise<ISyncReport[]> {
+    public sync(_req: Request, res: Response): Promise<ISyncReport> {
         res.setHeader("Content-Type", "application/json");
         return this.syncController.sync();
     }

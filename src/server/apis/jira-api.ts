@@ -1,7 +1,7 @@
 import JiraClientApi, { JiraApiOptions } from "jira-client";
 import dateUtils from "../../common/date-utils";
 import arrayUtils from "../../common/array-utils";
-import { IAccount, Worklog } from "../models/jira/interfaces";
+import { IAccount, IIssue, Worklog } from "../models/jira/interfaces";
 import { IProjectConfig } from "../project-config";
 
 export class JiraApi {
@@ -32,13 +32,23 @@ export class JiraApi {
     }
 
     public async getWorklogs(ids: number[]): Promise<Worklog[]> {
-        console.log("JIRA getWorklogs ...");
-        const response = await this.client.getWorklogs(
-            ids.map((i) => i + ""),
-            undefined
-        );
-        console.log("... " + response.length);
-        return response as Worklog[];
+        const chunkSize = 1000;
+        const allWorklogs: Worklog[] = [];
+        for (let i = 0; i < ids.length; i += chunkSize) {
+            const chunk = ids.slice(i, i + chunkSize);
+            console.log(`JIRA getWorklogs ${chunk.length}x ...`);
+            const response = await this.client.getWorklogs(
+                chunk.map((i) => i + ""),
+                undefined
+            );
+            allWorklogs.push(...(response as Worklog[]));
+            console.log("... " + response.length);
+        }
+        return allWorklogs.map((t) => {
+            const newT = new Worklog();
+            Object.keys(t).forEach((key) => ((newT as any)[key] = (t as any)[key]));
+            return newT;
+        });
     }
 
     public async getCurrentUser(): Promise<IAccount> {
@@ -47,14 +57,10 @@ export class JiraApi {
         return response as IAccount;
     }
 
-    public async getProjects(): Promise<{ [key: string]: string }> {
+    public async getProjects(): Promise<any[]> {
         const response = await this.client.listProjects();
         response.sort((a, b) => a.name.localeCompare(b.name));
-        return arrayUtils.toDictionary(
-            response,
-            (r) => r.key,
-            (r) => r.name
-        );
+        return response;
     }
 
     public async getNitsFiledValues(): Promise<{ [key: string]: string }> {
@@ -71,5 +77,21 @@ export class JiraApi {
             });
         });
         return values;
+    }
+
+    public async searchIssues(searchString: string, fields: string[]): Promise<IIssue[]> {
+        let totalResults = 0;
+        let response: any;
+        const issues: IIssue[] = [];
+        do {
+            response = await this.client.searchJira(searchString, {
+                maxResults: 1000,
+                fields,
+                startAt: totalResults,
+            });
+            totalResults += response.issues.length;
+            issues.push(...response.issues);
+        } while (totalResults < response.total);
+        return [...issues];
     }
 }

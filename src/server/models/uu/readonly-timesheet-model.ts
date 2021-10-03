@@ -1,7 +1,7 @@
 import dateUtils from "../../../common/date-utils";
 import { IUserData } from "../../../common/interfaces";
 import { WtmApi } from "../../apis/wtm-api";
-import { ISyncReport } from "../interfaces";
+import { ISyncReportUser } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
 import { UuUserModel } from "../uu-user-model";
 import { ITimesheetModel, Timesheet } from "./interfaces";
@@ -9,12 +9,12 @@ import { ITimesheetModel, Timesheet } from "./interfaces";
 export class ReadOnlyTimesheetModel implements ITimesheetModel {
     constructor(private accessCode1: string, private accessCode2: string, private uuUserModel: UuUserModel, private wtmApi: WtmApi) {}
 
-    public async saveTimesheets(newTimesheets: Timesheet[], report: ISyncReport): Promise<void> {
+    public async saveTimesheets(newTimesheets: Timesheet[], report: ISyncReportUser): Promise<void> {
         for (const ts of newTimesheets) {
             report.log.push(`Simulation of saving timesheet ${ts}`);
         }
     }
-    public async removeTimesheets(timesheets: Timesheet[], report: ISyncReport): Promise<void> {
+    public async removeTimesheets(timesheets: Timesheet[], report: ISyncReportUser): Promise<void> {
         for (const ts of timesheets) {
             report.log.push(`Simulation of removing timesheet ${ts}`);
         }

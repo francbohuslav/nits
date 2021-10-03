@@ -54,7 +54,7 @@ const jiraApi = new JiraApi(
     },
     projectConfig
 );
-const jiraModel = new JiraModel(jiraApi);
+const jiraModel = new JiraModel(jiraApi, projectConfig);
 const uuUserModel = new UuUserModel(new UuIdendtityApi(), {});
 const userController = new UserController(uuUserModel, userDataModel, jiraConnectionSettings);
 const jiraController = new JiraController(userDataModel, crypt, projectConfig);
@@ -65,7 +65,13 @@ const loginAuthorize = loginAuthorizer.loginAuthorize.bind(loginAuthorizer);
 const adminAuthorize = loginAuthorizer.adminAuthorize.bind(loginAuthorizer);
 const userRequester = new UserRequester(userController, crypt);
 const jiraRequester = new JiraRequester(jiraController, crypt);
-const syncController = new SyncController(userDataModel, jiraModel, (acc1, acc2) => new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi()));
+const syncController = new SyncController(
+    userDataModel,
+    jiraModel,
+    projectController,
+    projectConfig,
+    (acc1, acc2) => new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi())
+);
 const syncRequester = new SyncRequester(syncController);
 const projectReqester = new ProjectRequester(projectController);
 const notifyRequester = new NotifyRequester(userController);

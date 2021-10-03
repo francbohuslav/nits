@@ -11,5 +11,5 @@ export interface IUserData {
 export interface IProjectSettings {
     jiraProjectCode: string;
     jiraNitsField: string;
-    uuArtifact: string;
+    wtmArtifact: string;
 }

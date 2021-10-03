@@ -1,3 +1,4 @@
+import arrayUtils from "../../common/array-utils";
 import dateUtils from "../../common/date-utils";
 import { IProjectSettings } from "../../common/interfaces";
 import { JiraApi } from "../apis/jira-api";
@@ -16,8 +17,13 @@ export class ProjectController {
         return this.projectDataModel.setProjectSettings(projectSettings);
     }
 
-    public getJiraProjects(): Promise<{ [key: string]: string }> {
-        return this.jiraApi.getProjects();
+    public async getJiraProjects(): Promise<{ [key: string]: string }> {
+        const projects = await this.jiraApi.getProjects();
+        return arrayUtils.toDictionary<any, string>(
+            projects,
+            (r) => r.key,
+            (r) => `${r.name} (${r.key})`
+        );
     }
 
     public async getNitsFieldValues(): Promise<{ [key: string]: string }> {
