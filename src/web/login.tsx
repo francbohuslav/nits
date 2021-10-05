@@ -49,7 +49,7 @@ export const Login = () => {
                     <TextField
                         margin="normal"
                         id="accessCode2"
-                        label="Přístupový kód 1"
+                        label="Přístupový kód 2"
                         value={accessCodes.accessCode2}
                         type="password"
                         fullWidth

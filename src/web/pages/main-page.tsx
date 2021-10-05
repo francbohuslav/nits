@@ -3,36 +3,47 @@ import { makeStyles } from "@material-ui/styles";
 import React = require("react");
 import EmailIcon from "@material-ui/icons/Email";
 import CheckIcon from "@material-ui/icons/Check";
+import InfoIcon from "@material-ui/icons/Info";
 import CloseIcon from "@material-ui/icons/Close";
 import SettingsIcon from "@material-ui/icons/Settings";
+import red from "@material-ui/core/colors/red";
+import green from "@material-ui/core/colors/green";
 import StatsIcon from "@material-ui/icons/BarChart";
 import ExitIcon from "@material-ui/icons/ExitToApp";
 import { useAjax } from "../ajax";
 import { useHistory } from "react-router-dom";
 import { Router } from "../router";
 import { DataContext, IDataContextValue } from "../data-context";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+import { Info } from "../components/info";
 
 const useStyles = makeStyles({
-    img: {
-        maxWidth: "100%",
-    },
     button: {
         justifyContent: "left",
     },
 
     greenIcon: {
         marginTop: "6px",
-        color: "green",
+        color: green[600],
     },
     redIcon: {
         marginTop: "6px",
-        color: "red",
+        color: red[500],
+    },
+    infoOpen: {
+        maxHeight: "500px !important",
+    },
+    infoNotOpen: {
+        maxHeight: 0,
+        transition: "max-height 0.5s",
+        overflow: "hidden",
+        cursor: "pointer",
     },
 });
 
 export const MainPage = () => {
     const { isJiraOk, isAdmin, notificationEmail } = useContext<IDataContextValue>(DataContext);
+    const [infoOpen, setInfoOpen] = useState(false);
     const classes = useStyles();
     const history = useHistory();
     const ajax = useAjax();
@@ -48,23 +59,11 @@ export const MainPage = () => {
 
     return (
         <>
-            <Typography variant="body1" paragraph>
-                <img className={classes.img} src="https://source.unsplash.com/random/600x300" />
-            </Typography>
-            <Typography variant="h6" align="center" paragraph>
+            <Typography variant="h5" align="center" paragraph>
                 Vítejte v aplikaci Network Inventory Time Sheets (NITS)
             </Typography>
-            <Typography variant="body1" align="left" paragraph>
-                Tato aplikace propojuje zajišťuje automatické propisy výkazů z JIRA do WTM. K propisu dochází každý den v noci, přičemž zpracovány jsou výkazy
-                vždy 7 dní zpětně.
-            </Typography>
-            <Typography variant="body1" align="left" paragraph>
-                Existující položky ve WTM jsou mazány a přepsány novými údaji, nejsou však ovlivněny výkazy, které jsou ve WTM zadané mimo projekty JIRA (např.
-                dovolené, pohovory apod).
-            </Typography>
-            <Typography variant="body1" align="left" paragraph>
-                Výkazy JIRA jsou ve WTM agregovány do 1-2 bloků a propojeny s definovaným artefaktem. V případě konfliktu výkazu nebo chyby je uživatel
-                notifikován e-mailem.
+            <Typography variant="body1" align="center" paragraph>
+                <img src="/images/logo.jpg" height="200" />
             </Typography>
             <Box mt={4} mb={1}>
                 <Grid container alignItems="center" spacing={1}>
@@ -129,10 +128,16 @@ export const MainPage = () => {
                 </ButtonRow>
             )}
             <ButtonRow>
-                <Button className={classes.button} variant="contained" startIcon={<ExitIcon color="secondary" />} fullWidth onClick={onLogout}>
+                <Button className={classes.button} variant="contained" startIcon={<InfoIcon />} fullWidth onClick={() => setInfoOpen(true)}>
+                    Info
+                </Button>
+            </ButtonRow>
+            <ButtonRow>
+                <Button className={classes.button} variant="contained" startIcon={<ExitIcon color="error" />} fullWidth onClick={onLogout}>
                     Odhlášení
                 </Button>
             </ButtonRow>
+            <Info open={infoOpen} onClose={() => setInfoOpen(false)} />
         </>
     );
 };

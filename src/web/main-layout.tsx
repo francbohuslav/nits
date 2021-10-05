@@ -24,7 +24,7 @@ interface IMainLayoutProps {
 }
 
 export const MainLayout = (props: IMainLayoutProps) => {
-    const { name } = useContext<IDataContextValue>(DataContext);
+    const { name, isAdmin } = useContext<IDataContextValue>(DataContext);
 
     const classes = useStyles();
     return (
@@ -41,7 +41,10 @@ export const MainLayout = (props: IMainLayoutProps) => {
                             </Tooltip>
                         </Link>
                     </Box>
-                    <Typography variant="h6">{name}</Typography>
+                    <Typography variant="h6">
+                        {name}
+                        {isAdmin ? " (admin)" : ""}
+                    </Typography>
                 </Toolbar>
             </AppBar>
             <Container maxWidth={props.containerSize || "sm"}>
