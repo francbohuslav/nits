@@ -77,7 +77,7 @@ export class SyncController {
         const validWorklogs: Worklog[] = [];
         for (const workglog of worklogList) {
             const issue = issuesById[workglog.issueId];
-            const nitsField = issue.fields[this.projectConfig.nitsCustomField] as IIssueCustomField;
+            const nitsField = issue.fields[this.projectConfig.jira.nitsCustomField] as IIssueCustomField;
             assert(issue, `Issue ${workglog.issueId} of worklog ${workglog.toString()} not found`);
             if (validProjectCodes.indexOf(issue.fields.project.key) == -1) {
                 report.log.push(`Worklog ${workglog.toString()} skipped. Project ${issue.fields.project.key} is not configured.`);

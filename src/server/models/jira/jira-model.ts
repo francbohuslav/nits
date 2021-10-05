@@ -20,7 +20,7 @@ export class JiraModel {
 
     public async getIssuesById(ids: string[]): Promise<IIssue[]> {
         const uniqIds = ids.filter((id, index) => ids.indexOf(id) == index);
-        return await this.jiraApi.searchIssues("id in (" + uniqIds.join(",") + ")", ["project", "parent", this.projectConfig.nitsCustomField]);
+        return await this.jiraApi.searchIssues("id in (" + uniqIds.join(",") + ")", ["project", "parent", this.projectConfig.jira.nitsCustomField]);
     }
 
     //TODO: BF: vice vykazu nenaslo

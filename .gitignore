@@ -1,10 +1,6 @@
 ﻿/node_modules/
 /dist
-/cache/*.cache
 /debug.log
-/cache/*.json
-/userdata/*.json
-/userdata/attachments/
 /userdata/users/*.data
 /.env
 /userdata/projects/project-settings.data

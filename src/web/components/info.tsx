@@ -16,7 +16,7 @@ interface IInfoProps {
 export const Info = (props: IInfoProps) => {
     const classes = useStyles();
     return (
-        <Dialog open={props.open}>
+        <Dialog open={props.open} onClose={() => props.onClose()}>
             <DialogTitle id="alert-dialog-title">Info</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">

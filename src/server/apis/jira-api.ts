@@ -1,6 +1,5 @@
 import JiraClientApi, { JiraApiOptions } from "jira-client";
 import dateUtils from "../../common/date-utils";
-import arrayUtils from "../../common/array-utils";
 import { IAccount, IIssue, Worklog } from "../models/jira/interfaces";
 import { IProjectConfig } from "../project-config";
 
@@ -70,7 +69,7 @@ export class JiraApi {
         const values: { [key: string]: string } = {};
         response.projects.forEach((project: any) => {
             project.issuetypes.forEach((issuetype: any) => {
-                const nitsFiled = issuetype?.fields[this.projectConfig.nitsCustomField];
+                const nitsFiled = issuetype?.fields[this.projectConfig.jira.nitsCustomField];
                 nitsFiled?.allowedValues?.forEach((field: any) => {
                     values[field.id] = field.value;
                 });

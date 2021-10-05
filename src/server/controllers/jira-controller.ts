@@ -17,8 +17,8 @@ export class JiraController {
         console.log("https://auth.atlassian.com/oauth/token");
         const response = await axios.post("https://auth.atlassian.com/oauth/token", {
             grant_type: "authorization_code",
-            client_id: process.env.NITS_JIRA_CLIENT_ID,
-            client_secret: process.env.NITS_JIRA_SECRET,
+            client_id: this.projectConfig.jira.clientId,
+            client_secret: this.projectConfig.jira.clientSecret,
             code: jiraAuthorizationCode,
             redirect_uri: "https://nits-beta.herokuapp.com/server/jira/oauth",
         });
@@ -28,7 +28,7 @@ export class JiraController {
         const jiraApi = new JiraApi(
             {
                 protocol: "https",
-                host: "api.atlassian.com/ex/jira/15ab9731-71ff-4f9a-86ee-91d06e58fa50",
+                host: "api.atlassian.com/ex/jira/" + this.projectConfig.jira.cloudId,
                 apiVersion: "3",
                 strictSSL: true,
                 bearer: accessToken,

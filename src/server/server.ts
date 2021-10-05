@@ -2,7 +2,6 @@ import express = require("express");
 import compression from "compression";
 import session = require("express-session");
 import fs from "fs";
-import os from "os";
 import http from "http";
 const json = require("body-parser").json;
 import path = require("path");
@@ -32,7 +31,7 @@ import { ProjectDataModel } from "./models/project-data-model";
 import { NotifyRequester } from "./requesters/notify-requester";
 dotenv.config();
 
-const isDevelopment = os.hostname().toLowerCase() == "msi";
+const isDevelopment = !!process.env.NITS_DEVEL_ACCOUNT;
 
 console.log(`Using JIRA username '${process.env.NITS_JIRA_USERNAME}'`);
 
@@ -50,13 +49,13 @@ const jiraApi = new JiraApi(
     {
         ...jiraConnectionSettings,
         username: process.env.NITS_JIRA_USERNAME,
-        password: process.env.NITS_JIRA_PASSWORD,
+        password: process.env.NITS_JIRA_API_TOKEN,
     },
     projectConfig
 );
 const jiraModel = new JiraModel(jiraApi, projectConfig);
 const uuUserModel = new UuUserModel(new UuIdendtityApi(), {});
-const userController = new UserController(uuUserModel, userDataModel, jiraConnectionSettings);
+const userController = new UserController(uuUserModel, userDataModel, projectConfig);
 const jiraController = new JiraController(userDataModel, crypt, projectConfig);
 const projectController = new ProjectController(projectDataModel, jiraApi);
 // Requests

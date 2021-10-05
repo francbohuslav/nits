@@ -1,0 +1,9 @@
+version: "3"
+services:
+    nits:
+        image: node:12.19.0
+        ports:
+            - "83:83"
+        volumes:
+            - .:/nits
+        command: /bin/sh -c "cd /nits; npm i; npm run build; npm run start"

@@ -1,12 +1,12 @@
 import { IUserData } from "../../common/interfaces";
 import { UserDataModel } from "../models/user-data-model";
 import { IUserIdentity, UuUserModel } from "../models/uu-user-model";
-import { JiraApiOptions } from "jira-client";
+import { IProjectConfig } from "../project-config";
 
 export class UserController {
     private authenticatedUsers: IUserIdentity[] = [];
 
-    constructor(private uuUserModel: UuUserModel, private userDataModel: UserDataModel, private jiraDefaultSettings: JiraApiOptions) {}
+    constructor(private uuUserModel: UuUserModel, private userDataModel: UserDataModel, private projectConfig: IProjectConfig) {}
 
     /**
      * @returns UID
@@ -47,7 +47,6 @@ export class UserController {
     }
 
     public isAdmin(uid: string): boolean {
-        const admins = process.env.NITS_ADMIN_UIDS.trim().split(/\s*,\s*/);
-        return admins.indexOf(uid) > -1;
+        return this.projectConfig.admins.indexOf(uid) > -1;
     }
 }
