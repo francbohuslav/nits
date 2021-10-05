@@ -5,13 +5,9 @@ A very secret project. Don't tell anyone about it.
 Home page: <https://github.com/francbohuslav/nits>  
 Skype: [cis_franc](skype:cis_franc), E-mail: [bohuslav.franc@unicornuniverse.eu](bohuslav.franc@unicornuniverse.eu)
 
----
-
 ## Preparation
 
 [Node.js](https://nodejs.org/) or docker must be installed.
-
----
 
 ## Usage
 
@@ -28,8 +24,6 @@ Either ...
 ... or ...
 
 4. Start as docker `docker-compose up -d`.
-
----
 
 ## User data
 
