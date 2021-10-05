@@ -63,7 +63,7 @@ export const MainPage = () => {
                 Vítejte v aplikaci Network Inventory Time Sheets (NITS)
             </Typography>
             <Typography variant="body1" align="center" paragraph>
-                <img src="/images/logo.jpg" height="200" />
+                <img src="/images/logo.png" height="200" />
             </Typography>
             <Box mt={4} mb={1}>
                 <Grid container alignItems="center" spacing={1}>
