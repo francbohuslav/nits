@@ -15,7 +15,9 @@ export const ProjectSettingsPage = () => {
     const [projectSettings, setProjectSettings] = useState<IProjectSettings[]>(null);
     const [nitsFieldValues, setNitsFieldValues] = useState<{ [id: string]: string }>({});
     const [projects, setProjects] = useState<{ [id: string]: string }>({});
-    projectSettings?.sort((p1, p2) => p1.jiraProjectKey.localeCompare(p2.jiraProjectKey) || p1.jiraNitsField.localeCompare(p2.jiraNitsField));
+    projectSettings?.sort(
+        (p1, p2) => (p1.jiraProjectKey || "").localeCompare(p2.jiraProjectKey || "") || (p1.jiraNitsField || "").localeCompare(p2.jiraNitsField || "")
+    );
     const rows = projectSettings?.map((p, index) => ({ ...p, id: index }));
 
     const [isLoading, setIsLoading] = useState(false);
