@@ -17,7 +17,13 @@ const theme = createTheme({
     },
 });
 
-const pages = { [Router.PageMain]: "sm", [Router.PageJiraSettings]: "sm", [Router.PageNotification]: "sm", [Router.PageProjectSettings]: "md" };
+const pages = {
+    [Router.PageLogin]: "sm",
+    [Router.PageJiraSettings]: "sm",
+    [Router.PageNotification]: "sm",
+    [Router.PageProjectSettings]: "md",
+    [Router.PageMain]: "sm",
+};
 
 export const App = () => {
     return (
@@ -27,19 +33,20 @@ export const App = () => {
                     <Switch>
                         {Object.entries(pages).map(([path, size]) => (
                             <Route key={path} path={path}>
-                                <DataProvider>
-                                    <MainLayout containerSize={size as any}>
-                                        {path == Router.PageMain ? <MainPage /> : ""}
-                                        {path == Router.PageJiraSettings ? <JiraSettingsPage /> : ""}
-                                        {path == Router.PageNotification ? <NotifySettingsPage /> : ""}
-                                        {path == Router.PageProjectSettings ? <ProjectSettingsPage /> : ""}
-                                    </MainLayout>
-                                </DataProvider>
+                                {path == Router.PageLogin ? (
+                                    <Login />
+                                ) : (
+                                    <DataProvider>
+                                        <MainLayout containerSize={size as any}>
+                                            {path == Router.PageMain ? <MainPage /> : ""}
+                                            {path == Router.PageJiraSettings ? <JiraSettingsPage /> : ""}
+                                            {path == Router.PageNotification ? <NotifySettingsPage /> : ""}
+                                            {path == Router.PageProjectSettings ? <ProjectSettingsPage /> : ""}
+                                        </MainLayout>
+                                    </DataProvider>
+                                )}
                             </Route>
                         ))}
-                        <Route path="/">
-                            <Login />
-                        </Route>
                     </Switch>
                 </AppProvider>
             </BrowserRouter>

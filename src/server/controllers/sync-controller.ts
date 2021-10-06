@@ -59,90 +59,73 @@ export class SyncController {
         return report;
     }
 
-    private async filterWorklogsAndAssignWtmConfig(
+    protected async filterWorklogsAndAssignWtmConfig(
         worklogList: Worklog[],
         wtmTsConfigPerWorklogs: IWtmTsConfigPerWorklogId,
         report: ISyncReport
     ): Promise<Worklog[]> {
         const projectSettingsList = await this.projectController.getProjectSettings();
-        const projectsWithNitsField = projectSettingsList.filter((p) => !!p.jiraNitsField).map((p) => p.jiraProjectCode);
-        console.log("projectsWithNitsField", projectsWithNitsField);
-        const projectsWithoutNitsField = projectSettingsList
-            .filter((p) => projectsWithNitsField.indexOf(p.jiraProjectCode) == -1)
-            .map((p) => p.jiraProjectCode);
-        console.log("projectsWithoutNitsField", projectsWithoutNitsField);
 
-        const validProjectCodes = projectSettingsList.map((p) => p.jiraProjectCode);
+        const validProjectCodes = projectSettingsList.map((p) => p.jiraProjectKey);
         const issuesById = await this.getAllNeededIssues(worklogList);
         const validWorklogs: Worklog[] = [];
         for (const workglog of worklogList) {
             const issue = issuesById[workglog.issueId];
-            const nitsField = issue.fields[this.projectConfig.jira.nitsCustomField] as IIssueCustomField;
+            const parentIssue = issue.fields.parent ? issuesById[issue.fields.parent.id] : null;
             assert(issue, `Issue ${workglog.issueId} of worklog ${workglog.toString()} not found`);
-            if (validProjectCodes.indexOf(issue.fields.project.key) == -1) {
-                report.log.push(`Worklog ${workglog.toString()} skipped. Project ${issue.fields.project.key} is not configured.`);
+
+            const projectKey = issue.fields.project.key;
+            let nitsField = issue.fields[this.projectConfig.jira.nitsCustomField] as IIssueCustomField;
+            nitsField = nitsField || (parentIssue ? (parentIssue.fields[this.projectConfig.jira.nitsCustomField] as IIssueCustomField) : null);
+            const nitsFieldId = nitsField ? nitsField.id : null;
+
+            let projectSettings: IProjectSettings = null;
+
+            if (validProjectCodes.indexOf(projectKey) == -1) {
+                report.log.push(`Worklog ${workglog.toString()} skipped. Project ${projectKey} is not configured.`);
                 continue;
             }
-            // Issue with project without specified nits field
-            if (projectsWithoutNitsField.indexOf(issue.fields.project.key) > -1) {
-                validWorklogs.push(workglog);
-                const projectSettings = projectSettingsList.find((p) => p.jiraProjectCode == issue.fields.project.key && !p.jiraNitsField);
-                report.log.push(`Worklog ${workglog.toString()} passed. Artifact ${projectSettings.wtmArtifact} will be used.`);
-                wtmTsConfigPerWorklogs[workglog.id] = {
-                    projectSettings,
-                    artifact: projectSettings.wtmArtifact,
-                };
-                continue;
-            }
-            // Issue with project and nits specified
-            let projectSettings = projectSettingsList.find(
-                (p) => p.jiraProjectCode == issue.fields.project.key && p.jiraNitsField && p.jiraNitsField == nitsField?.id
-            );
+
+            // Exact fit of project and NITS field
+            projectSettings = projectSettingsList.find((p) => p.jiraProjectKey == projectKey && p.jiraNitsField && p.jiraNitsField == nitsFieldId);
             if (projectSettings) {
                 report.log.push(`Worklog ${workglog.toString()} passed. Artifact ${projectSettings.wtmArtifact} will be used.`);
+            }
+            // Issue with project without specified NITS field
+            if (!projectSettings) {
+                projectSettings = projectSettingsList.find((p) => p.jiraProjectKey == projectKey && !p.jiraNitsField && !nitsFieldId);
+                if (projectSettings) {
+                    report.log.push(`Worklog ${workglog.toString()} passed. Artifact ${projectSettings.wtmArtifact} will be used.`);
+                }
+            }
+            // Issue with project but with unknown NITS field
+            if (!projectSettings) {
+                projectSettings = projectSettingsList.find((p) => p.jiraProjectKey == projectKey && !p.jiraNitsField && nitsFieldId);
+                if (projectSettings) {
+                    report.log.push(
+                        `Worklog ${workglog.toString()} passed. Artifact ${
+                            projectSettings.wtmArtifact
+                        } will be used. WARNING: issue or parent has unused NITS custom field ${JSON.stringify(nitsField)}.`
+                    );
+                }
+            }
+            if (projectSettings) {
                 validWorklogs.push(workglog);
                 wtmTsConfigPerWorklogs[workglog.id] = {
                     projectSettings,
                     artifact: projectSettings.wtmArtifact,
                 };
+            } else {
+                report.log.push(`Worklog ${workglog.toString()} skipped. Neither issue ${issue.key} nor parent has no valid configuration.`);
             }
-            assert(!nitsField?.id, `Unknown nitsCustomField ${JSON.stringify(nitsField)}.`);
-
-            if (issue.fields.parent) {
-                const parent = issuesById[issue.fields.parent.id];
-                assert(parent);
-                projectSettings = projectSettingsList.find(
-                    (p) => p.jiraProjectCode == parent.fields.project.key && p.jiraNitsField && p.jiraNitsField == nitsField?.id
-                );
-                if (projectSettings) {
-                    report.log.push(`Worklog ${workglog.toString()} passed. Artifact ${projectSettings.wtmArtifact} will be used because of issue parent.`);
-                    validWorklogs.push(workglog);
-                    wtmTsConfigPerWorklogs[workglog.id] = {
-                        projectSettings,
-                        artifact: projectSettings.wtmArtifact,
-                    };
-                    continue;
-                }
-                projectSettings = projectSettingsList.find((p) => p.jiraProjectCode == parent.fields.project.key && !p.jiraNitsField && !nitsField?.id);
-                if (projectSettings) {
-                    report.log.push(`Worklog ${workglog.toString()} passed. Artifact ${projectSettings.wtmArtifact} will be used because of issue parent.`);
-                    validWorklogs.push(workglog);
-                    wtmTsConfigPerWorklogs[workglog.id] = {
-                        projectSettings,
-                        artifact: projectSettings.wtmArtifact,
-                    };
-                    continue;
-                }
-            }
-            report.log.push(`Worklog ${workglog.toString()} skipped. Neither issue ${issue.key} nor parent has no valid configuration.`);
         }
         return validWorklogs;
     }
 
     private async getAllNeededIssues(worklogList: Worklog[]): Promise<{ [id: string]: IIssue }> {
-        const issues = await this.jiraModel.getIssuesById(worklogList.map((w) => w.issueId));
+        const issues = worklogList.length ? await this.jiraModel.getIssuesById(worklogList.map((w) => w.issueId)) : [];
         const issuesById = arrayUtils.toDictionary<IIssue, IIssue>(issues, (i) => i.id);
-        const parents = await this.jiraModel.getIssuesById(issues.filter((i) => i.fields.parent?.id).map((i) => i.fields.parent.id));
+        const parents = issues.length ? await this.jiraModel.getIssuesById(issues.filter((i) => i.fields.parent?.id).map((i) => i.fields.parent.id)) : [];
         parents.forEach((p) => {
             if (!issuesById[p.id]) {
                 issuesById[p.id] = p;
@@ -152,9 +135,9 @@ export class SyncController {
     }
 }
 
-interface IWtmTsConfig {
+export interface IWtmTsConfig {
     artifact: string;
     projectSettings: IProjectSettings;
 }
 
-type IWtmTsConfigPerWorklogId = { [worklogId: string]: IWtmTsConfig };
+export type IWtmTsConfigPerWorklogId = { [worklogId: string]: IWtmTsConfig };

@@ -54,7 +54,7 @@ export const MainPage = () => {
 
     const onLogout = async () => {
         await ajax.post<boolean>(Router.PageLogout);
-        history.push("/");
+        history.push(Router.PageLogin);
     };
 
     return (

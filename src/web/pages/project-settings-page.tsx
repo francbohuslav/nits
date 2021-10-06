@@ -15,7 +15,7 @@ export const ProjectSettingsPage = () => {
     const [projectSettings, setProjectSettings] = useState<IProjectSettings[]>(null);
     const [nitsFieldValues, setNitsFieldValues] = useState<{ [id: string]: string }>({});
     const [projects, setProjects] = useState<{ [id: string]: string }>({});
-    projectSettings?.sort((p1, p2) => p1.jiraProjectCode.localeCompare(p2.jiraProjectCode) || p1.jiraNitsField.localeCompare(p2.jiraNitsField));
+    projectSettings?.sort((p1, p2) => p1.jiraProjectKey.localeCompare(p2.jiraProjectKey) || p1.jiraNitsField.localeCompare(p2.jiraNitsField));
     const rows = projectSettings?.map((p, index) => ({ ...p, id: index }));
 
     const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +53,7 @@ export const ProjectSettingsPage = () => {
         }
     };
 
-    const onAdd = () => setProjectSettings([...projectSettings, { jiraNitsField: "", jiraProjectCode: "", wtmArtifact: "" }]);
+    const onAdd = () => setProjectSettings([...projectSettings, { jiraNitsField: "", jiraProjectKey: "", wtmArtifact: "" }]);
     const onDelete = (index: number) => {
         if (confirm("Opravdu smazat tento záznam?")) {
             setProjectSettings(projectSettings.filter((_v, i) => index != i));
@@ -66,8 +66,8 @@ export const ProjectSettingsPage = () => {
 
     const columns: GridColumns = [
         {
-            field: "jiraProjectCode",
-            headerName: "JIRA project code",
+            field: "jiraProjectKey",
+            headerName: "JIRA project key",
             type: "singleSelect",
             valueOptions: Object.entries(projects).map(([k, v]) => ({
                 value: k,

@@ -9,7 +9,7 @@ export interface IUserData {
 }
 
 export interface IProjectSettings {
-    jiraProjectCode: string;
+    jiraProjectKey: string;
     jiraNitsField: string;
     wtmArtifact: string;
 }

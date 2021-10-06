@@ -1,6 +1,7 @@
 import { useHistory } from "react-router";
 import { IBaseResponse } from "../common/ajax-interfaces";
 import { thisApp } from "./app-provider";
+import { Router } from "./router";
 
 class Ajax {
     constructor(private history: any) {}
@@ -42,7 +43,7 @@ class Ajax {
     }
 
     private goToLogin() {
-        this.history.push("/");
+        this.history.push(Router.PageLogin);
     }
 
     private async processResult<T>(response: Response, throwException: boolean): Promise<IBaseResponse<T>> {
