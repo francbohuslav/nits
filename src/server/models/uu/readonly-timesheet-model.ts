@@ -1,7 +1,8 @@
+import arrayUtils from "../../../common/array-utils";
 import dateUtils from "../../../common/date-utils";
 import { IUserData } from "../../../common/interfaces";
 import { WtmApi } from "../../apis/wtm-api";
-import { ISyncReportUser } from "../interfaces";
+import { ISyncReportUser, TimesheetMapping } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
 import { UuUserModel } from "../uu-user-model";
 import { ITimesheetModel, Timesheet } from "./interfaces";
@@ -38,14 +39,33 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
         }
         return timesheets;
     }
-    convertWorklogsToTimesheets(worklogList: Worklog[]): Timesheet[] {
-        return worklogList.map((w) => {
-            const ts = new Timesheet();
-            ts.description = w.commentAsText;
-            ts.datetimeFrom = w.startedDate.toISOString();
-            ts.datetimeTo = new Date(dateUtils.increase(w.startedDate, "seconds", w.timeSpentSeconds)).toISOString();
-            //TODO: BF: tady bude prevod na subject
-            return ts;
+    convertWorklogsToTimesheetMappings(worklogList: Worklog[], report: ISyncReportUser): TimesheetMapping[] {
+        worklogList.forEach((w) => report.log.push(w.toString()));
+        //TODO: BF: otestovat utc, zda se nahodou casy v 11vecer a v 1 ranu vykazou spravne
+        const worklogsPerDay = arrayUtils.toGroups(worklogList, (w) => dateUtils.toIsoFormat(w.startedDate));
+        const worklogsPerDayAndIssue: { [day: string]: { [issueId: string]: Worklog[] } } = {};
+        Object.entries(worklogsPerDay).forEach(([day, wlogs]) => (worklogsPerDayAndIssue[day] = arrayUtils.toGroups(wlogs, (w) => w.issueId)));
+        console.log(worklogsPerDayAndIssue);
+        const timesheetsMapping: TimesheetMapping[] = [];
+        Object.entries(worklogsPerDayAndIssue).forEach(([day, worklogsPerIssue]) => {
+            Object.entries(worklogsPerIssue).forEach(([issueId, worklogs]) => {
+                const mapping = new TimesheetMapping();
+                mapping.jiraIssueId = issueId;
+                mapping.date = day;
+                mapping.description = worklogs.map((w) => w.commentAsText).join("\n");
+                mapping.spentSeconds = arrayUtils.sumAction(worklogs, (w) => w.timeSpentSeconds);
+                mapping.jiraWorklogs = worklogs;
+                timesheetsMapping.push(mapping);
+            });
         });
+        return timesheetsMapping;
+        // const ts = new Timesheet();
+        // ts.description = worklogs.map((w) => w.commentAsText).join("\n");
+
+        // ts.datetimeFrom = w.startedDate.toISOString();
+        // ts.datetimeTo = new Date(dateUtils.increase(w.startedDate, "seconds", w.timeSpentSeconds)).toISOString();
+        // //TODO: BF: tady bude prevod na subject
+        // timesheets.push(ts);
+        // return ts;
     }
 }

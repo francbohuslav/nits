@@ -14,7 +14,7 @@ export class Worklog {
     public startedDate: Date;
 
     public toString(): string {
-        return `JIRA Worklog ${this.author.displayName} ${this.started}`;
+        return `JIRA Worklog ${this.author.displayName} ${this.issueId} ${this.started}`;
     }
 }
 

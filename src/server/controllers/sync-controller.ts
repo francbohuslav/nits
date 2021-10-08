@@ -19,35 +19,41 @@ export class SyncController {
     ) {}
 
     public async sync(): Promise<ISyncReport> {
-        const userDataList = await this.userDataModel.getAllValidUserData();
         const report: ISyncReport = { users: [], log: [] };
-        let worklogList = await this.jiraModel.getLastWorklogs();
+
+        // Get all changed worklogs
+        let allWorklogList = await this.jiraModel.getLastWorklogs();
+
+        // Filter that worklogs be project settings. Only worklogs with artifact is relevant
         const wtmTsConfigPerWorklogs: IWtmTsConfigPerWorklogId = {};
-        worklogList = await this.filterWorklogsAndAssignWtmConfig(worklogList, wtmTsConfigPerWorklogs, report);
+        allWorklogList = await this.filterWorklogsAndAssignWtmConfig(allWorklogList, wtmTsConfigPerWorklogs, report);
+
+        // Split worklogs by user
         const worklogListPerAccountId: { [accountId: string]: Worklog[] } = {};
-        worklogList.forEach((w) => {
+        allWorklogList.forEach((w) => {
             const accountId = w.author.accountId;
             worklogListPerAccountId[accountId] = worklogListPerAccountId[accountId] || [];
             worklogListPerAccountId[accountId].push(w);
         });
-        for (const [accountId, worklogList] of Object.entries(worklogListPerAccountId)) {
-            const userData = userDataList.find((u) => u.jiraAccountId == accountId);
+
+        // Process user's worklogs
+        const userDataList = await this.userDataModel.getAllValidUserData();
+        for (const userData of userDataList) {
+            const worklogList = worklogListPerAccountId[userData.jiraAccountId] || [];
             const reportUser: ISyncReportUser = {
-                name: userData?.name,
-                uid: userData?.uid || worklogList[0].author.displayName,
+                name: userData.name,
+                uid: userData.uid,
                 log: [],
             };
-            if (!userData) {
-                //report.log.push("User is not logged into NITS, skipped.");
-                continue;
-            }
             report.users.push(reportUser);
             try {
                 const timesheetModel = this.timesheetModelFactory(userData.uuAccessCode1, userData.uuAccessCode2);
-                const newTimesheets = timesheetModel.convertWorklogsToTimesheets(worklogList);
-                const timesheets = await timesheetModel.getLastUserTimesheets(userData);
+                const timesheetMapping = timesheetModel.convertWorklogsToTimesheetMappings(worklogList, reportUser);
+                console.log(timesheetMapping);
+                timesheetMapping.forEach((m) => reportUser.log.push(m.toString()));
+                /*const timesheets = await timesheetModel.getLastUserTimesheets(userData);
                 await timesheetModel.removeTimesheets(timesheets, reportUser);
-                await timesheetModel.saveTimesheets(newTimesheets, reportUser);
+                await timesheetModel.saveTimesheets(newTimesheets, reportUser);*/
             } catch (err) {
                 if (err instanceof Error) {
                     reportUser.log.push(err.message + "\n" + err.stack);

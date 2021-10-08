@@ -11,6 +11,7 @@ export class JiraModel {
             w.commentAsText = this.convertCommentToText(w);
             w.startedDate = new Date(w.started);
         });
+        worklogList.sort((a, b) => a.startedDate.getTime() - b.startedDate.getTime());
         return worklogList;
     }
 

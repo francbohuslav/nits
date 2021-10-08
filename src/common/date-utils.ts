@@ -22,6 +22,11 @@ class DateUtils {
         return Math.round(date.getTime() / 1000);
     }
 
+    /**
+     * Returns date in ISO format, e.g 2021-10-08
+     * @param date input date
+     * @returns Date only in ISO format, e.g 2021-10-08
+     */
     public toIsoFormat(date: number | Date | string = new Date()): string {
         if (typeof date === "string") {
             date = new Date(date);

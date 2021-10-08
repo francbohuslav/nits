@@ -102,39 +102,39 @@ function sendError(res: Response, ex: any) {
     );
 }
 
-const methods: any[] = [
-    ["post", "/server/login", userRequester.login.bind(userRequester)],
-    ["post", "/server/logout", userRequester.logout.bind(userRequester)],
-    ["get", "/server/get-user-public-data", userRequester.getUserPublicData.bind(userRequester), loginAuthorize],
-    ["get", "/server/get-user-session", userRequester.getUserSession.bind(userRequester), loginAuthorize],
-    ["post", "/server/logout-jira", userRequester.logoutJira.bind(userRequester), loginAuthorize],
-    ["get", "/server/jira/oauth", jiraRequester.oauth.bind(jiraRequester)],
-    ["get", "/server/sync", syncRequester.sync.bind(syncRequester)],
-    ["post", "/server/notify/set", notifyRequester.setNotificationEmail.bind(notifyRequester), loginAuthorize],
+const methods: IServerMethod[] = [
+    m("post", "/server/login", userRequester.login.bind(userRequester)),
+    m("post", "/server/logout", userRequester.logout.bind(userRequester)),
+    m("get", "/server/get-user-public-data", userRequester.getUserPublicData.bind(userRequester), loginAuthorize),
+    m("get", "/server/get-user-session", userRequester.getUserSession.bind(userRequester), loginAuthorize),
+    m("post", "/server/logout-jira", userRequester.logoutJira.bind(userRequester), loginAuthorize),
+    m("get", "/server/jira/oauth", jiraRequester.oauth.bind(jiraRequester)),
+    m("get", "/server/sync", syncRequester.sync.bind(syncRequester), undefined, { formatOutput: true }),
+    m("post", "/server/notify/set", notifyRequester.setNotificationEmail.bind(notifyRequester), loginAuthorize),
 
     // admin commands
-    ["get", "/server/project-settings/get", projectReqester.getProjectSettings.bind(projectReqester), adminAuthorize],
-    ["post", "/server/project-settings/set", projectReqester.setProjectSettings.bind(projectReqester), adminAuthorize],
+    m("get", "/server/project-settings/get", projectReqester.getProjectSettings.bind(projectReqester), adminAuthorize),
+    m("post", "/server/project-settings/set", projectReqester.setProjectSettings.bind(projectReqester), adminAuthorize),
 ];
 
-const processRequest = (method: (req: express.Request, res: express.Response) => any) => async (req: express.Request, res: express.Response) => {
+const processRequest = (method: IServerAction, options: IServerMethodOptions) => async (req: express.Request, res: express.Response) => {
     try {
         const dataResult = await method(req, res);
         const result: IBaseResponse<unknown> = {
             data: dataResult,
         };
-        res.send(isDevelopment ? JSON.stringify(result, null, 2) : JSON.stringify(result));
+        res.send(isDevelopment || options.formatOutput ? JSON.stringify(result, null, 2) : JSON.stringify(result));
     } catch (ex) {
         sendError(res, ex);
     }
 };
 
 methods.forEach((method) => {
-    const postOrGet = (app as any)[method[0]].bind(app);
-    if (method[3]) {
-        postOrGet(method[1], method[3], processRequest(method[2]));
+    const postOrGet = (app as any)[method.method].bind(app);
+    if (method.authorization) {
+        postOrGet(method.path, method.authorization, processRequest(method.action, method.options));
     } else {
-        postOrGet(method[1], processRequest(method[2]));
+        postOrGet(method.path, processRequest(method.action, method.options));
     }
 });
 
@@ -155,3 +155,27 @@ const httpServer = http.createServer(app);
 httpServer.listen(port, () => {
     console.log("HTTP Server running on port " + port);
 });
+
+type IServerAction = (req: express.Request, res: express.Response) => any;
+type IMiddleWare = (req: Request, res: Response, next: () => void) => void;
+interface IServerMethodOptions {
+    formatOutput?: boolean;
+}
+
+interface IServerMethod {
+    method: string;
+    path: string;
+    action: IServerAction;
+    authorization: IMiddleWare;
+    options: IServerMethodOptions;
+}
+
+function m(method: string, path: string, action: IServerAction, authorization?: IMiddleWare, options?: IServerMethodOptions): IServerMethod {
+    return {
+        action,
+        method,
+        path,
+        authorization,
+        options: options || {},
+    };
+}
