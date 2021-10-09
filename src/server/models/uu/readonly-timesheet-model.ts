@@ -14,13 +14,15 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
         for (const ts of newTimesheets) {
             report.log.push(`Simulation of saving timesheet ${ts}`);
         }
+        //TODO: BF: implement in WritebleTimesheetModel
     }
     public async removeTimesheets(timesheets: Timesheet[], report: ISyncReportUser): Promise<void> {
         for (const ts of timesheets) {
             report.log.push(`Simulation of removing timesheet ${ts}`);
         }
+        //TODO: BF: implement in WritebleTimesheetModel
     }
-    public async getLastUserTimesheets(_userData: IUserData): Promise<Timesheet[]> {
+    public async getUserLastTimesheets(_userData: IUserData): Promise<Timesheet[]> {
         const tokenResponse = await this.uuUserModel.getToken(this.accessCode1, this.accessCode2);
         const to = new Date();
         const toStr = dateUtils.toIsoFormat(to);

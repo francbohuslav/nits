@@ -41,6 +41,13 @@
             "group": "build",
             "label": "npm: watch-server",
             "isBackground": true
+        },
+        {
+            "type": "npm",
+            "script": "test-watch",
+            "group": "build",
+            "problemMatcher": [],
+            "label": "npm: test-watch"
         }
     ]
 }

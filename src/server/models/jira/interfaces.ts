@@ -14,7 +14,7 @@ export class Worklog {
     public startedDate: Date;
 
     public toString(): string {
-        return `JIRA Worklog ${this.author.displayName} ${this.issueId} ${this.started}`;
+        return `JIRA Worklog ${this.author.displayName} ${this.issueId} ${this.started} ${this.commentAsText}`;
     }
 }
 
@@ -38,7 +38,8 @@ export interface IContent {
 }
 
 export interface ISegments {
-    type: "text";
+    type: "text" | "emoji";
+    attrs: any;
     text: string;
 }
 

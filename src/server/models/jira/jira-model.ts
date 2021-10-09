@@ -24,7 +24,6 @@ export class JiraModel {
         return await this.jiraApi.searchIssues("id in (" + uniqIds.join(",") + ")", ["project", "parent", this.projectConfig.jira.nitsCustomField]);
     }
 
-    //TODO: BF: vice vykazu nenaslo
     private convertCommentToText(worklog: Worklog): string {
         worklog.commentAsTextErrors = [];
         const comment = worklog.comment;
@@ -42,11 +41,16 @@ export class JiraModel {
                 }
                 const line: string[] = [];
                 p.content.forEach((s) => {
-                    if (s.type != "text") {
+                    if (s.type == "text") {
+                        if (s.text) {
+                            line.push(s.text);
+                        }
+                    } else if (s.type == "emoji") {
+                        if (s.attrs?.text) {
+                            line.push(s.attrs?.text);
+                        }
+                    } else {
                         worklog.commentAsTextErrors.push(`Comment segment "${s.type}" is not supported in worklog ${worklog.id}"`);
-                    }
-                    if (s.text) {
-                        line.push(s.text);
                     }
                 });
                 if (line.length) {

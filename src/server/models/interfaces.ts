@@ -8,7 +8,7 @@ export interface ISyncReport {
 export interface ISyncReportUser {
     uid: string;
     name: string;
-    log: string[];
+    log: any[];
 }
 export class TimesheetMapping {
     public jiraIssueId: string;

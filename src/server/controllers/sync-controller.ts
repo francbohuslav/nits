@@ -1,9 +1,9 @@
 import arrayUtils from "../../common/array-utils";
-import { ISyncReport, ISyncReportUser } from "../models/interfaces";
+import { ISyncReport, ISyncReportUser, TimesheetMapping } from "../models/interfaces";
 import { IIssue, IIssueCustomField, Worklog } from "../models/jira/interfaces";
 import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
-import { TimesheetModelFactoryHandler } from "../models/uu/interfaces";
+import { Timesheet, TimesheetModelFactoryHandler } from "../models/uu/interfaces";
 import { ProjectController } from "./project-controller";
 import { assert } from "../../common/core";
 import { IProjectConfig } from "../project-config";
@@ -48,12 +48,27 @@ export class SyncController {
             report.users.push(reportUser);
             try {
                 const timesheetModel = this.timesheetModelFactory(userData.uuAccessCode1, userData.uuAccessCode2);
+                // Join worklogs from same issue
                 const timesheetMapping = timesheetModel.convertWorklogsToTimesheetMappings(worklogList, reportUser);
-                console.log(timesheetMapping);
+                const commentErrors = worklogList.filter((w) => w.commentAsTextErrors.length > 0).map((w) => w.commentAsTextErrors);
+                if (commentErrors.length) {
+                    reportUser.log.push(commentErrors);
+                }
                 timesheetMapping.forEach((m) => reportUser.log.push(m.toString()));
-                /*const timesheets = await timesheetModel.getLastUserTimesheets(userData);
-                await timesheetModel.removeTimesheets(timesheets, reportUser);
-                await timesheetModel.saveTimesheets(newTimesheets, reportUser);*/
+                const exitingTimesheets = await timesheetModel.getUserLastTimesheets(userData);
+                const { timesheetsToDelete, timesheetsToRemain } = this.separateTimesheets(exitingTimesheets);
+                const newTimesheets = this.computeNewTimesheets(timesheetMapping, timesheetsToRemain);
+                reportUser.log.push({
+                    timesheetMapping: timesheetMapping.map((m) => {
+                        delete m.jiraWorklogs;
+                        return m;
+                    }),
+                });
+                reportUser.log.push({ timesheetsToDelete });
+                reportUser.log.push({ timesheetsToRemain });
+                reportUser.log.push({ newTimesheets });
+                await timesheetModel.removeTimesheets(timesheetsToDelete, reportUser);
+                await timesheetModel.saveTimesheets(newTimesheets, reportUser);
             } catch (err) {
                 if (err instanceof Error) {
                     reportUser.log.push(err.message + "\n" + err.stack);
@@ -138,6 +153,28 @@ export class SyncController {
             }
         });
         return issuesById;
+    }
+
+    private separateTimesheets(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; timesheetsToRemain: Timesheet[] } {
+        const timesheetsToDelete: Timesheet[] = [];
+        const timesheetsToRemain: Timesheet[] = [];
+        for (const timesheet of exitingTimesheets) {
+            if (timesheet.data?.nits) {
+                timesheetsToDelete.push(timesheet);
+            } else {
+                timesheetsToRemain.push(timesheet);
+            }
+        }
+        return {
+            timesheetsToRemain,
+            timesheetsToDelete,
+        };
+    }
+
+    private computeNewTimesheets(timesheetMapping: TimesheetMapping[], timesheetsToRemain: Timesheet[]): Timesheet[] {
+        console.log(timesheetMapping);
+        console.log("timesheetsToRemain", timesheetsToRemain);
+        return [];
     }
 }
 
