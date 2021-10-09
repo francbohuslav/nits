@@ -4,3 +4,4 @@
 /userdata/users/*.data
 /.env
 /userdata/projects/project-settings.data
+/coverage

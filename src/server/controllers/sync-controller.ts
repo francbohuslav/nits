@@ -143,6 +143,10 @@ export class SyncController {
         return validWorklogs;
     }
 
+    /**
+     * Returns all used issues and parents in worklogs
+     * @param worklogList
+     */
     private async getAllNeededIssues(worklogList: Worklog[]): Promise<{ [id: string]: IIssue }> {
         const issues = worklogList.length ? await this.jiraModel.getIssuesById(worklogList.map((w) => w.issueId)) : [];
         const issuesById = arrayUtils.toDictionary<IIssue, IIssue>(issues, (i) => i.id);
@@ -155,11 +159,11 @@ export class SyncController {
         return issuesById;
     }
 
-    private separateTimesheets(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; timesheetsToRemain: Timesheet[] } {
+    protected separateTimesheets(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; timesheetsToRemain: Timesheet[] } {
         const timesheetsToDelete: Timesheet[] = [];
         const timesheetsToRemain: Timesheet[] = [];
         for (const timesheet of exitingTimesheets) {
-            if (timesheet.data?.nits) {
+            if (timesheet.data?.nits !== undefined) {
                 timesheetsToDelete.push(timesheet);
             } else {
                 timesheetsToRemain.push(timesheet);
@@ -171,7 +175,7 @@ export class SyncController {
         };
     }
 
-    private computeNewTimesheets(timesheetMapping: TimesheetMapping[], timesheetsToRemain: Timesheet[]): Timesheet[] {
+    protected computeNewTimesheets(timesheetMapping: TimesheetMapping[], timesheetsToRemain: Timesheet[]): Timesheet[] {
         console.log(timesheetMapping);
         console.log("timesheetsToRemain", timesheetsToRemain);
         return [];
