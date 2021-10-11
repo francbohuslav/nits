@@ -4,6 +4,7 @@ import { IAccount, IIssue, Worklog } from "./interfaces";
 
 export class JiraModel {
     constructor(private jiraApi: JiraApi, private projectConfig: IProjectConfig) {}
+
     public async getLastWorklogs(): Promise<Worklog[]> {
         const worklogIdList = await this.jiraApi.getUpdatedWorklogIds();
         const worklogList = await this.jiraApi.getWorklogs(worklogIdList);

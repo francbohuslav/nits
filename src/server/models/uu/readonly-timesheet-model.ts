@@ -2,7 +2,7 @@ import arrayUtils from "../../../common/array-utils";
 import dateUtils from "../../../common/date-utils";
 import { IUserData } from "../../../common/interfaces";
 import { WtmApi } from "../../apis/wtm-api";
-import { ISyncReportUser, TimesheetMapping } from "../interfaces";
+import { ISyncReportUser, TimesheetMapping, TimesheetMappingsPerDay } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
 import { UuUserModel } from "../uu-user-model";
 import { ITimesheetModel, Timesheet } from "./interfaces";
@@ -41,18 +41,19 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
         }
         return timesheets;
     }
-    convertWorklogsToTimesheetMappings(worklogList: Worklog[], report: ISyncReportUser): TimesheetMapping[] {
+
+    public convertWorklogsToTimesheetMappings(worklogList: Worklog[], report: ISyncReportUser): TimesheetMappingsPerDay {
         worklogList.forEach((w) => report.log.push(w.toString()));
         //TODO: BF: otestovat utc, zda se nahodou casy v 11vecer a v 1 ranu vykazou spravne
         const worklogsPerDay = arrayUtils.toGroups(worklogList, (w) => dateUtils.toIsoFormat(w.startedDate));
         const worklogsPerDayAndIssue: { [day: string]: { [issueId: string]: Worklog[] } } = {};
-        Object.entries(worklogsPerDay).forEach(([day, wlogs]) => (worklogsPerDayAndIssue[day] = arrayUtils.toGroups(wlogs, (w) => w.issueId)));
+        Object.entries(worklogsPerDay).forEach(([day, wlogs]) => (worklogsPerDayAndIssue[day] = arrayUtils.toGroups(wlogs, (w) => w.issueKey)));
         console.log(worklogsPerDayAndIssue);
         const timesheetsMapping: TimesheetMapping[] = [];
         Object.entries(worklogsPerDayAndIssue).forEach(([day, worklogsPerIssue]) => {
-            Object.entries(worklogsPerIssue).forEach(([issueId, worklogs]) => {
+            Object.entries(worklogsPerIssue).forEach(([issueKey, worklogs]) => {
                 const mapping = new TimesheetMapping();
-                mapping.jiraIssueId = issueId;
+                mapping.jiraIssueKey = issueKey;
                 mapping.date = day;
                 mapping.description = worklogs.map((w) => w.commentAsText).join("\n");
                 mapping.spentSeconds = arrayUtils.sumAction(worklogs, (w) => w.timeSpentSeconds);
@@ -60,7 +61,8 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
                 timesheetsMapping.push(mapping);
             });
         });
-        return timesheetsMapping;
+        const timesheetMappingsPerDay = arrayUtils.toGroups(timesheetsMapping, (m) => m.date);
+        return timesheetMappingsPerDay;
         // const ts = new Timesheet();
         // ts.description = worklogs.map((w) => w.commentAsText).join("\n");
 

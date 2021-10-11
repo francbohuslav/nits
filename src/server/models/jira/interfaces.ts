@@ -1,3 +1,5 @@
+import { assert } from "../../../common/core";
+
 export class Worklog {
     public author: IAccount;
     public created: string; // "2021-09-16T12:19:36.231+0200",
@@ -12,9 +14,19 @@ export class Worklog {
     public commentAsText: string;
     public commentAsTextErrors: string[];
     public startedDate: Date;
+    private _issueKey: string;
+
+    public get issueKey(): string {
+        assert(this._issueKey, "IssueKey must be set before get");
+        return this._issueKey;
+    }
+
+    public set issueKey(value: string) {
+        this._issueKey = value;
+    }
 
     public toString(): string {
-        return `JIRA Worklog ${this.author.displayName} ${this.issueId} ${this.started} ${this.commentAsText}`;
+        return `JIRA Worklog ${this.author.displayName} ${this._issueKey || this.issueId} ${this.started} ${this.commentAsText}`;
     }
 }
 

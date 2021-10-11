@@ -11,7 +11,7 @@ export interface ISyncReportUser {
     log: any[];
 }
 export class TimesheetMapping {
-    public jiraIssueId: string;
+    public jiraIssueKey: string;
     public date: string;
     public spentSeconds: number;
     public jiraWorklogs: Worklog[];
@@ -19,6 +19,7 @@ export class TimesheetMapping {
     public wtmArtifact: string;
 
     public toString(): string {
-        return `Timesheet mapping ${this.date} ${this.spentSeconds / 3600}h ${this.jiraIssueId}`;
+        return `Timesheet mapping ${this.date} ${this.spentSeconds / 3600}h ${this.jiraIssueKey}`;
     }
 }
+export type TimesheetMappingsPerDay = { [day: string]: TimesheetMapping[] };

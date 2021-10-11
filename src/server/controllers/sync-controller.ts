@@ -1,5 +1,5 @@
 import arrayUtils from "../../common/array-utils";
-import { ISyncReport, ISyncReportUser, TimesheetMapping } from "../models/interfaces";
+import { ISyncReport, ISyncReportUser, TimesheetMappingsPerDay } from "../models/interfaces";
 import { IIssue, IIssueCustomField, Worklog } from "../models/jira/interfaces";
 import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
@@ -26,7 +26,9 @@ export class SyncController {
 
         // Filter that worklogs be project settings. Only worklogs with artifact is relevant
         const wtmTsConfigPerWorklogs: IWtmTsConfigPerWorklogId = {};
-        allWorklogList = await this.filterWorklogsAndAssignWtmConfig(allWorklogList, wtmTsConfigPerWorklogs, report);
+        const issuesById = await this.getAllNeededIssues(allWorklogList);
+        allWorklogList.forEach((w) => (w.issueKey = issuesById[w.issueId].key));
+        allWorklogList = await this.filterWorklogsAndAssignWtmConfig(allWorklogList, issuesById, wtmTsConfigPerWorklogs, report);
 
         // Split worklogs by user
         const worklogListPerAccountId: { [accountId: string]: Worklog[] } = {};
@@ -49,21 +51,15 @@ export class SyncController {
             try {
                 const timesheetModel = this.timesheetModelFactory(userData.uuAccessCode1, userData.uuAccessCode2);
                 // Join worklogs from same issue
-                const timesheetMapping = timesheetModel.convertWorklogsToTimesheetMappings(worklogList, reportUser);
+                const timesheetMappingsPerDay = timesheetModel.convertWorklogsToTimesheetMappings(worklogList, reportUser);
                 const commentErrors = worklogList.filter((w) => w.commentAsTextErrors.length > 0).map((w) => w.commentAsTextErrors);
                 if (commentErrors.length) {
                     reportUser.log.push(commentErrors);
                 }
-                timesheetMapping.forEach((m) => reportUser.log.push(m.toString()));
                 const exitingTimesheets = await timesheetModel.getUserLastTimesheets(userData);
                 const { timesheetsToDelete, timesheetsToRemain } = this.separateTimesheets(exitingTimesheets);
-                const newTimesheets = this.computeNewTimesheets(timesheetMapping, timesheetsToRemain);
-                reportUser.log.push({
-                    timesheetMapping: timesheetMapping.map((m) => {
-                        delete m.jiraWorklogs;
-                        return m;
-                    }),
-                });
+                const newTimesheets = this.computeNewTimesheets(timesheetMappingsPerDay, timesheetsToRemain);
+                reportUser.log.push({ timesheetMappingsPerDay });
                 reportUser.log.push({ timesheetsToDelete });
                 reportUser.log.push({ timesheetsToRemain });
                 reportUser.log.push({ newTimesheets });
@@ -82,18 +78,19 @@ export class SyncController {
 
     protected async filterWorklogsAndAssignWtmConfig(
         worklogList: Worklog[],
+        issuesById: { [id: string]: IIssue },
         wtmTsConfigPerWorklogs: IWtmTsConfigPerWorklogId,
         report: ISyncReport
     ): Promise<Worklog[]> {
         const projectSettingsList = await this.projectController.getProjectSettings();
 
         const validProjectCodes = projectSettingsList.map((p) => p.jiraProjectKey);
-        const issuesById = await this.getAllNeededIssues(worklogList);
+
         const validWorklogs: Worklog[] = [];
         for (const workglog of worklogList) {
             const issue = issuesById[workglog.issueId];
             const parentIssue = issue.fields.parent ? issuesById[issue.fields.parent.id] : null;
-            assert(issue, `Issue ${workglog.issueId} of worklog ${workglog.toString()} not found`);
+            assert(issue, `Issue ${workglog.issueKey} of worklog ${workglog.toString()} not found`);
 
             const projectKey = issue.fields.project.key;
             let nitsField = issue.fields[this.projectConfig.jira.nitsCustomField] as IIssueCustomField;
@@ -175,8 +172,8 @@ export class SyncController {
         };
     }
 
-    protected computeNewTimesheets(timesheetMapping: TimesheetMapping[], timesheetsToRemain: Timesheet[]): Timesheet[] {
-        console.log(timesheetMapping);
+    protected computeNewTimesheets(timesheetMappingsPerDay: TimesheetMappingsPerDay, timesheetsToRemain: Timesheet[]): Timesheet[] {
+        console.log(timesheetMappingsPerDay);
         console.log("timesheetsToRemain", timesheetsToRemain);
         return [];
     }

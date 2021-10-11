@@ -1,5 +1,5 @@
 import { IUserData } from "../../../common/interfaces";
-import { ISyncReportUser, TimesheetMapping } from "../interfaces";
+import { ISyncReportUser, TimesheetMappingsPerDay } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
 
 export type TimesheetModelFactoryHandler = (accessCode1: string, accessCode2: string) => ITimesheetModel;
@@ -8,7 +8,7 @@ export interface ITimesheetModel {
     saveTimesheets(newTimesheets: Timesheet[], report: ISyncReportUser): Promise<void>;
     removeTimesheets(timesheets: Timesheet[], report: ISyncReportUser): Promise<void>;
     getUserLastTimesheets(userData: IUserData): Promise<Timesheet[]>;
-    convertWorklogsToTimesheetMappings(worklogList: Worklog[], report: ISyncReportUser): TimesheetMapping[];
+    convertWorklogsToTimesheetMappings(worklogList: Worklog[], report: ISyncReportUser): TimesheetMappingsPerDay;
 }
 
 export class Timesheet {
@@ -28,6 +28,7 @@ export class Timesheet {
 
 export interface ITimesheetData {
     nits: {
-        ids: number[];
+        issueKey: string;
+        worklogIds: string[];
     };
 }
