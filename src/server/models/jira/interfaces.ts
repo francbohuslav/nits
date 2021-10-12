@@ -1,4 +1,5 @@
 import { assert } from "../../../common/core";
+import dateUtils from "../../../common/date-utils";
 
 export class Worklog {
     public author: IAccount;
@@ -26,7 +27,9 @@ export class Worklog {
     }
 
     public toString(): string {
-        return `JIRA Worklog ${this.author.displayName} ${this._issueKey || this.issueId} ${this.started} ${this.commentAsText}`;
+        return `JIRA Worklog ${this.author.displayName} ${this._issueKey || this.issueId} ${dateUtils.formatDateTime(this.started, true)} ${
+            this.commentAsText
+        }`;
     }
 }
 

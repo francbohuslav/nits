@@ -1,3 +1,4 @@
+import dateUtils from "../../../common/date-utils";
 import { IUserData } from "../../../common/interfaces";
 import { ISyncReportUser, TimesheetMappingsPerDay } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
@@ -22,7 +23,7 @@ export class Timesheet {
     public data: ITimesheetData;
 
     public toString(): string {
-        return `UU Timesheet: ${this.datetimeFrom}-${this.datetimeTo} - ${this.description}`;
+        return `UU Timesheet: ${dateUtils.formatDateTime(this.datetimeFrom, true)} - ${dateUtils.formatDateTime(this.datetimeTo, true)} - ${this.description}`;
     }
 }
 

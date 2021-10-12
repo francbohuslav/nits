@@ -322,6 +322,17 @@ test("getNextFreeTimeSegment", () => {
     });
     // Next timesheets overlap searchFromTime
     expect(syncController.getNextFreeTimeSegment2(searchFromTime, [createTimesheet("2021-10-12T05:00:00Z", "2021-10-12T22:00:00Z")])).toBeNull();
+
+    // Adjacent Remaining timesheets
+    expect(
+        syncController.getNextFreeTimeSegment2(searchFromTime, [
+            createTimesheet("2021-10-12T06:00:00Z", "2021-10-12T07:00:00Z"),
+            createTimesheet("2021-10-12T07:00:00Z", "2021-10-12T08:00:00Z"),
+        ])
+    ).toEqual({
+        from: new Date("2021-10-12T08:00:00Z"),
+        to: new Date("2021-10-12T22:00:00Z"),
+    });
 });
 
 describe("computeNewTimesheetsInDay", () => {

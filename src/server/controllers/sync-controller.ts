@@ -60,10 +60,9 @@ export class SyncController {
                 const exitingTimesheets = await timesheetModel.getUserLastTimesheets(userData);
                 const { timesheetsToDelete, timesheetsToRemain } = this.separateTimesheets(exitingTimesheets);
                 const newTimesheets = this.computeNewTimesheets(timesheetMappingsPerDay, timesheetsToRemain);
-                reportUser.log.push({ timesheetMappingsPerDay });
-                reportUser.log.push({ timesheetsToDelete });
-                reportUser.log.push({ timesheetsToRemain });
-                reportUser.log.push({ newTimesheets });
+                // reportUser.log.push({ timesheetMappingsPerDay });
+                reportUser.log.push({ timesheetsToDelete: timesheetsToDelete.map((t) => t.toString()) });
+                reportUser.log.push({ timesheetsToRemain: timesheetsToRemain.map((t) => t.toString()) });
                 await timesheetModel.removeTimesheets(timesheetsToDelete, reportUser);
                 await timesheetModel.saveTimesheets(newTimesheets, reportUser);
             } catch (err) {
@@ -246,7 +245,7 @@ export class SyncController {
     protected getNextFreeTimeSegment(searchFromTime: Date, timesheetsToRemain: Timesheet[]): IInterval {
         const day = dateUtils.toIsoFormat(searchFromTime);
         const timesheetsAfterTime = timesheetsToRemain.filter((t) => !dateUtils.isLowerOrEqualsThen(t.datetimeTo, searchFromTime));
-        if (timesheetsAfterTime.length > 0 && dateUtils.isLowerOrEqualsThen(timesheetsAfterTime[0].datetimeFrom, searchFromTime)) {
+        while (timesheetsAfterTime.length > 0 && dateUtils.isLowerOrEqualsThen(timesheetsAfterTime[0].datetimeFrom, searchFromTime)) {
             searchFromTime = dateUtils.toDate(timesheetsAfterTime[0].datetimeTo);
             timesheetsAfterTime.shift();
         }

@@ -42,9 +42,13 @@ class DateUtils {
         return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
     }
 
-    public formatDateTime(timestamp: number | Date): string {
-        const d = (typeof timestamp === "object" ? timestamp : this.toDate(timestamp)) as Date;
-        return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()} ${d.getHours()}:${(d.getMinutes() + "").padStart(2, "0")}`;
+    public formatDateTime(date: IDateType = new Date(), withLeadingSpaces: boolean = false): string {
+        const d = this.toDate(date);
+        const zeros = withLeadingSpaces ? 2 : 1;
+        return `${(d.getDate() + "").padStart(zeros, " ")}.${(d.getMonth() + 1 + "").padStart(zeros, " ")}.${d.getFullYear()} ${(d.getHours() + "").padStart(
+            zeros,
+            " "
+        )}:${(d.getMinutes() + "").padStart(2, "0")}`;
     }
 
     public formatDate(date: IDateType): string {
