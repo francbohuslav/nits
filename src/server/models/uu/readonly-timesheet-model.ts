@@ -63,13 +63,5 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
         });
         const timesheetMappingsPerDay = arrayUtils.toGroups(timesheetsMapping, (m) => m.date);
         return timesheetMappingsPerDay;
-        // const ts = new Timesheet();
-        // ts.description = worklogs.map((w) => w.commentAsText).join("\n");
-
-        // ts.datetimeFrom = w.startedDate.toISOString();
-        // ts.datetimeTo = new Date(dateUtils.increase(w.startedDate, "seconds", w.timeSpentSeconds)).toISOString();
-        // //TODO: BF: tady bude prevod na subject
-        // timesheets.push(ts);
-        // return ts;
     }
 }

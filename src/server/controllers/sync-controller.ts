@@ -1,5 +1,5 @@
 import arrayUtils from "../../common/array-utils";
-import { ISyncReport, ISyncReportUser, TimesheetMappingsPerDay } from "../models/interfaces";
+import { ISyncReport, ISyncReportUser, TimesheetMapping, TimesheetMappingsPerDay } from "../models/interfaces";
 import { IIssue, IIssueCustomField, Worklog } from "../models/jira/interfaces";
 import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
@@ -8,6 +8,7 @@ import { ProjectController } from "./project-controller";
 import { assert } from "../../common/core";
 import { IProjectConfig } from "../project-config";
 import { IProjectSettings } from "../../common/interfaces";
+import dateUtils from "../../common/date-utils";
 
 export class SyncController {
     constructor(
@@ -173,9 +174,94 @@ export class SyncController {
     }
 
     protected computeNewTimesheets(timesheetMappingsPerDay: TimesheetMappingsPerDay, timesheetsToRemain: Timesheet[]): Timesheet[] {
-        console.log(timesheetMappingsPerDay);
-        console.log("timesheetsToRemain", timesheetsToRemain);
-        return [];
+        let newTimesheets: Timesheet[] = [];
+        Object.entries(timesheetMappingsPerDay).forEach(([day, tsm]) => {
+            const timesheetsToRemainOfDay = timesheetsToRemain.filter((t) => dateUtils.toIsoFormat(t.datetimeFrom) == day);
+            newTimesheets = newTimesheets.concat(this.computeNewTimesheetsInDay(tsm, timesheetsToRemainOfDay));
+        });
+        return newTimesheets;
+    }
+
+    protected computeNewTimesheetsInDay(timesheetMapping: TimesheetMapping[], timesheetsToRemain: Timesheet[]): Timesheet[] {
+        if (timesheetMapping.length == 0) {
+            return [];
+        }
+        let startHour = 8;
+        while (startHour > -1) {
+            let searchFromTime = dateUtils.increase(dateUtils.getStartOfDay(timesheetMapping[0].date), "hours", startHour);
+            const newTimesheets: Timesheet[] = [];
+            const timesheetMappingToProcess = JSON.parse(JSON.stringify(timesheetMapping));
+            let interval: IInterval = null;
+            do {
+                interval = this.getNextFreeTimeSegment(searchFromTime, timesheetsToRemain);
+                if (interval) {
+                    this.computeNewTimesheetsInSegment(interval, newTimesheets, timesheetMappingToProcess);
+                    if (timesheetMappingToProcess.length == 0) {
+                        return newTimesheets;
+                    }
+                    if (dateUtils.toIsoFormat(searchFromTime) != dateUtils.toIsoFormat(interval.to)) {
+                        break;
+                    }
+                    searchFromTime = interval.to;
+                }
+            } while (interval);
+            startHour--;
+        }
+        throw new Error(`There is no space in ${timesheetMapping[0].date} for new timesheets`);
+    }
+
+    protected computeNewTimesheetsInSegment(interval: IInterval, newTimesheets: Timesheet[], timesheetMapping: TimesheetMapping[]) {
+        if (timesheetMapping.length == 0) {
+            return;
+        }
+        let restTime = dateUtils.secondsBetween(interval.from, interval.to);
+        let startTime = interval.from;
+        let tsm: TimesheetMapping = null;
+        do {
+            tsm = timesheetMapping[0];
+            const timeToSpent = restTime >= tsm.spentSeconds ? tsm.spentSeconds : restTime;
+            const ts = new Timesheet();
+            ts.description = tsm.description;
+            ts.datetimeFrom = startTime.toISOString();
+            startTime = dateUtils.increase(startTime, "seconds", timeToSpent);
+            ts.datetimeTo = startTime.toISOString();
+            ts.subject = tsm.wtmArtifact;
+            ts.highRate = false;
+            ts.data = {
+                nits: {
+                    issueKey: tsm.jiraIssueKey,
+                    worklogIds: tsm.jiraWorklogs.map((w) => w.id),
+                },
+            };
+            newTimesheets.push(ts);
+            restTime -= timeToSpent;
+            if (timeToSpent < tsm.spentSeconds) {
+                tsm.spentSeconds -= timeToSpent;
+            } else {
+                timesheetMapping.shift();
+            }
+        } while (timesheetMapping.length > 0 && restTime > 0);
+    }
+
+    protected getNextFreeTimeSegment(searchFromTime: Date, timesheetsToRemain: Timesheet[]): IInterval {
+        const day = dateUtils.toIsoFormat(searchFromTime);
+        const timesheetsAfterTime = timesheetsToRemain.filter((t) => !dateUtils.isLowerOrEqualsThen(t.datetimeTo, searchFromTime));
+        if (timesheetsAfterTime.length > 0 && dateUtils.isLowerOrEqualsThen(timesheetsAfterTime[0].datetimeFrom, searchFromTime)) {
+            searchFromTime = dateUtils.toDate(timesheetsAfterTime[0].datetimeTo);
+            timesheetsAfterTime.shift();
+        }
+        // No space to end of day
+        if (day != dateUtils.toIsoFormat(searchFromTime)) {
+            return null;
+        }
+
+        return {
+            from: searchFromTime,
+            to:
+                timesheetsAfterTime.length == 0
+                    ? dateUtils.getStartOfDay(dateUtils.increaseDay(searchFromTime))
+                    : dateUtils.toDate(timesheetsAfterTime[0].datetimeFrom),
+        };
     }
 }
 
@@ -185,3 +271,8 @@ export interface IWtmTsConfig {
 }
 
 export type IWtmTsConfigPerWorklogId = { [worklogId: string]: IWtmTsConfig };
+
+export interface IInterval {
+    from: Date;
+    to: Date;
+}

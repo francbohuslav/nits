@@ -22,7 +22,7 @@ export class Timesheet {
     public data: ITimesheetData;
 
     public toString(): string {
-        return `UU Timesheet: ${this.datetimeFrom} - ${this.description}`;
+        return `UU Timesheet: ${this.datetimeFrom}-${this.datetimeTo} - ${this.description}`;
     }
 }
 

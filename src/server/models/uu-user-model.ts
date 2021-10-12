@@ -24,7 +24,7 @@ export class UuUserModel {
 
     public async getToken(accessCode1: string, accessCode2: string): Promise<ITokenResponse> {
         const key = md5(accessCode1 + "|" + accessCode2);
-        if (this.tokenCache[key] && dateUtils.toTimestamp() < this.tokenCache[key].expirationTimestamp) {
+        if (this.tokenCache[key] && dateUtils.isLowerThen(new Date(), this.tokenCache[key].expirationTimestamp)) {
             return this.tokenCache[key];
         }
         const tokenResponse = await this.uuIdendtityApi.getToken(accessCode1, accessCode2);
