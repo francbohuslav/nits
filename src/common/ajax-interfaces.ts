@@ -16,14 +16,6 @@ export interface ILoginRequest {
     accessCode2: string;
 }
 
-export interface IUserPublicData {
-    jiraAccountId: string;
-    jiraName: string;
-    uid: string;
-    name: string;
-    notificationEmail: string;
-    isAdmin: boolean;
-}
 export interface IProjectSettingsResponse {
     records: IProjectSettings[];
     nitsFiledValues: { [key: string]: string };

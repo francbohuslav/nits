@@ -1,6 +1,7 @@
 import { Request } from "express";
-import { ILoginRequest, IUserPublicData } from "../../common/ajax-interfaces";
+import { ILoginRequest } from "../../common/ajax-interfaces";
 import dateUtils from "../../common/date-utils";
+import { IUserPublicData } from "../../common/interfaces";
 import { UserController } from "../controllers/user-controller";
 import { Crypt } from "../helpers/crypt";
 import { BaseRequester } from "./base-requester";
@@ -34,8 +35,9 @@ export class UserRequester extends BaseRequester {
             name: userData.name,
             uid: userData.uid,
             notificationEmail: userData.notificationEmail,
+            lastSynchronization: userData.lastSynchronization,
             isAdmin: this.userController.isAdmin(uid),
-        };
+        } as IUserPublicData;
     }
 
     public async logoutJira(req: Request): Promise<void> {

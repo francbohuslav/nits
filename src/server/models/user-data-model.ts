@@ -21,6 +21,7 @@ export class UserDataModel {
             jiraAccountId: "",
             jiraName: "",
             notificationEmail: "",
+            lastSynchronization: "",
         };
         const filePath = this.getUserFilePath(uid);
         try {

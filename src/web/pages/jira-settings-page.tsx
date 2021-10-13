@@ -2,7 +2,7 @@ import { Button, LinearProgress, Typography } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import React = require("react");
 import { useHistory } from "react-router-dom";
-import { IUserPublicData } from "../../common/ajax-interfaces";
+import { IUserPublicData } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
 import { Router } from "../router";

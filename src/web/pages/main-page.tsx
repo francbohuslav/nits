@@ -16,6 +16,7 @@ import { Router } from "../router";
 import { DataContext, IDataContextValue } from "../data-context";
 import { useContext, useState } from "react";
 import { Info } from "../components/info";
+import { MainPageStats } from "../components/main-page-stats";
 
 const useStyles = makeStyles({
     button: {
@@ -42,7 +43,7 @@ const useStyles = makeStyles({
 });
 
 export const MainPage = () => {
-    const { isJiraOk, isAdmin, notificationEmail } = useContext<IDataContextValue>(DataContext);
+    const { isJiraOk, userData } = useContext<IDataContextValue>(DataContext);
     const [infoOpen, setInfoOpen] = useState(false);
     const classes = useStyles();
     const history = useHistory();
@@ -65,6 +66,7 @@ export const MainPage = () => {
             <Typography variant="body1" align="center" paragraph>
                 <img src="/images/logo.png" height="200" />
             </Typography>
+            <MainPageStats></MainPageStats>
             <Box mt={4} mb={1}>
                 <Grid container alignItems="center" spacing={1}>
                     <Grid item xs={3} sm={4}></Grid>
@@ -101,7 +103,7 @@ export const MainPage = () => {
                         </Button>
                     </Grid>
                     <Grid item xs={3} sm={4}>
-                        {notificationEmail ? (
+                        {userData?.notificationEmail ? (
                             <Tooltip title="Notifikační e-mail je nastaven">
                                 <CheckIcon className={classes.greenIcon} />
                             </Tooltip>
@@ -113,14 +115,14 @@ export const MainPage = () => {
                     </Grid>
                 </Grid>
             </Box>
-            {isAdmin && (
+            {userData?.isAdmin && (
                 <ButtonRow>
                     <Button className={classes.button} variant="contained" startIcon={<SettingsIcon />} fullWidth onClick={onProjectSetting}>
                         Nastavení
                     </Button>
                 </ButtonRow>
             )}
-            {isAdmin && (
+            {userData?.isAdmin && (
                 <ButtonRow>
                     <Button disabled className={classes.button} variant="contained" startIcon={<StatsIcon />} fullWidth>
                         Statistiky

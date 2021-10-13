@@ -6,6 +6,7 @@ export class Router<TQueryParams> {
     public static PageJiraSettings = "/page/jira-settings/";
     public static PageNotification = "/page/notification/";
     public static PageProjectSettings = "/page/project-settings/";
+    public static PageSynchronization = "/server/sync/";
     public static PageLogout = "/server/logout/";
 
     constructor(public route: string, public history: any, public location: any) {}

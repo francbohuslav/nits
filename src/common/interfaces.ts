@@ -1,11 +1,19 @@
-export interface IUserData {
+interface IUserDataBase {
     jiraAccountId: string;
     jiraName: string;
-    uuAccessCode1: string;
-    uuAccessCode2: string;
     uid: string;
     name: string;
     notificationEmail: string;
+    lastSynchronization: string;
+}
+
+export interface IUserPublicData extends IUserDataBase {
+    isAdmin: boolean;
+}
+
+export interface IUserData extends IUserDataBase {
+    uuAccessCode1: string;
+    uuAccessCode2: string;
 }
 
 export interface IProjectSettings {

@@ -65,6 +65,7 @@ export class SyncController {
                 reportUser.log.push({ timesheetsToRemain: timesheetsToRemain.map((t) => t.toString()) });
                 await timesheetModel.removeTimesheets(timesheetsToDelete, reportUser);
                 await timesheetModel.saveTimesheets(newTimesheets, reportUser);
+                userData.lastSynchronization = new Date().toISOString();
             } catch (err) {
                 if (err instanceof Error) {
                     reportUser.log.push(err.message + "\n" + err.stack);

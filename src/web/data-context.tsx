@@ -1,17 +1,15 @@
 import React = require("react");
 import { useState } from "react";
 import { useAjax } from "./ajax";
-import { IUserPublicData } from "../common/ajax-interfaces";
+import { IUserPublicData } from "../common/interfaces";
 
 interface IDataContextProps {
     children: any;
 }
 export interface IDataContextValue {
     isLoading: boolean;
-    name: string;
+    userData: IUserPublicData;
     isJiraOk: boolean;
-    isAdmin: boolean;
-    notificationEmail: string;
 }
 
 export const DataContext = React.createContext<IDataContextValue>(null);
@@ -40,10 +38,8 @@ export const DataProvider = (props: IDataContextProps) => {
         <DataContext.Provider
             value={{
                 isLoading,
-                name: userData?.name,
+                userData,
                 isJiraOk: !!userData?.jiraAccountId,
-                isAdmin: userData?.isAdmin,
-                notificationEmail: userData?.notificationEmail,
             }}
         >
             {props.children}

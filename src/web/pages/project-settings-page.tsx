@@ -134,7 +134,11 @@ export const ProjectSettingsPage = () => {
                         />
                     </Typography>
                     <Box display="flex">
-                        <Box flexGrow={1}></Box>
+                        <Box flexGrow={1}>
+                            <Button variant="contained" color="secondary" href={Router.PageSynchronization} target="_blank">
+                                Spustit synchronizaci
+                            </Button>
+                        </Box>
                         <Box>
                             <Button variant="contained" color="primary" onClick={onSave}>
                                 Uložit

@@ -24,7 +24,7 @@ interface IMainLayoutProps {
 }
 
 export const MainLayout = (props: IMainLayoutProps) => {
-    const { name, isAdmin } = useContext<IDataContextValue>(DataContext);
+    const { userData } = useContext<IDataContextValue>(DataContext);
 
     const classes = useStyles();
     return (
@@ -42,8 +42,8 @@ export const MainLayout = (props: IMainLayoutProps) => {
                         </Link>
                     </Box>
                     <Typography variant="h6">
-                        {name}
-                        {isAdmin ? " (admin)" : ""}
+                        {userData?.name}
+                        {userData?.isAdmin ? " (admin)" : ""}
                     </Typography>
                 </Toolbar>
             </AppBar>

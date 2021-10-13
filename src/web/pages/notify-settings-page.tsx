@@ -5,7 +5,7 @@ import { useAjax } from "../ajax";
 import { useHistory } from "react-router";
 import { Router } from "../router";
 import { thisApp } from "../app-provider";
-import { IUserPublicData } from "../../common/ajax-interfaces";
+import { IUserPublicData } from "../../common/interfaces";
 
 export const NotifySettingsPage = () => {
     const [email, setEmail] = useState<string>(null);
