@@ -5,8 +5,8 @@ import { IAccount, IIssue, Worklog } from "./interfaces";
 export class JiraModel {
     constructor(private jiraApi: JiraApi, private projectConfig: IProjectConfig) {}
 
-    public async getLastWorklogs(): Promise<Worklog[]> {
-        const worklogIdList = await this.jiraApi.getUpdatedWorklogIds();
+    public async getLastWorklogs(sinceDays: number): Promise<Worklog[]> {
+        const worklogIdList = await this.jiraApi.getUpdatedWorklogIds(sinceDays);
         const worklogList = await this.jiraApi.getWorklogs(worklogIdList);
         worklogList.forEach((w) => {
             w.commentAsText = this.convertCommentToText(w);

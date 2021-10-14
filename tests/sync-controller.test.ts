@@ -125,6 +125,7 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
         {
             admins: [],
             cryptoSalt: "test",
+            syncDaysCount: 7,
             jira: {
                 clientId: "",
                 clientSecret: "",

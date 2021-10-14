@@ -27,7 +27,7 @@ export class UserController {
         const userData = await this.getUserData(identity.uid);
         userData.uuAccessCode1 = accessCode1;
         userData.uuAccessCode2 = accessCode2;
-        userData.name = `${identity.identity.name} ${identity.identity.surname}`;
+        userData.name = `${identity.identity.surname} ${identity.identity.name}`;
         await this.setUserData(identity.uid, userData);
         return identity.uid;
     }
@@ -47,6 +47,6 @@ export class UserController {
     }
 
     public isAdmin(uid: string): boolean {
-        return this.projectConfig.admins.indexOf(uid) > -1;
+        return this.projectConfig.admins.includes(uid);
     }
 }

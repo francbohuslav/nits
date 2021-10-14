@@ -22,13 +22,15 @@ import { IBaseResponse } from "../common/ajax-interfaces";
 import dotenv from "dotenv";
 import { ReadOnlyTimesheetModel } from "./models/uu/readonly-timesheet-model";
 import { UuUserModel } from "./models/uu-user-model";
-import { WtmApi } from "./apis/wtm-api";
+import { WtmApi, WtmError } from "./apis/wtm-api";
 import { JiraRequester } from "./requesters/jira-requester";
 import { JiraController } from "./controllers/jira-controller";
 import { ProjectRequester } from "./requesters/project-requester";
 import { ProjectController } from "./controllers/project-controller";
 import { ProjectDataModel } from "./models/project-data-model";
 import { NotifyRequester } from "./requesters/notify-requester";
+import { StatsRequester } from "./requesters/stats-requester";
+import { StatsController } from "./controllers/stats-controller";
 dotenv.config();
 
 const isDevelopment = !!process.env.NITS_DEVEL_ACCOUNT;
@@ -58,6 +60,7 @@ const uuUserModel = new UuUserModel(new UuIdendtityApi(), {});
 const userController = new UserController(uuUserModel, userDataModel, projectConfig);
 const jiraController = new JiraController(userDataModel, crypt, projectConfig);
 const projectController = new ProjectController(projectDataModel, jiraApi);
+const statsController = new StatsController(userDataModel, jiraModel, (acc1, acc2) => new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi()));
 // Requests
 const loginAuthorizer = new LoginAuthorizer(userController);
 const loginAuthorize = loginAuthorizer.loginAuthorize.bind(loginAuthorizer);
@@ -74,6 +77,7 @@ const syncController = new SyncController(
 const syncRequester = new SyncRequester(syncController);
 const projectReqester = new ProjectRequester(projectController);
 const notifyRequester = new NotifyRequester(userController);
+const statsRequester = new StatsRequester(statsController);
 
 const app = express();
 app.use(compression());
@@ -89,17 +93,15 @@ app.use(json());
 function sendError(res: Response, ex: any) {
     console.log(ex);
     res.status(400);
-    res.send(
-        JSON.stringify(
-            {
-                message: ex.message,
-                statusText: ex.response?.statusText,
-                stack: ex.response?.data || ex.stack,
-            } as IBaseResponse<unknown>,
-            null,
-            2
-        )
-    );
+    const errorStructure: any = {
+        message: ex.message,
+        statusText: ex.response?.statusText,
+        stack: ex.response?.data || ex.stack,
+    };
+    if (ex instanceof WtmError) {
+        errorStructure.additional = (ex as WtmError).uuAppErrorMap;
+    }
+    res.send(JSON.stringify(errorStructure as IBaseResponse<unknown>, null, 2));
 }
 
 const methods: IServerMethod[] = [
@@ -115,6 +117,7 @@ const methods: IServerMethod[] = [
     // admin commands
     m("get", "/server/project-settings/get", projectReqester.getProjectSettings.bind(projectReqester), adminAuthorize),
     m("post", "/server/project-settings/set", projectReqester.setProjectSettings.bind(projectReqester), adminAuthorize),
+    m("get", "/server/stats/get", statsRequester.getStats.bind(statsRequester), adminAuthorize),
 ];
 
 const processRequest = (method: IServerAction, options: IServerMethodOptions) => async (req: express.Request, res: express.Response) => {

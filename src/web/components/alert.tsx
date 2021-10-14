@@ -17,6 +17,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 export interface IAlertProps {
     message?: string;
     stack?: string;
+    additional?: any;
     time?: Date;
 }
 
@@ -48,6 +49,7 @@ export const Alert = (props: IAlertProps) => {
                                     <AccordionDetails>
                                         <Typography>
                                             <pre>{stack}</pre>
+                                            {props.additional && <pre>{JSON.stringify(props.additional, null, 2)}</pre>}
                                         </Typography>
                                     </AccordionDetails>
                                 )}

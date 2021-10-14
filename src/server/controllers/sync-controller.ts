@@ -23,7 +23,7 @@ export class SyncController {
         const report: ISyncReport = { users: [], log: [] };
 
         // Get all changed worklogs
-        let allWorklogList = await this.jiraModel.getLastWorklogs();
+        let allWorklogList = await this.jiraModel.getLastWorklogs(this.projectConfig.syncDaysCount);
 
         // Filter that worklogs be project settings. Only worklogs with artifact is relevant
         const wtmTsConfigPerWorklogs: IWtmTsConfigPerWorklogId = {};
@@ -57,7 +57,7 @@ export class SyncController {
                 if (commentErrors.length) {
                     reportUser.log.push(commentErrors);
                 }
-                const exitingTimesheets = await timesheetModel.getUserLastTimesheets(userData);
+                const exitingTimesheets = await timesheetModel.getUserLastTimesheets();
                 const { timesheetsToDelete, timesheetsToRemain } = this.separateTimesheets(exitingTimesheets);
                 const newTimesheets = this.computeNewTimesheets(timesheetMappingsPerDay, timesheetsToRemain);
                 // reportUser.log.push({ timesheetMappingsPerDay });
@@ -66,6 +66,7 @@ export class SyncController {
                 await timesheetModel.removeTimesheets(timesheetsToDelete, reportUser);
                 await timesheetModel.saveTimesheets(newTimesheets, reportUser);
                 userData.lastSynchronization = new Date().toISOString();
+                this.userDataModel.setUserData(userData.uid, userData);
             } catch (err) {
                 if (err instanceof Error) {
                     reportUser.log.push(err.message + "\n" + err.stack);
@@ -100,7 +101,7 @@ export class SyncController {
 
             let projectSettings: IProjectSettings = null;
 
-            if (validProjectCodes.indexOf(projectKey) == -1) {
+            if (!validProjectCodes.includes(projectKey)) {
                 report.log.push(`Worklog ${workglog.toString()} skipped. Project ${projectKey} is not configured.`);
                 continue;
             }

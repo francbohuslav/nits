@@ -9,6 +9,7 @@ import { JiraSettingsPage } from "./pages/jira-settings-page";
 import { MainPage } from "./pages/main-page";
 import { NotifySettingsPage } from "./pages/notify-settings-page";
 import { ProjectSettingsPage } from "./pages/project-settings-page";
+import { StatsPage } from "./pages/stats-page";
 import { Router } from "./router";
 
 const theme = createTheme({
@@ -22,6 +23,7 @@ const pages = {
     [Router.PageJiraSettings]: "sm",
     [Router.PageNotification]: "sm",
     [Router.PageProjectSettings]: "md",
+    [Router.PageStats]: "sm",
     [Router.PageMain]: "sm",
 };
 
@@ -42,6 +44,7 @@ export const App = () => {
                                             {path == Router.PageJiraSettings ? <JiraSettingsPage /> : ""}
                                             {path == Router.PageNotification ? <NotifySettingsPage /> : ""}
                                             {path == Router.PageProjectSettings ? <ProjectSettingsPage /> : ""}
+                                            {path == Router.PageStats ? <StatsPage /> : ""}
                                         </MainLayout>
                                     </DataProvider>
                                 )}

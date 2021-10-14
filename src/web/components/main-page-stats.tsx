@@ -9,7 +9,9 @@ export const MainPageStats = () => {
 
     return (
         <Typography align="center">
-            {userData?.lastSynchronization ? dateUtils.formatDateTime(userData.lastSynchronization) : "zatím nesynchronizováno"}
+            {userData?.lastSynchronization
+                ? `Poslední synchronizace proběhla ${dateUtils.formatDateTime(userData.lastSynchronization)}`
+                : "Zatím nesynchronizováno"}
         </Typography>
     );
 };

@@ -52,6 +52,7 @@ export const MainPage = () => {
     const onJira = () => history.push(Router.PageJiraSettings);
     const onNotify = () => history.push(Router.PageNotification);
     const onProjectSetting = () => history.push(Router.PageProjectSettings);
+    const onStats = () => history.push(Router.PageStats);
 
     const onLogout = async () => {
         await ajax.post<boolean>(Router.PageLogout);
@@ -124,7 +125,7 @@ export const MainPage = () => {
             )}
             {userData?.isAdmin && (
                 <ButtonRow>
-                    <Button disabled className={classes.button} variant="contained" startIcon={<StatsIcon />} fullWidth>
+                    <Button className={classes.button} variant="contained" startIcon={<StatsIcon />} fullWidth onClick={onStats}>
                         Statistiky
                     </Button>
                 </ButtonRow>

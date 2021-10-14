@@ -9,8 +9,8 @@ export class JiraApi {
         this.client = new JiraClientApi(options);
     }
 
-    public async getUpdatedWorklogIds(): Promise<number[]> {
-        let since = (dateUtils.toTimestamp() - 7 * 24 * 3600) * 1000;
+    public async getUpdatedWorklogIds(sinceDays: number): Promise<number[]> {
+        let since = (dateUtils.toTimestamp() - sinceDays * 24 * 3600) * 1000;
         const worklogIdList = new Set<number>();
         let isLastPage = false;
         while (!isLastPage) {

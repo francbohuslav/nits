@@ -21,3 +21,19 @@ export interface IProjectSettings {
     jiraNitsField: string;
     wtmArtifact: string;
 }
+
+export interface IStats {
+    uid: string;
+    name: string;
+    jiraHours: number;
+    wtmHours: number;
+    days: IStatsDays;
+}
+
+export type IStatsDays = { [date: string]: IStatsDay };
+
+export interface IStatsDay {
+    date: string;
+    jiraHours: number;
+    wtmHours: number;
+}
