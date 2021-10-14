@@ -66,7 +66,6 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
                     .filter((t) => dateUtils.toIsoFormat(t.datetimeFrom) >= fromStr && dateUtils.toIsoFormat(t.datetimeFrom) <= toStr)
                     .filter((t) => (filter ? filter(t) : true))
                     .map((t) => timesheetsPerUser[evaluation.workerUuIdentity].push(t));
-                console.log(timesheetsPerUser);
             }
             time = dateUtils.toDate(dateUtils.increase(time, "month", 1));
         }

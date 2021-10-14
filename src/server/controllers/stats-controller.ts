@@ -1,6 +1,6 @@
 import arrayUtils from "../../common/array-utils";
 import dateUtils from "../../common/date-utils";
-import { IStats, IStatsDays, IUserData } from "../../common/interfaces";
+import { IStats, IStatsArts, IStatsDays, IUserData } from "../../common/interfaces";
 import { Worklog } from "../models/jira/interfaces";
 import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
@@ -11,7 +11,7 @@ export class StatsController {
 
     public async getStats(adminUid: string): Promise<IStats[]> {
         //TODO: BF: vice dnu
-        const lastDays = 14;
+        const lastDays = 4;
         const adminUserData = await this.userDataModel.getUserData(adminUid);
         const timesheetModel = this.timesheetModelFactory(adminUserData.uuAccessCode1, adminUserData.uuAccessCode2);
 
@@ -23,8 +23,11 @@ export class StatsController {
         const stats: IStats[] = [];
         for (const userData of userDataList) {
             const days: IStatsDays = {};
+            const artifacts: IStatsArts = {};
+
             let jiraHours = 0;
             let wtmHours = 0;
+
             if (worklogsPerUserAndDay[userData.jiraAccountId]) {
                 jiraHours = arrayUtils.sumAction(worklogsPerUser[userData.jiraAccountId], (w) => w.timeSpentSeconds) / 3600;
                 Object.entries(worklogsPerUserAndDay[userData.jiraAccountId]).forEach(([date, workLogs]) => {
@@ -38,6 +41,13 @@ export class StatsController {
                     const dayStats = (days[date] = days[date] || { date, jiraHours: 0, wtmHours: 0 });
                     dayStats.wtmHours = arrayUtils.sumAction(timesheets, (t) => dateUtils.secondsBetween(t.datetimeFrom, t.datetimeTo)) / 3600;
                 });
+                const timesheetsPerArtifacts = arrayUtils.toGroups(timesheetsPerUser[userData.uid], (t) => t.subject);
+                Object.entries(timesheetsPerArtifacts).forEach(([art, timesheets]) => {
+                    artifacts[art] = {
+                        artifact: art,
+                        wtmHours: arrayUtils.sumAction(timesheets, (t) => dateUtils.secondsBetween(t.datetimeFrom, t.datetimeTo)) / 3600,
+                    };
+                });
             }
             const stat: IStats = {
                 uid: userData.uid,
@@ -45,6 +55,7 @@ export class StatsController {
                 jiraHours,
                 wtmHours,
                 days,
+                artifacts,
             };
             stats.push(stat);
         }

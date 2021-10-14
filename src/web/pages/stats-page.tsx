@@ -4,7 +4,7 @@ import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 import { useEffect, useState } from "react";
 import React = require("react");
-import { IStats, IStatsDays } from "../../common/interfaces";
+import { IStats } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import red from "@material-ui/core/colors/red";
 import green from "@material-ui/core/colors/green";
@@ -23,7 +23,7 @@ const useStyles = makeStyles({
 export const StatsPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [stats, setStats] = useState<IStats[]>([]);
-    const [showDays, setShowDays] = useState<IStatsDays>(null);
+    const [showDays, setShowDays] = useState<IStats>(null);
     const ajax = useAjax();
     const classes = useStyles();
 
@@ -55,7 +55,7 @@ export const StatsPage = () => {
                         href="#"
                         onClick={(e) => {
                             e.preventDefault();
-                            setShowDays((params.row as IStats).days);
+                            setShowDays(params.row as IStats);
                         }}
                     >
                         {params.value}
@@ -107,7 +107,7 @@ export const StatsPage = () => {
                 )}
             </Typography>
             <DataGrid getRowId={idGetter} columns={columns} rows={stats} density="compact" autoHeight disableColumnMenu hideFooterPagination hideFooter />
-            <StatsDays days={showDays} onClose={() => setShowDays(null)} />
+            <StatsDays stats={showDays} onClose={() => setShowDays(null)} />
         </>
     );
 };

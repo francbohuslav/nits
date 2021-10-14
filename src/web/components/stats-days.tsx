@@ -1,7 +1,7 @@
 import React = require("react");
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Typography, makeStyles } from "@material-ui/core";
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Typography, makeStyles, Grid } from "@material-ui/core";
 import { DataGrid, GridColumns, GridRowData } from "@material-ui/data-grid";
-import { IStats, IStatsDay, IStatsDays } from "../../common/interfaces";
+import { IStats, IStatsArt, IStatsDay } from "../../common/interfaces";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 import red from "@material-ui/core/colors/red";
@@ -10,7 +10,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 import dateUtils from "../../common/date-utils";
 
 interface IInfoProps {
-    days: IStatsDays;
+    stats: IStats;
     onClose(): void;
 }
 
@@ -26,63 +26,108 @@ const useStyles = makeStyles({
 export const StatsDays = (props: IInfoProps) => {
     const classes = useStyles();
 
-    const idGetter = (row: GridRowData) => (row as IStatsDay).date;
+    const days = props.stats?.days;
+    const artifacts = props.stats?.artifacts;
 
-    const columns: GridColumns = [
+    const daysIdGetter = (row: GridRowData) => (row as IStatsDay).date;
+    const artsIdGetter = (row: GridRowData) => (row as IStatsArt).artifact;
+
+    const dayColumns = (
+        [
+            {
+                field: "date",
+                headerName: "Datum",
+                flex: 1,
+                renderCell: (params) => dateUtils.formatDate(params.value as string),
+                align: "left",
+                headerAlign: "left",
+            },
+            {
+                field: "jiraHours",
+                headerName: "JIRA [hod]",
+                flex: 1,
+            },
+            {
+                field: "wtmHours",
+                headerName: "WTM [hod]",
+                flex: 1,
+            },
+            {
+                field: "status",
+                headerName: " ",
+                type: "boolean",
+                flex: 0.4,
+                valueGetter: (params) => {
+                    const stats = params.row as IStats;
+                    return stats.jiraHours == stats.wtmHours;
+                },
+                renderCell: (params) => (params.value ? <CheckIcon className={classes.greenIcon} /> : <CloseIcon className={classes.redIcon} />),
+            },
+        ] as GridColumns
+    ).map((c) => {
+        c.flex = c.flex || 1;
+        c.align = c.align || "center";
+        c.headerAlign = c.headerAlign || "center";
+        return c;
+    });
+    const artsColumns: GridColumns = [
         {
-            field: "date",
-            headerName: "Datum",
-            flex: 1,
-            renderCell: (params) => dateUtils.formatDate(params.value as string),
-        },
-        {
-            field: "jiraHours",
-            headerName: "JIRA [hod]",
-            flex: 1,
+            field: "artifact",
+            headerName: "Předmět",
+            flex: 2,
         },
         {
             field: "wtmHours",
             headerName: "WTM [hod]",
+            align: "center",
+            headerAlign: "center",
             flex: 1,
         },
-        {
-            field: "status",
-            headerName: " ",
-            type: "boolean",
-            flex: 0.4,
-            valueGetter: (params) => {
-                const stats = params.row as IStats;
-                return stats.jiraHours == stats.wtmHours;
-            },
-            renderCell: (params) => (params.value ? <CheckIcon className={classes.greenIcon} /> : <CloseIcon className={classes.redIcon} />),
-        },
     ];
-    const userSyncWarning = props.days && Object.values(props.days).some((r) => r.jiraHours != r.wtmHours);
-    const rows = props.days ? Object.values(props.days) : [];
-    rows.sort((a, b) => -a.date.localeCompare(b.date));
+    const userSyncWarning = days && Object.values(days).some((r) => r.jiraHours != r.wtmHours);
+    const dayRows = days ? Object.values(days) : [];
+    dayRows.sort((a, b) => -a.date.localeCompare(b.date));
+    const artRows = artifacts ? Object.values(artifacts) : [];
+    artRows.sort((a, b) => -a.artifact.localeCompare(b.artifact));
 
     return (
-        <Dialog open={!!props.days} onClose={() => props.onClose()}>
+        <Dialog open={!!days} onClose={() => props.onClose()} maxWidth="md" fullWidth>
             <DialogTitle>Info</DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     <Typography paragraph>
                         {userSyncWarning && (
                             <MuiAlert variant="filled" severity="warning">
-                                Některým uživatelům nesouhlasí počet synchronizovaných hodin!
+                                Nesouhlasí počet synchronizovaných hodin!
                             </MuiAlert>
                         )}
                     </Typography>
-                    <DataGrid
-                        getRowId={idGetter}
-                        columns={columns}
-                        rows={rows}
-                        density="compact"
-                        autoHeight
-                        disableColumnMenu
-                        hideFooterPagination
-                        hideFooter
-                    />
+                    <Grid container spacing={1}>
+                        <Grid item xs={6}>
+                            <DataGrid
+                                getRowId={daysIdGetter}
+                                columns={dayColumns}
+                                rows={dayRows}
+                                density="compact"
+                                autoHeight
+                                disableColumnMenu
+                                hideFooterPagination
+                                hideFooter
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <DataGrid
+                                getRowId={artsIdGetter}
+                                columns={artsColumns}
+                                rows={artRows}
+                                density="compact"
+                                autoHeight
+                                disableColumnMenu
+                                hideFooterPagination
+                                hideFooter
+                            />
+                        </Grid>
+                    </Grid>
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
