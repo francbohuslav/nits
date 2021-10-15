@@ -46,11 +46,13 @@ export const StatsDays = (props: IInfoProps) => {
                 field: "jiraHours",
                 headerName: "JIRA [hod]",
                 flex: 1,
+                renderCell: (params) => dateUtils.formatHours(params.value as number),
             },
             {
                 field: "wtmHours",
                 headerName: "WTM [hod]",
                 flex: 1,
+                renderCell: (params) => dateUtils.formatHours(params.value as number),
             },
             {
                 field: "status",
@@ -82,6 +84,7 @@ export const StatsDays = (props: IInfoProps) => {
             align: "center",
             headerAlign: "center",
             flex: 1,
+            renderCell: (params) => dateUtils.formatHours(params.value as number),
         },
     ];
     const userSyncWarning = days && Object.values(days).some((r) => r.jiraHours != r.wtmHours);

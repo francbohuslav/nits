@@ -58,7 +58,7 @@ export class SyncController {
                     reportUser.log.push(commentErrors);
                 }
                 const exitingTimesheets = await timesheetModel.getMyLastTimesheets(
-                    dateUtils.toIsoFormat(dateUtils.increaseDay(new Date(), this.projectConfig.syncDaysCount))
+                    dateUtils.toIsoFormat(dateUtils.increaseDay(new Date(), -this.projectConfig.syncDaysCount))
                 );
                 const { timesheetsToDelete, timesheetsToRemain } = this.separateTimesheets(exitingTimesheets);
                 const newTimesheets = this.computeNewTimesheets(timesheetMappingsPerDay, timesheetsToRemain);

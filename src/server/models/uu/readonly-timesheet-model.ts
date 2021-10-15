@@ -1,6 +1,6 @@
 import arrayUtils from "../../../common/array-utils";
 import dateUtils from "../../../common/date-utils";
-import { WtmApi } from "../../apis/wtm-api";
+import { WtmApi, WtmError } from "../../apis/wtm-api";
 import { ISyncReportUser, TimesheetMapping, TimesheetMappingsPerDay } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
 import { UuUserModel } from "../uu-user-model";
@@ -55,17 +55,35 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
         const timesheetsPerUser: ITimesheetPerUser = {};
         let time = fromMonthDate;
         while (dateUtils.isLowerOrEqualsThen(time, toMonthDate)) {
-            const evaluations = await this.wtmApi.listConfirmerMonthlyEvaluations(tokenResponse.id_token, time.getFullYear(), time.getMonth() + 1);
-            for (const evaluation of evaluations) {
-                if (!userUids.includes(evaluation.workerUuIdentity)) {
-                    continue;
+            console.log(`getTimesheetsOfUsers ${time.toISOString()}`);
+            try {
+                const evaluations = await this.wtmApi.listConfirmerMonthlyEvaluations(tokenResponse.id_token, time.getFullYear(), time.getMonth() + 1);
+                console.log(`Evaluation ${evaluations.length}`);
+                for (const evaluation of evaluations) {
+                    if (!userUids.includes(evaluation.workerUuIdentity)) {
+                        continue;
+                    }
+                    timesheetsPerUser[evaluation.workerUuIdentity] = timesheetsPerUser[evaluation.workerUuIdentity] || [];
+                    const items = await this.wtmApi.listTimesheetItemsByMonthlyEvaluation(tokenResponse.id_token, evaluation.id);
+                    items
+                        .filter((t) => dateUtils.toIsoFormat(t.datetimeFrom) >= fromStr && dateUtils.toIsoFormat(t.datetimeFrom) <= toStr)
+                        .filter((t) => (filter ? filter(t) : true))
+                        .map((t) => timesheetsPerUser[evaluation.workerUuIdentity].push(t));
                 }
-                timesheetsPerUser[evaluation.workerUuIdentity] = timesheetsPerUser[evaluation.workerUuIdentity] || [];
-                const items = await this.wtmApi.listTimesheetItemsByMonthlyEvaluation(tokenResponse.id_token, evaluation.id);
-                items
-                    .filter((t) => dateUtils.toIsoFormat(t.datetimeFrom) >= fromStr && dateUtils.toIsoFormat(t.datetimeFrom) <= toStr)
-                    .filter((t) => (filter ? filter(t) : true))
-                    .map((t) => timesheetsPerUser[evaluation.workerUuIdentity].push(t));
+            } catch (ex) {
+                if (ex instanceof WtmError) {
+                    if (
+                        ex.uuAppErrorMap["uu-specialistwtm-main/listConfirmerMonthlyEvaluations/monthlyEvaluationsNotFound"] &&
+                        ex.uuAppErrorMap["uu-specialistwtm-main/listConfirmerMonthlyEvaluations/confirmerMonthlyTimesheetNotFound"] &&
+                        Object.keys(ex.uuAppErrorMap).length == 2
+                    ) {
+                        // This is not error for us. Just empty data
+                    } else {
+                        throw ex;
+                    }
+                } else {
+                    throw ex;
+                }
             }
             time = dateUtils.toDate(dateUtils.increase(time, "month", 1));
         }

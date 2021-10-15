@@ -60,6 +60,12 @@ class DateUtils {
         return `${d.getDate()}.${d.getMonth() + 1}.${year}`;
     }
 
+    public formatHours(hours: number): string {
+        const hourPart = Math.floor(hours);
+        const minutePart = (hours - hourPart) * 60;
+        return `${hourPart}:${minutePart.toFixed(0).padStart(2, "0")}`;
+    }
+
     public increase(date: IDateType, units: string, unitCount: number = 1): Date {
         if (typeof date === "string") {
             date = new Date(date);

@@ -12,6 +12,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 import { StatsDays } from "../components/stats-days";
 import { Router } from "../router";
 import { useHistory } from "react-router-dom";
+import dateUtils from "../../common/date-utils";
 
 const useStyles = makeStyles({
     greenIcon: {
@@ -69,10 +70,12 @@ export const StatsPage = () => {
         {
             field: "jiraHours",
             headerName: "JIRA [hod]",
+            renderCell: (params) => dateUtils.formatHours(params.value as number),
         },
         {
             field: "wtmHours",
             headerName: "WTM [hod]",
+            renderCell: (params) => dateUtils.formatHours(params.value as number),
         },
         {
             field: "status",
@@ -101,7 +104,10 @@ export const StatsPage = () => {
     return (
         <>
             {isLoading ? (
-                <LinearProgress />
+                <>
+                    <Typography paragraph>Dat bývá hodně, zabere to necelou minutku.</Typography>
+                    <LinearProgress />
+                </>
             ) : (
                 <>
                     <Typography paragraph>
