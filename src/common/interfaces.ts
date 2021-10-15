@@ -28,18 +28,19 @@ export interface IStats {
     jiraHours: number;
     wtmHours: number;
     days: IStatsDays;
-    artifacts: IStatsArts;
     lastSynchronization: string;
 }
 
 export type IStatsDays = { [date: string]: IStatsDay };
-export type IStatsArts = { [art: string]: IStatsArt };
 
 export interface IStatsDay {
     date: string;
     jiraHours: number;
     wtmHours: number;
+    artifacts: IStatsArts;
 }
+
+export type IStatsArts = { [art: string]: IStatsArt };
 
 export interface IStatsArt {
     artifact: string;

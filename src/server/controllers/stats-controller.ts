@@ -1,6 +1,6 @@
 import arrayUtils from "../../common/array-utils";
 import dateUtils from "../../common/date-utils";
-import { IStats, IStatsArts, IStatsDays, IUserData, IUserStats } from "../../common/interfaces";
+import { IStats, IStatsDays, IUserData, IUserStats } from "../../common/interfaces";
 import { Worklog } from "../models/jira/interfaces";
 import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
@@ -22,7 +22,6 @@ export class StatsController {
         const stats: IStats[] = [];
         for (const userData of userDataList) {
             const days: IStatsDays = {};
-            const artifacts: IStatsArts = {};
 
             let jiraHours = 0;
             let wtmHours = 0;
@@ -30,22 +29,22 @@ export class StatsController {
             if (worklogsPerUserAndDay[userData.jiraAccountId]) {
                 jiraHours = arrayUtils.sumAction(worklogsPerUser[userData.jiraAccountId], (w) => w.timeSpentSeconds) / 3600;
                 Object.entries(worklogsPerUserAndDay[userData.jiraAccountId]).forEach(([date, workLogs]) => {
-                    const dayStats = (days[date] = days[date] || { date, jiraHours: 0, wtmHours: 0 });
+                    const dayStats = (days[date] = days[date] || { date, jiraHours: 0, wtmHours: 0, artifacts: {} });
                     dayStats.jiraHours = arrayUtils.sumAction(workLogs, (w) => w.timeSpentSeconds) / 3600;
                 });
             }
             if (timesheetsPerUserAndDay[userData.uid]) {
                 wtmHours = arrayUtils.sumAction(timesheetsPerUser[userData.uid], (t) => t.getSpentHours());
                 Object.entries(timesheetsPerUserAndDay[userData.uid]).forEach(([date, timesheets]) => {
-                    const dayStats = (days[date] = days[date] || { date, jiraHours: 0, wtmHours: 0 });
+                    const dayStats = (days[date] = days[date] || { date, jiraHours: 0, wtmHours: 0, artifacts: {} });
                     dayStats.wtmHours = arrayUtils.sumAction(timesheets, (t) => t.getSpentHours());
-                });
-                const timesheetsPerArtifacts = arrayUtils.toGroups(timesheetsPerUser[userData.uid], (t) => t.subject);
-                Object.entries(timesheetsPerArtifacts).forEach(([art, timesheets]) => {
-                    artifacts[art] = {
-                        artifact: art,
-                        wtmHours: arrayUtils.sumAction(timesheets, (t) => t.getSpentHours()),
-                    };
+                    const timesheetsPerArtifacts = arrayUtils.toGroups(timesheets, (t) => t.subject);
+                    Object.entries(timesheetsPerArtifacts).forEach(([art, timesheets]) => {
+                        dayStats.artifacts[art] = {
+                            artifact: art,
+                            wtmHours: arrayUtils.sumAction(timesheets, (t) => t.getSpentHours()),
+                        };
+                    });
                 });
             }
             const stat: IStats = {
@@ -54,7 +53,6 @@ export class StatsController {
                 jiraHours,
                 wtmHours,
                 days,
-                artifacts,
                 lastSynchronization: userData.lastSynchronization,
             };
             stats.push(stat);
