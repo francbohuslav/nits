@@ -39,8 +39,8 @@ export const StatsDays = (props: IInfoProps) => {
                 headerName: "Datum",
                 flex: 1,
                 renderCell: (params) => dateUtils.formatDate(params.value as string),
-                align: "left",
-                headerAlign: "left",
+                align: "center",
+                headerAlign: "center",
             },
             {
                 field: "jiraHours",
@@ -56,9 +56,9 @@ export const StatsDays = (props: IInfoProps) => {
             },
             {
                 field: "status",
-                headerName: " ",
+                headerName: "Stav",
                 type: "boolean",
-                flex: 0.4,
+                flex: 1,
                 valueGetter: (params) => {
                     const stats = params.row as IStats;
                     return stats.jiraHours == stats.wtmHours;
@@ -95,7 +95,7 @@ export const StatsDays = (props: IInfoProps) => {
 
     return (
         <Dialog open={!!days} onClose={() => props.onClose()} maxWidth="md" fullWidth>
-            <DialogTitle>Info</DialogTitle>
+            <DialogTitle>Info - {props.stats?.name}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
                     <Typography paragraph>

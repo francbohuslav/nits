@@ -81,5 +81,4 @@ export interface IMonthlyEvaluation {
 
 export type ITimesheetPerUser = { [uid: string]: Timesheet[] };
 
-//TODO: BF:
-export const nitsTimesheetFilter = (_t: Timesheet) => true; //t.data?.nits !== undefined;
+export const nitsTimesheetFilter = (t: Timesheet) => t.data?.nits !== undefined;

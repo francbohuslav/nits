@@ -1,6 +1,9 @@
 const path = require("path"),
     CopyPlugin = require("copy-webpack-plugin"),
-    HtmlWebpackPlugin = require("html-webpack-plugin");
+    HtmlWebpackPlugin = require("html-webpack-plugin"),
+    webpack = require("webpack");
+
+require("dotenv").config({ path: __dirname + "/.env" });
 
 module.exports = {
     mode: "development",
@@ -60,6 +63,12 @@ module.exports = {
         }),
         new CopyPlugin({
             patterns: [{ from: "src/web/images", to: "images" }],
+        }),
+        new webpack.DefinePlugin({
+            "process.env": JSON.stringify({
+                NITS_JIRA_CLIENT_ID: process.env.NITS_JIRA_CLIENT_ID,
+                NITS_SERVER_ADDRESS: process.env.NITS_SERVER_ADDRESS,
+            }),
         }),
     ],
 
