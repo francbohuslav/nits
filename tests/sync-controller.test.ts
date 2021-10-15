@@ -126,6 +126,7 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
             admins: [],
             cryptoSalt: "test",
             syncDaysCount: 7,
+            serverAddress: "",
             jira: {
                 clientId: "",
                 clientSecret: "",
@@ -566,11 +567,11 @@ describe("computeNewTimesheetsInDay", () => {
     });
 });
 
-describe("computeNewTimesheetsInSegment", () => {
+describe("computeNewTimesheetInSegment", () => {
     test("empty", () => {
         const syncController = new TestingSyncController(null, null, null, null, null);
         const newTimesheets: Timesheet[] = [];
-        syncController.computeNewTimesheetsInSegment2({ from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T06:00:00Z") }, newTimesheets, []);
+        syncController.computeNewTimesheetInSegment2({ from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T06:00:00Z") }, newTimesheets, []);
         expect(newTimesheets.length).toBe(0);
     });
 
@@ -587,7 +588,7 @@ describe("computeNewTimesheetsInSegment", () => {
                 wtmArtifact: "UNI-BT:1",
             },
         ];
-        syncController.computeNewTimesheetsInSegment2(
+        syncController.computeNewTimesheetInSegment2(
             { from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T08:00:00Z") },
             newTimesheets,
             timesheetMappings
@@ -622,7 +623,7 @@ describe("computeNewTimesheetsInSegment", () => {
                 wtmArtifact: "UNI-BT:1",
             },
         ];
-        syncController.computeNewTimesheetsInSegment2(
+        syncController.computeNewTimesheetInSegment2(
             { from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T06:45:00Z") },
             newTimesheets,
             timesheetMappings
@@ -634,7 +635,7 @@ describe("computeNewTimesheetsInSegment", () => {
         expect(timesheetMappings[0].spentSeconds).toBe(15 * 60);
     });
 
-    test("two_timesheets_exact_as_segment", () => {
+    test("timesheets_exact_as_segment", () => {
         const syncController = new TestingSyncController(null, null, null, null, null);
         const newTimesheets: Timesheet[] = [];
         const timesheetMappings: TimesheetMapping[] = [
@@ -646,6 +647,7 @@ describe("computeNewTimesheetsInSegment", () => {
                 spentSeconds: 3600,
                 wtmArtifact: "UNI-BT:1",
             },
+            // this will not be used
             {
                 date: "2021-10-12",
                 description: "desc2",
@@ -655,12 +657,12 @@ describe("computeNewTimesheetsInSegment", () => {
                 wtmArtifact: "UNI-BT:2",
             },
         ];
-        syncController.computeNewTimesheetsInSegment2(
-            { from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T07:30:00Z") },
+        syncController.computeNewTimesheetInSegment2(
+            { from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T07:00:00Z") },
             newTimesheets,
             timesheetMappings
         );
-        expect(newTimesheets.length).toBe(2);
+        expect(newTimesheets.length).toBe(1);
         expect(newTimesheets[0]).toEqual({
             datetimeFrom: "2021-10-12T06:00:00.000Z",
             datetimeTo: "2021-10-12T07:00:00.000Z",
@@ -674,20 +676,7 @@ describe("computeNewTimesheetsInSegment", () => {
                 },
             },
         } as Timesheet);
-        expect(newTimesheets[1]).toEqual({
-            datetimeFrom: "2021-10-12T07:00:00.000Z",
-            datetimeTo: "2021-10-12T07:30:00.000Z",
-            description: "desc2",
-            highRate: false,
-            subject: "UNI-BT:2",
-            data: {
-                nits: {
-                    issueKey: "C-2",
-                    worklogIds: ["2"],
-                },
-            },
-        } as Timesheet);
-        expect(timesheetMappings).toHaveLength(0);
+        expect(timesheetMappings).toHaveLength(1);
     });
 });
 
@@ -718,8 +707,8 @@ class TestingSyncController extends SyncController {
         return this.getNextFreeTimeSegment(searchFromTime, timesheetsToRemain, isPauseApplied, alreadyProcessedHours);
     }
 
-    public computeNewTimesheetsInSegment2(interval: IInterval, newTimesheets: Timesheet[], timesheetMapping: TimesheetMapping[]) {
-        return this.computeNewTimesheetsInSegment(interval, newTimesheets, timesheetMapping);
+    public computeNewTimesheetInSegment2(interval: IInterval, newTimesheets: Timesheet[], timesheetMapping: TimesheetMapping[]) {
+        return this.computeNewTimesheetInSegment(interval, newTimesheets, timesheetMapping);
     }
 
     public computeNewTimesheetsInDay2(timesheetMapping: TimesheetMapping[], timesheetsToRemain: Timesheet[]): Timesheet[] {

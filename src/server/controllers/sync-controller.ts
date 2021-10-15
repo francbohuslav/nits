@@ -203,52 +203,50 @@ export class SyncController {
                 segment = this.getNextFreeTimeSegment(searchFromTime, timesheetsToRemain, segment?.isPauseApplied, alreadyProcessedHours);
                 if (segment) {
                     //TODO: BF: predelat na delani vykazu pojednom
-                    this.computeNewTimesheetsInSegment(segment.interval, newTimesheets, timesheetMappingToProcess);
+                    const endTime = this.computeNewTimesheetInSegment(segment.interval, newTimesheets, timesheetMappingToProcess);
                     if (timesheetMappingToProcess.length == 0) {
                         return newTimesheets;
                     }
-                    if (dateUtils.toIsoFormat(searchFromTime) != dateUtils.toIsoFormat(segment.interval.to)) {
+                    if (dateUtils.toIsoFormat(searchFromTime) != dateUtils.toIsoFormat(endTime)) {
                         break;
                     }
-                    searchFromTime = segment.interval.to;
+                    searchFromTime = endTime;
                 }
             } while (segment);
-            startHour--;
+            startHour -= 0.5;
         }
         throw new Error(`There is no space in ${timesheetMapping[0].date} for new timesheets`);
     }
 
-    protected computeNewTimesheetsInSegment(interval: IInterval, newTimesheets: Timesheet[], timesheetMapping: TimesheetMapping[]) {
+    protected computeNewTimesheetInSegment(interval: IInterval, newTimesheets: Timesheet[], timesheetMapping: TimesheetMapping[]): Date {
         if (timesheetMapping.length == 0) {
             return;
         }
         let restTime = dateUtils.secondsBetween(interval.from, interval.to);
         let startTime = interval.from;
-        let tsm: TimesheetMapping = null;
-        do {
-            tsm = timesheetMapping[0];
-            const timeToSpent = restTime >= tsm.spentSeconds ? tsm.spentSeconds : restTime;
-            const ts = new Timesheet();
-            ts.description = tsm.description;
-            ts.datetimeFrom = startTime.toISOString();
-            startTime = dateUtils.increase(startTime, "seconds", timeToSpent);
-            ts.datetimeTo = startTime.toISOString();
-            ts.subject = tsm.wtmArtifact;
-            ts.highRate = false;
-            ts.data = {
-                nits: {
-                    issueKey: tsm.jiraIssueKey,
-                    worklogIds: tsm.jiraWorklogs.map((w) => w.id),
-                },
-            };
-            newTimesheets.push(ts);
-            restTime -= timeToSpent;
-            if (timeToSpent < tsm.spentSeconds) {
-                tsm.spentSeconds -= timeToSpent;
-            } else {
-                timesheetMapping.shift();
-            }
-        } while (timesheetMapping.length > 0 && restTime > 0);
+        const tsm = timesheetMapping[0];
+        const timeToSpent = restTime >= tsm.spentSeconds ? tsm.spentSeconds : restTime;
+        const ts = new Timesheet();
+        ts.description = tsm.description;
+        ts.datetimeFrom = startTime.toISOString();
+        startTime = dateUtils.increase(startTime, "seconds", timeToSpent);
+        ts.datetimeTo = startTime.toISOString();
+        ts.subject = tsm.wtmArtifact;
+        ts.highRate = false;
+        ts.data = {
+            nits: {
+                issueKey: tsm.jiraIssueKey,
+                worklogIds: tsm.jiraWorklogs.map((w) => w.id),
+            },
+        };
+        newTimesheets.push(ts);
+        restTime -= timeToSpent;
+        if (timeToSpent < tsm.spentSeconds) {
+            tsm.spentSeconds -= timeToSpent;
+        } else {
+            timesheetMapping.shift();
+        }
+        return startTime;
     }
 
     //TODO: BF: udelat test na to ze se tam pauza nikam nevejde
@@ -263,6 +261,7 @@ export class SyncController {
         do {
             const timesheetsAfterTime = timesheetsToRemain.filter((t) => !dateUtils.isLowerOrEqualsThen(t.datetimeTo, searchFromTime));
             while (timesheetsAfterTime.length > 0 && dateUtils.isLowerOrEqualsThen(timesheetsAfterTime[0].datetimeFrom, searchFromTime)) {
+                alreadyProcessedHours += dateUtils.secondsBetween(searchFromTime, timesheetsAfterTime[0].datetimeTo) / 3600;
                 searchFromTime = dateUtils.toDate(timesheetsAfterTime[0].datetimeTo);
                 timesheetsAfterTime.shift();
             }
