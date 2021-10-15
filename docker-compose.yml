@@ -7,3 +7,8 @@ services:
         volumes:
             - .:/nits
         command: /bin/sh -c "cd /nits; npm i; npm run build; npm run start"
+
+networks:
+  default:
+    external:
+      name: devtools          
