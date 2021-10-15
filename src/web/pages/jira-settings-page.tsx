@@ -6,6 +6,7 @@ import { IUserPublicData } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
 import { Router } from "../router";
+// import process from "process";
 
 export const JiraSettingsPage = () => {
     const [sessionHash, setSessionHash] = useState<string>(null);
@@ -43,10 +44,14 @@ export const JiraSettingsPage = () => {
         loadData();
     }, []);
 
+    const clientId = process.env.NITS_JIRA_CLIENT_ID;
+    const server = process.env.NITS_SERVER_ADDRESS.replace(/\/$/, "");
     const url = sessionHash
-        ? "https://auth.atlassian.com/authorize?audience=api.atlassian.com&client_id=ZMqmBVTa7mGD1Pzz3e0WmsLwALu7leFJ&scope=read%3Ajira-user&redirect_uri=https%3A%2F%2Fnits-beta.herokuapp.com%2Fserver%2Fjira%2Foauth&state=" +
-          sessionHash +
-          "&response_type=code&prompt=consent"
+        ? `https://auth.atlassian.com/authorize?audience=api.atlassian.com&client_id=${encodeURIComponent(
+              clientId
+          )}&scope=read%3Ajira-user&redirect_uri=${encodeURIComponent(server)}%2Fserver%2Fjira%2Foauth&state=${encodeURIComponent(
+              sessionHash
+          )}&response_type=code&prompt=consent`
         : "#";
 
     return isLoading ? (
