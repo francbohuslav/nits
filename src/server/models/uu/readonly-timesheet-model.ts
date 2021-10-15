@@ -23,11 +23,11 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
         //TODO: BF: implement in WritebleTimesheetModel
     }
 
-    public async getUserLastTimesheets(): Promise<Timesheet[]> {
+    public async getMyLastTimesheets(since: string): Promise<Timesheet[]> {
         const tokenResponse = await this.uuUserModel.getToken(this.accessCode1, this.accessCode2);
         const to = new Date();
         const toStr = dateUtils.toIsoFormat(to);
-        const from = dateUtils.toDate(dateUtils.increaseDay(new Date(), -7));
+        const from = dateUtils.toDate(since);
         const fromStr = dateUtils.toIsoFormat(from);
         const fromMonthDate = new Date(from.getFullYear(), from.getMonth(), 1);
         const toMonthDate = new Date(to.getFullYear(), to.getMonth(), 1);

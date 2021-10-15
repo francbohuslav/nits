@@ -7,7 +7,7 @@ export type TimesheetModelFactoryHandler = (accessCode1: string, accessCode2: st
 export interface ITimesheetModel {
     saveTimesheets(newTimesheets: Timesheet[], report: ISyncReportUser): Promise<void>;
     removeTimesheets(timesheets: Timesheet[], report: ISyncReportUser): Promise<void>;
-    getUserLastTimesheets(): Promise<Timesheet[]>;
+    getMyLastTimesheets(since: string): Promise<Timesheet[]>;
     convertWorklogsToTimesheetMappings(worklogList: Worklog[], report: ISyncReportUser): TimesheetMappingsPerDay;
     getTimesheetsOfUsers(userUids: string[], lastDays: number, filter?: (t: Timesheet) => boolean): Promise<ITimesheetPerUser>;
 }
@@ -22,6 +22,10 @@ export class Timesheet {
     public description: string;
     public data: ITimesheetData;
     public workerUuIdentity: string;
+
+    public getSpentHours() {
+        return dateUtils.secondsBetween(this.datetimeFrom, this.datetimeTo) / 3600;
+    }
 
     public toString(): string {
         return `UU Timesheet: ${dateUtils.formatDateTime(this.datetimeFrom, true)} - ${dateUtils.formatDateTime(this.datetimeTo, true)} - ${this.description}`;
@@ -76,3 +80,6 @@ export interface IMonthlyEvaluation {
 }
 
 export type ITimesheetPerUser = { [uid: string]: Timesheet[] };
+
+//TODO: BF:
+export const nitsTimesheetFilter = (_t: Timesheet) => true; //t.data?.nits !== undefined;

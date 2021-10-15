@@ -1,17 +1,46 @@
 import React = require("react");
-import { useContext } from "react";
-import { DataContext, IDataContextValue } from "../data-context";
+import { useEffect, useState } from "react";
 import dateUtils from "../../common/date-utils";
-import { Typography } from "@material-ui/core";
+import { Box, LinearProgress, Typography } from "@material-ui/core";
+import { useAjax } from "../ajax";
+import { IUserStats } from "../../common/interfaces";
 
 export const MainPageStats = () => {
-    const { userData } = useContext<IDataContextValue>(DataContext);
+    const [isLoading, setIsLoading] = useState(false);
+    const [stats, setStats] = useState<IUserStats>(null);
+    const ajax = useAjax();
+
+    const loadData = async () => {
+        setIsLoading(true);
+        const res = await ajax.get<IUserStats>("/server/user-stats/get");
+        if (res.isOk) {
+            setStats(res.data);
+        }
+        setIsLoading(false);
+    };
+
+    useEffect(() => {
+        loadData();
+    }, []);
 
     return (
-        <Typography align="center">
-            {userData?.lastSynchronization
-                ? `Poslední synchronizace proběhla ${dateUtils.formatDateTime(userData.lastSynchronization)}`
-                : "Zatím nesynchronizováno"}
-        </Typography>
+        <div style={{ minHeight: "44px" }}>
+            {isLoading ? (
+                <Box pt={2}>
+                    <LinearProgress />
+                </Box>
+            ) : (
+                <Typography align="center">
+                    {stats ? (
+                        <>
+                            Poslední synchronizace proběhla {dateUtils.formatDateTime(stats.lastSynchronization)}. <br />
+                            Za tento měsíc bylo synchronizováno {stats.wtmHours} hodin.
+                        </>
+                    ) : (
+                        "Zatím nesynchronizováno"
+                    )}
+                </Typography>
+            )}
+        </div>
     );
 };

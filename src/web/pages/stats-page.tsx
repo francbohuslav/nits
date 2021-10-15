@@ -1,4 +1,4 @@
-import { LinearProgress, Link, makeStyles, Tooltip, Typography } from "@material-ui/core";
+import { Box, Button, LinearProgress, Link, makeStyles, Tooltip, Typography } from "@material-ui/core";
 import { DataGrid, GridColumns, GridRowData } from "@material-ui/data-grid";
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
@@ -10,6 +10,8 @@ import red from "@material-ui/core/colors/red";
 import green from "@material-ui/core/colors/green";
 import MuiAlert from "@material-ui/lab/Alert";
 import { StatsDays } from "../components/stats-days";
+import { Router } from "../router";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles({
     greenIcon: {
@@ -26,10 +28,11 @@ export const StatsPage = () => {
     const [showDays, setShowDays] = useState<IStats>(null);
     const ajax = useAjax();
     const classes = useStyles();
+    const history = useHistory();
 
     const loadData = async () => {
         setIsLoading(true);
-        const res = await ajax.get<IStats[]>("/server/stats/get");
+        const res = await ajax.get<IStats[]>("/server/admin-stats/get");
         if (res.isOk) {
             setStats(res.data);
         }
@@ -95,18 +98,43 @@ export const StatsPage = () => {
 
     const userSyncWarning = stats.some((r) => r.jiraHours != r.wtmHours);
 
-    return isLoading ? (
-        <LinearProgress />
-    ) : (
+    return (
         <>
-            <Typography paragraph>
-                {userSyncWarning && (
-                    <MuiAlert variant="filled" severity="warning">
-                        Některým uživatelům nesouhlasí počet synchronizovaných hodin!
-                    </MuiAlert>
-                )}
-            </Typography>
-            <DataGrid getRowId={idGetter} columns={columns} rows={stats} density="compact" autoHeight disableColumnMenu hideFooterPagination hideFooter />
+            {isLoading ? (
+                <LinearProgress />
+            ) : (
+                <>
+                    <Typography paragraph>
+                        {userSyncWarning && (
+                            <MuiAlert variant="filled" severity="warning">
+                                Některým uživatelům nesouhlasí počet synchronizovaných hodin!
+                            </MuiAlert>
+                        )}
+                    </Typography>
+                    <DataGrid
+                        getRowId={idGetter}
+                        columns={columns}
+                        rows={stats}
+                        density="compact"
+                        autoHeight
+                        disableColumnMenu
+                        hideFooterPagination
+                        hideFooter
+                    />
+                </>
+            )}
+            <Box display="flex" mt={2}>
+                <Box flexGrow={1}>
+                    <Button variant="contained" color="secondary" href={Router.PageSynchronization} target="_blank">
+                        Spustit synchronizaci
+                    </Button>
+                </Box>
+                <Box>
+                    <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
+                        Zpět
+                    </Button>
+                </Box>
+            </Box>
             <StatsDays stats={showDays} onClose={() => setShowDays(null)} />
         </>
     );

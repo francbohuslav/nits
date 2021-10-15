@@ -113,11 +113,12 @@ const methods: IServerMethod[] = [
     m("get", "/server/jira/oauth", jiraRequester.oauth.bind(jiraRequester)),
     m("get", "/server/sync", syncRequester.sync.bind(syncRequester), undefined, { formatOutput: true }),
     m("post", "/server/notify/set", notifyRequester.setNotificationEmail.bind(notifyRequester), loginAuthorize),
+    m("get", "/server/user-stats/get", statsRequester.getUserStats.bind(statsRequester), loginAuthorize),
 
     // admin commands
     m("get", "/server/project-settings/get", projectReqester.getProjectSettings.bind(projectReqester), adminAuthorize),
     m("post", "/server/project-settings/set", projectReqester.setProjectSettings.bind(projectReqester), adminAuthorize),
-    m("get", "/server/stats/get", statsRequester.getStats.bind(statsRequester), adminAuthorize),
+    m("get", "/server/admin-stats/get", statsRequester.getAdminStats.bind(statsRequester), adminAuthorize),
 ];
 
 const processRequest = (method: IServerAction, options: IServerMethodOptions) => async (req: express.Request, res: express.Response) => {

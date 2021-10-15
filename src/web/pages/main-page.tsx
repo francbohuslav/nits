@@ -67,7 +67,7 @@ export const MainPage = () => {
             <Typography variant="body1" align="center" paragraph>
                 <img src="/images/logo.png" height="200" />
             </Typography>
-            <MainPageStats></MainPageStats>
+            <MainPageStats />
             <Box mt={4} mb={1}>
                 <Grid container alignItems="center" spacing={1}>
                     <Grid item xs={3} sm={4}></Grid>

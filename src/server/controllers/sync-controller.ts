@@ -3,7 +3,7 @@ import { ISyncReport, ISyncReportUser, TimesheetMapping, TimesheetMappingsPerDay
 import { IIssue, IIssueCustomField, Worklog } from "../models/jira/interfaces";
 import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
-import { Timesheet, TimesheetModelFactoryHandler } from "../models/uu/interfaces";
+import { nitsTimesheetFilter, Timesheet, TimesheetModelFactoryHandler } from "../models/uu/interfaces";
 import { ProjectController } from "./project-controller";
 import { assert } from "../../common/core";
 import { IProjectConfig } from "../project-config";
@@ -57,7 +57,9 @@ export class SyncController {
                 if (commentErrors.length) {
                     reportUser.log.push(commentErrors);
                 }
-                const exitingTimesheets = await timesheetModel.getUserLastTimesheets();
+                const exitingTimesheets = await timesheetModel.getMyLastTimesheets(
+                    dateUtils.toIsoFormat(dateUtils.increaseDay(new Date(), this.projectConfig.syncDaysCount))
+                );
                 const { timesheetsToDelete, timesheetsToRemain } = this.separateTimesheets(exitingTimesheets);
                 const newTimesheets = this.computeNewTimesheets(timesheetMappingsPerDay, timesheetsToRemain);
                 // reportUser.log.push({ timesheetMappingsPerDay });
@@ -162,7 +164,7 @@ export class SyncController {
         const timesheetsToDelete: Timesheet[] = [];
         const timesheetsToRemain: Timesheet[] = [];
         for (const timesheet of exitingTimesheets) {
-            if (timesheet.data?.nits !== undefined) {
+            if (nitsTimesheetFilter(timesheet)) {
                 timesheetsToDelete.push(timesheet);
             } else {
                 timesheetsToRemain.push(timesheet);

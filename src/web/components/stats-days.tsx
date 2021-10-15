@@ -102,7 +102,7 @@ export const StatsDays = (props: IInfoProps) => {
                             </MuiAlert>
                         )}
                     </Typography>
-                    <Grid container spacing={1}>
+                    <Grid container spacing={2}>
                         <Grid item xs={6}>
                             <DataGrid
                                 getRowId={daysIdGetter}
@@ -116,16 +116,23 @@ export const StatsDays = (props: IInfoProps) => {
                             />
                         </Grid>
                         <Grid item xs={6}>
-                            <DataGrid
-                                getRowId={artsIdGetter}
-                                columns={artsColumns}
-                                rows={artRows}
-                                density="compact"
-                                autoHeight
-                                disableColumnMenu
-                                hideFooterPagination
-                                hideFooter
-                            />
+                            <Typography paragraph>
+                                <DataGrid
+                                    getRowId={artsIdGetter}
+                                    columns={artsColumns}
+                                    rows={artRows}
+                                    density="compact"
+                                    autoHeight
+                                    disableColumnMenu
+                                    hideFooterPagination
+                                    hideFooter
+                                />
+                            </Typography>
+                            <Typography variant="body1">
+                                {props.stats?.lastSynchronization
+                                    ? `Poslední synchronizace proběhla ${dateUtils.formatDateTime(props.stats.lastSynchronization)}`
+                                    : "Zatím nesynchronizováno"}
+                            </Typography>
                         </Grid>
                     </Grid>
                 </DialogContentText>

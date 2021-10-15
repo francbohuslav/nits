@@ -29,6 +29,7 @@ export interface IStats {
     wtmHours: number;
     days: IStatsDays;
     artifacts: IStatsArts;
+    lastSynchronization: string;
 }
 
 export type IStatsDays = { [date: string]: IStatsDay };
@@ -43,4 +44,9 @@ export interface IStatsDay {
 export interface IStatsArt {
     artifact: string;
     wtmHours: number;
+}
+
+export interface IUserStats {
+    wtmHours: number;
+    lastSynchronization: string;
 }

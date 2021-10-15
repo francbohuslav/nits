@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { IStats } from "../../common/interfaces";
+import { IStats, IUserStats } from "../../common/interfaces";
 import { StatsController } from "../controllers/stats-controller";
 import { BaseRequester } from "./base-requester";
 
@@ -8,8 +8,14 @@ export class StatsRequester extends BaseRequester {
         super();
     }
 
-    public async getStats(req: Request): Promise<IStats[]> {
+    public async getAdminStats(req: Request): Promise<IStats[]> {
         const uid = this.getUid(req);
-        return this.statsController.getStats(uid);
+        return this.statsController.getAdminStats(uid);
+    }
+
+    public async getUserStats(req: Request): Promise<IUserStats> {
+        const uid = this.getUid(req);
+
+        return this.statsController.getUserStats(uid);
     }
 }
