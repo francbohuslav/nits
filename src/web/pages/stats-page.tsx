@@ -9,7 +9,8 @@ import { Router } from "../router";
 import { useHistory } from "react-router-dom";
 import dateUtils from "../../common/date-utils";
 import { StatsStatus } from "../components/stats-status";
-
+import arrayUtils from "../../common/array-utils";
+/*
 const mockData: IStats[] = [
     {
         uid: "12-8835-1",
@@ -300,7 +301,7 @@ const mockData: IStats[] = [
         lastSynchronization: "2021-10-15T13:46:42.853Z",
     },
 ];
-
+*/
 const useStyles = makeStyles({
     level1: {
         paddingLeft: "1em",
@@ -341,8 +342,8 @@ export const StatsPage = () => {
     };
 
     useEffect(() => {
-        //loadData();
-        setStats(mockData);
+        loadData();
+        //setStats(mockData);
     }, []);
 
     const idGetter = (row: GridRowData) => {
@@ -350,10 +351,12 @@ export const StatsPage = () => {
         return (row as IStats).uid || (row as IStatsDay).date || (row as IStatsArt).artifact;
     };
 
+    const badUserCount = arrayUtils.sumAction(stats, (s) => (Object.values(s.days).some((d) => d.jiraHours != d.wtmHours) ? 1 : 0));
+
     const columns: GridColumns = [
         {
             field: "name",
-            headerName: "Jméno",
+            headerName: `Jméno (${stats?.length}x)`,
             flex: 1.5,
             align: "left",
             headerAlign: "center",
@@ -404,17 +407,17 @@ export const StatsPage = () => {
         },
         {
             field: "jiraHours",
-            headerName: "JIRA [hod]",
+            headerName: `JIRA (${dateUtils.formatHours(arrayUtils.sumAction(stats, (s) => s.jiraHours))})`,
             renderCell: (params) => (params.value == undefined ? "" : dateUtils.formatHours(params.value as number)),
         },
         {
             field: "wtmHours",
-            headerName: "WTM [hod]",
+            headerName: `WTM (${dateUtils.formatHours(arrayUtils.sumAction(stats, (s) => s.wtmHours))})`,
             renderCell: (params) => dateUtils.formatHours(params.value as number),
         },
         {
             field: "status",
-            headerName: "Stav",
+            headerName: `Stav (${badUserCount}/${stats.length - badUserCount})`,
             type: "boolean",
             align: "center",
             headerAlign: "center",
