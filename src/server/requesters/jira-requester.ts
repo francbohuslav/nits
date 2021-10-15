@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { IJiraProcessRequest } from "../../common/ajax-interfaces";
 import { JiraController } from "../controllers/jira-controller";
 import { Crypt } from "../helpers/crypt";
 import { BaseRequester } from "./base-requester";
@@ -9,7 +10,7 @@ export class JiraRequester extends BaseRequester {
     }
 
     public async oauth(req: Request, res: Response): Promise<void> {
-        await this.jiraController.processOAth(req.query.code as string, req.query.state as string);
+        await this.jiraController.processOAth(req.query as any as IJiraProcessRequest);
         res.redirect("/page/main/");
     }
 }
