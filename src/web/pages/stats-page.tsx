@@ -52,7 +52,7 @@ export const StatsPage = () => {
             headerName: "Jméno",
             flex: 1.5,
             align: "left",
-            headerAlign: "left",
+            headerAlign: "center",
             renderCell: (params) => (
                 <Tooltip title="Zobrazit denní data">
                     <Link
@@ -79,9 +79,11 @@ export const StatsPage = () => {
         },
         {
             field: "status",
-            headerName: " ",
+            headerName: "Stav",
             type: "boolean",
-            flex: 0.4,
+            align: "center",
+            headerAlign: "center",
+            flex: 1,
             valueGetter: (params) => {
                 const stats = params.row as IStats;
                 return stats.jiraHours == stats.wtmHours;
