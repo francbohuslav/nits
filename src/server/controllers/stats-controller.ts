@@ -10,8 +10,7 @@ export class StatsController {
     constructor(private userDataModel: UserDataModel, private jiraModel: JiraModel, private timesheetModelFactory: TimesheetModelFactoryHandler) {}
 
     public async getAdminStats(adminUid: string): Promise<IStats[]> {
-        //TODO: BF: vice dnu
-        const lastDays = 4;
+        const lastDays = 31;
         const adminUserData = await this.userDataModel.getUserData(adminUid);
         const timesheetModel = this.timesheetModelFactory(adminUserData.uuAccessCode1, adminUserData.uuAccessCode2);
 

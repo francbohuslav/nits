@@ -192,79 +192,98 @@ export class SyncController {
         let startHour = 8;
         while (startHour > -1) {
             let searchFromTime = dateUtils.increase(dateUtils.getStartOfDay(timesheetMapping[0].date), "hours", startHour);
+            const startOfDay = timesheetsToRemain
+                .map((t) => t.datetimeFrom)
+                .reduce((p, c) => (dateUtils.isLowerThen(p, c) ? dateUtils.toDate(p) : dateUtils.toDate(c)), searchFromTime);
             const newTimesheets: Timesheet[] = [];
             const timesheetMappingToProcess = JSON.parse(JSON.stringify(timesheetMapping));
-            let interval: IInterval = null;
+            let segment: { interval: IInterval; isPauseApplied: boolean } = null;
             do {
-                interval = this.getNextFreeTimeSegment(searchFromTime, timesheetsToRemain);
-                if (interval) {
-                    this.computeNewTimesheetsInSegment(interval, newTimesheets, timesheetMappingToProcess);
+                const alreadyProcessedHours = dateUtils.secondsBetween(startOfDay, searchFromTime) / 3600;
+                segment = this.getNextFreeTimeSegment(searchFromTime, timesheetsToRemain, segment?.isPauseApplied, alreadyProcessedHours);
+                if (segment) {
+                    //TODO: BF: predelat na delani vykazu pojednom
+                    const endTime = this.computeNewTimesheetInSegment(segment.interval, newTimesheets, timesheetMappingToProcess);
                     if (timesheetMappingToProcess.length == 0) {
                         return newTimesheets;
                     }
-                    if (dateUtils.toIsoFormat(searchFromTime) != dateUtils.toIsoFormat(interval.to)) {
+                    if (dateUtils.toIsoFormat(searchFromTime) != dateUtils.toIsoFormat(endTime)) {
                         break;
                     }
-                    searchFromTime = interval.to;
+                    searchFromTime = endTime;
                 }
-            } while (interval);
-            startHour--;
+            } while (segment);
+            startHour -= 0.5;
         }
         throw new Error(`There is no space in ${timesheetMapping[0].date} for new timesheets`);
     }
 
-    protected computeNewTimesheetsInSegment(interval: IInterval, newTimesheets: Timesheet[], timesheetMapping: TimesheetMapping[]) {
+    protected computeNewTimesheetInSegment(interval: IInterval, newTimesheets: Timesheet[], timesheetMapping: TimesheetMapping[]): Date {
         if (timesheetMapping.length == 0) {
             return;
         }
         let restTime = dateUtils.secondsBetween(interval.from, interval.to);
         let startTime = interval.from;
-        let tsm: TimesheetMapping = null;
-        do {
-            tsm = timesheetMapping[0];
-            const timeToSpent = restTime >= tsm.spentSeconds ? tsm.spentSeconds : restTime;
-            const ts = new Timesheet();
-            ts.description = tsm.description;
-            ts.datetimeFrom = startTime.toISOString();
-            startTime = dateUtils.increase(startTime, "seconds", timeToSpent);
-            ts.datetimeTo = startTime.toISOString();
-            ts.subject = tsm.wtmArtifact;
-            ts.highRate = false;
-            ts.data = {
-                nits: {
-                    issueKey: tsm.jiraIssueKey,
-                    worklogIds: tsm.jiraWorklogs.map((w) => w.id),
-                },
-            };
-            newTimesheets.push(ts);
-            restTime -= timeToSpent;
-            if (timeToSpent < tsm.spentSeconds) {
-                tsm.spentSeconds -= timeToSpent;
-            } else {
-                timesheetMapping.shift();
-            }
-        } while (timesheetMapping.length > 0 && restTime > 0);
+        const tsm = timesheetMapping[0];
+        const timeToSpent = restTime >= tsm.spentSeconds ? tsm.spentSeconds : restTime;
+        const ts = new Timesheet();
+        ts.description = tsm.description;
+        ts.datetimeFrom = startTime.toISOString();
+        startTime = dateUtils.increase(startTime, "seconds", timeToSpent);
+        ts.datetimeTo = startTime.toISOString();
+        ts.subject = tsm.wtmArtifact;
+        ts.highRate = false;
+        ts.data = {
+            nits: {
+                issueKey: tsm.jiraIssueKey,
+                worklogIds: tsm.jiraWorklogs.map((w) => w.id),
+            },
+        };
+        newTimesheets.push(ts);
+        restTime -= timeToSpent;
+        if (timeToSpent < tsm.spentSeconds) {
+            tsm.spentSeconds -= timeToSpent;
+        } else {
+            timesheetMapping.shift();
+        }
+        return startTime;
     }
 
-    protected getNextFreeTimeSegment(searchFromTime: Date, timesheetsToRemain: Timesheet[]): IInterval {
+    //TODO: BF: udelat test na to ze se tam pauza nikam nevejde
+    protected getNextFreeTimeSegment(
+        searchFromTime: Date,
+        timesheetsToRemain: Timesheet[],
+        isPauseApplied: boolean,
+        alreadyProcessedHours: number
+    ): { interval: IInterval; isPauseApplied: boolean } {
         const day = dateUtils.toIsoFormat(searchFromTime);
-        const timesheetsAfterTime = timesheetsToRemain.filter((t) => !dateUtils.isLowerOrEqualsThen(t.datetimeTo, searchFromTime));
-        while (timesheetsAfterTime.length > 0 && dateUtils.isLowerOrEqualsThen(timesheetsAfterTime[0].datetimeFrom, searchFromTime)) {
-            searchFromTime = dateUtils.toDate(timesheetsAfterTime[0].datetimeTo);
-            timesheetsAfterTime.shift();
-        }
-        // No space to end of day
-        if (day != dateUtils.toIsoFormat(searchFromTime)) {
-            return null;
-        }
+        let interval: IInterval = null;
+        do {
+            const timesheetsAfterTime = timesheetsToRemain.filter((t) => !dateUtils.isLowerOrEqualsThen(t.datetimeTo, searchFromTime));
+            while (timesheetsAfterTime.length > 0 && dateUtils.isLowerOrEqualsThen(timesheetsAfterTime[0].datetimeFrom, searchFromTime)) {
+                alreadyProcessedHours += dateUtils.secondsBetween(searchFromTime, timesheetsAfterTime[0].datetimeTo) / 3600;
+                searchFromTime = dateUtils.toDate(timesheetsAfterTime[0].datetimeTo);
+                timesheetsAfterTime.shift();
+            }
+            // No space to end of day
+            if (day != dateUtils.toIsoFormat(searchFromTime)) {
+                return null;
+            }
 
-        return {
-            from: searchFromTime,
-            to:
-                timesheetsAfterTime.length == 0
-                    ? dateUtils.getStartOfDay(dateUtils.increaseDay(searchFromTime))
-                    : dateUtils.toDate(timesheetsAfterTime[0].datetimeFrom),
-        };
+            interval = {
+                from: searchFromTime,
+                to:
+                    timesheetsAfterTime.length == 0
+                        ? dateUtils.getStartOfDay(dateUtils.increaseDay(searchFromTime))
+                        : dateUtils.toDate(timesheetsAfterTime[0].datetimeFrom),
+            };
+            if (!isPauseApplied && alreadyProcessedHours >= 4 && dateUtils.secondsBetween(interval.from, interval.to) >= 1800) {
+                interval.from = dateUtils.increase(interval.from, "minutes", 30);
+                searchFromTime = interval.from;
+                isPauseApplied = true;
+            }
+        } while (dateUtils.areEquals(interval.from, interval.to));
+        return { interval, isPauseApplied };
     }
 }
 

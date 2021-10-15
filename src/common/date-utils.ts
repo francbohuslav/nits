@@ -98,7 +98,7 @@ class DateUtils {
         return this.secondsBetween(firstDate, secondDate) / 24 / 3600;
     }
 
-    public isEquals(date1: IDateType, date2: IDateType): boolean {
+    public areEquals(date1: IDateType, date2: IDateType): boolean {
         return this.toTimestamp(date1) == this.toTimestamp(date2);
     }
 

@@ -3,6 +3,7 @@ export interface IProjectConfig {
     userDataEncrypted: boolean;
     admins: string[];
     syncDaysCount: number;
+    serverAddress: string;
     jira: {
         nitsCustomField: string;
         clientId: string;
@@ -21,6 +22,7 @@ export class ProjectConfigurer {
                 userDataEncrypted: true,
                 admins: process.env.NITS_ADMIN_UIDS.trim().split(/\s*,\s*/),
                 syncDaysCount: parseInt(process.env.NITS_SYNC_DAYS_COUNT || "7"),
+                serverAddress: process.env.NITS_SERVER_ADDRESS,
                 jira: {
                     nitsCustomField: process.env.NITS_JIRA_CUSTOM_FIELD,
                     clientId: process.env.NITS_JIRA_CLIENT_ID,

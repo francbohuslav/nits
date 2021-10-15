@@ -33,8 +33,8 @@ export const MainPageStats = () => {
                 <Typography align="center">
                     {stats ? (
                         <>
-                            Poslední synchronizace proběhla {dateUtils.formatDateTime(stats.lastSynchronization)}. <br />
-                            Za tento měsíc bylo synchronizováno {stats.wtmHours} hodin.
+                            Poslední synchronizace proběhla <strong>{dateUtils.formatDateTime(stats.lastSynchronization)}</strong>. <br />
+                            Za tento měsíc bylo synchronizováno <strong>{stats.wtmHours}</strong> hodin.
                         </>
                     ) : (
                         "Zatím nesynchronizováno"

@@ -24,7 +24,7 @@ export class JiraController {
             client_id: this.projectConfig.jira.clientId,
             client_secret: this.projectConfig.jira.clientSecret,
             code: request.code,
-            redirect_uri: "https://nits-beta.herokuapp.com/server/jira/oauth",
+            redirect_uri: this.projectConfig.serverAddress + "/server/jira/oauth",
         });
         const accessToken = response.data.access_token;
         console.log("accessToken", accessToken);

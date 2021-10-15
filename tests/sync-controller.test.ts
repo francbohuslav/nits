@@ -126,6 +126,7 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
             admins: [],
             cryptoSalt: "test",
             syncDaysCount: 7,
+            serverAddress: "",
             jira: {
                 clientId: "",
                 clientSecret: "",
@@ -180,7 +181,7 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
 
 test("separateTimesheets", async () => {
     const syncController = new TestingSyncController(null, null, null, null, null);
-    const result = syncController.publishedSeparateTimesheets([
+    const result = syncController.separateTimesheets2([
         {
             data: undefined,
         } as Partial<Timesheet>,
@@ -284,55 +285,116 @@ describe("computeNewTimesheets", () => {
     });
 });
 
-test("getNextFreeTimeSegment", () => {
-    const syncController = new TestingSyncController(null, null, null, null, null);
-    const searchFromTime = new Date("2021-10-12T06:00:00Z");
-    expect(syncController.getNextFreeTimeSegment2(searchFromTime, [])).toEqual({
-        from: searchFromTime,
-        to: new Date("2021-10-12T22:00:00Z"),
-    });
-    // Remaining timesheets are before
-    expect(syncController.getNextFreeTimeSegment2(searchFromTime, [createTimesheet("2021-10-12T04:00:00Z", "2021-10-12T05:00:00Z")])).toEqual({
-        from: searchFromTime,
-        to: new Date("2021-10-12T22:00:00Z"),
-    });
-    // Remaining timesheets are before and end time is same as searchFromTime
-    expect(syncController.getNextFreeTimeSegment2(searchFromTime, [createTimesheet("2021-10-12T04:00:00Z", "2021-10-12T06:00:00Z")])).toEqual({
-        from: searchFromTime,
-        to: new Date("2021-10-12T22:00:00Z"),
-    });
-    // Remaining timesheets are on same time as searchFromTime
-    expect(syncController.getNextFreeTimeSegment2(searchFromTime, [createTimesheet("2021-10-12T06:00:00Z", "2021-10-12T08:00:00Z")])).toEqual({
-        from: new Date("2021-10-12T08:00:00Z"),
-        to: new Date("2021-10-12T22:00:00Z"),
-    });
-    // Remaining timesheets are later than searchFromTime
-    expect(syncController.getNextFreeTimeSegment2(searchFromTime, [createTimesheet("2021-10-12T10:00:00Z", "2021-10-12T12:00:00Z")])).toEqual({
-        from: new Date("2021-10-12T06:00:00Z"),
-        to: new Date("2021-10-12T10:00:00Z"),
-    });
-    // Next timesheets overlap searchFromTime
-    expect(
-        syncController.getNextFreeTimeSegment2(searchFromTime, [
-            createTimesheet("2021-10-12T05:00:00Z", "2021-10-12T07:00:00Z"),
-            createTimesheet("2021-10-12T10:00:00Z", "2021-10-12T12:00:00Z"),
-        ])
-    ).toEqual({
-        from: new Date("2021-10-12T07:00:00Z"),
-        to: new Date("2021-10-12T10:00:00Z"),
-    });
-    // Next timesheets overlap searchFromTime
-    expect(syncController.getNextFreeTimeSegment2(searchFromTime, [createTimesheet("2021-10-12T05:00:00Z", "2021-10-12T22:00:00Z")])).toBeNull();
+describe("getNextFreeTimeSegment", () => {
+    let syncController: TestingSyncController;
+    let searchFromTime: Date;
 
-    // Adjacent Remaining timesheets
-    expect(
-        syncController.getNextFreeTimeSegment2(searchFromTime, [
-            createTimesheet("2021-10-12T06:00:00Z", "2021-10-12T07:00:00Z"),
-            createTimesheet("2021-10-12T07:00:00Z", "2021-10-12T08:00:00Z"),
-        ])
-    ).toEqual({
-        from: new Date("2021-10-12T08:00:00Z"),
-        to: new Date("2021-10-12T22:00:00Z"),
+    beforeEach(() => {
+        syncController = new TestingSyncController(null, null, null, null, null);
+        searchFromTime = new Date("2021-10-12T06:00:00Z");
+    });
+
+    test("basic", () => {
+        expect(syncController.getNextFreeTimeSegment2(searchFromTime, [], false, 0).interval).toEqual({
+            from: searchFromTime,
+            to: new Date("2021-10-12T22:00:00Z"),
+        });
+    });
+    test("Remaining timesheets are before", () => {
+        expect(
+            syncController.getNextFreeTimeSegment2(searchFromTime, [createTimesheet("2021-10-12T04:00:00Z", "2021-10-12T05:00:00Z")], false, 0).interval
+        ).toEqual({
+            from: searchFromTime,
+            to: new Date("2021-10-12T22:00:00Z"),
+        });
+    });
+    test("Remaining timesheets are before and end time is same as searchFromTime", () => {
+        expect(
+            syncController.getNextFreeTimeSegment2(searchFromTime, [createTimesheet("2021-10-12T04:00:00Z", "2021-10-12T06:00:00Z")], false, 0).interval
+        ).toEqual({
+            from: searchFromTime,
+            to: new Date("2021-10-12T22:00:00Z"),
+        });
+    });
+    test("Remaining timesheets are on same time as searchFromTime", () => {
+        expect(
+            syncController.getNextFreeTimeSegment2(searchFromTime, [createTimesheet("2021-10-12T06:00:00Z", "2021-10-12T08:00:00Z")], false, 0).interval
+        ).toEqual({
+            from: new Date("2021-10-12T08:00:00Z"),
+            to: new Date("2021-10-12T22:00:00Z"),
+        });
+    });
+    test("Remaining timesheets are later than searchFromTime", () => {
+        expect(
+            syncController.getNextFreeTimeSegment2(searchFromTime, [createTimesheet("2021-10-12T10:00:00Z", "2021-10-12T12:00:00Z")], false, 0).interval
+        ).toEqual({
+            from: new Date("2021-10-12T06:00:00Z"),
+            to: new Date("2021-10-12T10:00:00Z"),
+        });
+    });
+    test("Next timesheets overlap searchFromTime", () => {
+        expect(
+            syncController.getNextFreeTimeSegment2(
+                searchFromTime,
+                [createTimesheet("2021-10-12T05:00:00Z", "2021-10-12T07:00:00Z"), createTimesheet("2021-10-12T10:00:00Z", "2021-10-12T12:00:00Z")],
+                false,
+                0
+            ).interval
+        ).toEqual({
+            from: new Date("2021-10-12T07:00:00Z"),
+            to: new Date("2021-10-12T10:00:00Z"),
+        });
+    });
+    test("Next timesheets overlap searchFromTime", () => {
+        expect(syncController.getNextFreeTimeSegment2(searchFromTime, [createTimesheet("2021-10-12T05:00:00Z", "2021-10-12T22:00:00Z")], false, 0)).toBeNull();
+    });
+    test("Adjacent Remaining timesheets", () => {
+        expect(
+            syncController.getNextFreeTimeSegment2(
+                searchFromTime,
+                [createTimesheet("2021-10-12T06:00:00Z", "2021-10-12T07:00:00Z"), createTimesheet("2021-10-12T07:00:00Z", "2021-10-12T08:00:00Z")],
+                false,
+                0
+            ).interval
+        ).toEqual({
+            from: new Date("2021-10-12T08:00:00Z"),
+            to: new Date("2021-10-12T22:00:00Z"),
+        });
+    });
+    test("Launch pause", () => {
+        expect(
+            syncController.getNextFreeTimeSegment2(
+                searchFromTime,
+                [createTimesheet("2021-10-12T06:00:00Z", "2021-10-12T07:00:00Z"), createTimesheet("2021-10-12T08:00:00Z", "2021-10-12T09:00:00Z")],
+                false,
+                4
+            )
+        ).toEqual({
+            interval: {
+                from: new Date("2021-10-12T07:30:00Z"),
+                to: new Date("2021-10-12T08:00:00Z"),
+            },
+            isPauseApplied: true,
+        });
+    });
+    test("Pause with exactly fit", () => {
+        expect(
+            syncController.getNextFreeTimeSegment2(
+                searchFromTime,
+                [createTimesheet("2021-10-12T06:00:00Z", "2021-10-12T07:00:00Z"), createTimesheet("2021-10-12T07:30:00Z", "2021-10-12T09:00:00Z")],
+                false,
+                4
+            )
+        ).toEqual({
+            interval: {
+                from: new Date("2021-10-12T09:00:00Z"),
+                to: new Date("2021-10-12T22:00:00Z"),
+            },
+            isPauseApplied: true,
+        });
+    });
+    test("No space because of pause", () => {
+        expect(syncController.getNextFreeTimeSegment2(searchFromTime, [createTimesheet("2021-10-12T06:00:00Z", "2021-10-12T21:30:00Z")], false, 4)).toBeNull();
     });
 });
 
@@ -477,20 +539,20 @@ describe("computeNewTimesheetsInDay", () => {
                     wtmArtifact: "UNI-BT:2",
                 },
             ],
-            [createTimesheet("2021-10-12T06:00:00Z", "2021-10-12T07:00:00Z"), createTimesheet("2021-10-12T12:00:00Z", "2021-10-12T22:00:00Z")]
+            [createTimesheet("2021-10-12T05:45:00Z", "2021-10-12T06:45:00Z"), createTimesheet("2021-10-12T12:00:00Z", "2021-10-12T22:00:00Z")]
         );
 
         expect(newTimesheets).toHaveLength(3);
         expect(newTimesheets[0]).toEqual(
             expect.objectContaining({
-                datetimeFrom: "2021-10-12T03:00:00.000Z",
-                datetimeTo: "2021-10-12T06:00:00.000Z",
+                datetimeFrom: "2021-10-12T02:30:00.000Z",
+                datetimeTo: "2021-10-12T05:45:00.000Z",
                 subject: "UNI-BT:1",
             } as Timesheet)
         );
         expect(newTimesheets[1]).toEqual(
             expect.objectContaining({
-                datetimeFrom: "2021-10-12T07:00:00.000Z",
+                datetimeFrom: "2021-10-12T07:15:00.000Z",
                 datetimeTo: "2021-10-12T08:00:00.000Z",
                 subject: "UNI-BT:1",
             } as Timesheet)
@@ -505,11 +567,11 @@ describe("computeNewTimesheetsInDay", () => {
     });
 });
 
-describe("computeNewTimesheetsInSegment", () => {
+describe("computeNewTimesheetInSegment", () => {
     test("empty", () => {
         const syncController = new TestingSyncController(null, null, null, null, null);
         const newTimesheets: Timesheet[] = [];
-        syncController.computeNewTimesheetsInSegment2({ from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T06:00:00Z") }, newTimesheets, []);
+        syncController.computeNewTimesheetInSegment2({ from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T06:00:00Z") }, newTimesheets, []);
         expect(newTimesheets.length).toBe(0);
     });
 
@@ -526,7 +588,7 @@ describe("computeNewTimesheetsInSegment", () => {
                 wtmArtifact: "UNI-BT:1",
             },
         ];
-        syncController.computeNewTimesheetsInSegment2(
+        syncController.computeNewTimesheetInSegment2(
             { from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T08:00:00Z") },
             newTimesheets,
             timesheetMappings
@@ -561,7 +623,7 @@ describe("computeNewTimesheetsInSegment", () => {
                 wtmArtifact: "UNI-BT:1",
             },
         ];
-        syncController.computeNewTimesheetsInSegment2(
+        syncController.computeNewTimesheetInSegment2(
             { from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T06:45:00Z") },
             newTimesheets,
             timesheetMappings
@@ -573,7 +635,7 @@ describe("computeNewTimesheetsInSegment", () => {
         expect(timesheetMappings[0].spentSeconds).toBe(15 * 60);
     });
 
-    test("two_timesheets_exact_as_segment", () => {
+    test("timesheets_exact_as_segment", () => {
         const syncController = new TestingSyncController(null, null, null, null, null);
         const newTimesheets: Timesheet[] = [];
         const timesheetMappings: TimesheetMapping[] = [
@@ -585,6 +647,7 @@ describe("computeNewTimesheetsInSegment", () => {
                 spentSeconds: 3600,
                 wtmArtifact: "UNI-BT:1",
             },
+            // this will not be used
             {
                 date: "2021-10-12",
                 description: "desc2",
@@ -594,12 +657,12 @@ describe("computeNewTimesheetsInSegment", () => {
                 wtmArtifact: "UNI-BT:2",
             },
         ];
-        syncController.computeNewTimesheetsInSegment2(
-            { from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T07:30:00Z") },
+        syncController.computeNewTimesheetInSegment2(
+            { from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T07:00:00Z") },
             newTimesheets,
             timesheetMappings
         );
-        expect(newTimesheets.length).toBe(2);
+        expect(newTimesheets.length).toBe(1);
         expect(newTimesheets[0]).toEqual({
             datetimeFrom: "2021-10-12T06:00:00.000Z",
             datetimeTo: "2021-10-12T07:00:00.000Z",
@@ -613,20 +676,7 @@ describe("computeNewTimesheetsInSegment", () => {
                 },
             },
         } as Timesheet);
-        expect(newTimesheets[1]).toEqual({
-            datetimeFrom: "2021-10-12T07:00:00.000Z",
-            datetimeTo: "2021-10-12T07:30:00.000Z",
-            description: "desc2",
-            highRate: false,
-            subject: "UNI-BT:2",
-            data: {
-                nits: {
-                    issueKey: "C-2",
-                    worklogIds: ["2"],
-                },
-            },
-        } as Timesheet);
-        expect(timesheetMappings).toHaveLength(0);
+        expect(timesheetMappings).toHaveLength(1);
     });
 });
 
@@ -640,7 +690,7 @@ class TestingSyncController extends SyncController {
         return this.filterWorklogsAndAssignWtmConfig(worklogList, issuesById, wtmTsConfigPerWorklogs, report);
     }
 
-    public publishedSeparateTimesheets(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; timesheetsToRemain: Timesheet[] } {
+    public separateTimesheets2(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; timesheetsToRemain: Timesheet[] } {
         return this.separateTimesheets(exitingTimesheets);
     }
 
@@ -648,12 +698,17 @@ class TestingSyncController extends SyncController {
         return this.computeNewTimesheets(timesheetMappingsPerDay, timesheetsToRemain);
     }
 
-    public getNextFreeTimeSegment2(searchFromTime: Date, timesheetsToRemain: Timesheet[]): IInterval {
-        return this.getNextFreeTimeSegment(searchFromTime, timesheetsToRemain);
+    public getNextFreeTimeSegment2(
+        searchFromTime: Date,
+        timesheetsToRemain: Timesheet[],
+        isPauseApplied: boolean,
+        alreadyProcessedHours: number
+    ): { interval: IInterval; isPauseApplied: boolean } {
+        return this.getNextFreeTimeSegment(searchFromTime, timesheetsToRemain, isPauseApplied, alreadyProcessedHours);
     }
 
-    public computeNewTimesheetsInSegment2(interval: IInterval, newTimesheets: Timesheet[], timesheetMapping: TimesheetMapping[]) {
-        return this.computeNewTimesheetsInSegment(interval, newTimesheets, timesheetMapping);
+    public computeNewTimesheetInSegment2(interval: IInterval, newTimesheets: Timesheet[], timesheetMapping: TimesheetMapping[]) {
+        return this.computeNewTimesheetInSegment(interval, newTimesheets, timesheetMapping);
     }
 
     public computeNewTimesheetsInDay2(timesheetMapping: TimesheetMapping[], timesheetsToRemain: Timesheet[]): Timesheet[] {
