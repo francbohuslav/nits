@@ -45,8 +45,7 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
 
     public async getTimesheetsOfUsers(userUids: string[], lastDays: number, filter?: (t: Timesheet) => boolean): Promise<ITimesheetPerUser> {
         const tokenResponse = await this.uuUserModel.getToken(this.accessCode1, this.accessCode2);
-        //TODO: const to = new Date();
-        const to = new Date("2019-08-15");
+        const to = new Date();
         const toStr = dateUtils.toIsoFormat(to);
         const from = dateUtils.toDate(dateUtils.increaseDay(to, -lastDays));
         const fromStr = dateUtils.toIsoFormat(from);
