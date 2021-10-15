@@ -5,3 +5,4 @@
 /.env
 /userdata/projects/project-settings.data
 /coverage
+/.env.production
