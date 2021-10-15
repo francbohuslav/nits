@@ -192,22 +192,27 @@ export class SyncController {
         let startHour = 8;
         while (startHour > -1) {
             let searchFromTime = dateUtils.increase(dateUtils.getStartOfDay(timesheetMapping[0].date), "hours", startHour);
+            const startOfDay = timesheetsToRemain
+                .map((t) => t.datetimeFrom)
+                .reduce((p, c) => (dateUtils.isLowerThen(p, c) ? dateUtils.toDate(p) : dateUtils.toDate(c)), searchFromTime);
             const newTimesheets: Timesheet[] = [];
             const timesheetMappingToProcess = JSON.parse(JSON.stringify(timesheetMapping));
-            let interval: IInterval = null;
+            let segment: { interval: IInterval; isPauseApplied: boolean } = null;
             do {
-                interval = this.getNextFreeTimeSegment(searchFromTime, timesheetsToRemain);
-                if (interval) {
-                    this.computeNewTimesheetsInSegment(interval, newTimesheets, timesheetMappingToProcess);
+                const alreadyProcessedHours = dateUtils.secondsBetween(startOfDay, searchFromTime) / 3600;
+                segment = this.getNextFreeTimeSegment(searchFromTime, timesheetsToRemain, segment?.isPauseApplied, alreadyProcessedHours);
+                if (segment) {
+                    //TODO: BF: predelat na delani vykazu pojednom
+                    this.computeNewTimesheetsInSegment(segment.interval, newTimesheets, timesheetMappingToProcess);
                     if (timesheetMappingToProcess.length == 0) {
                         return newTimesheets;
                     }
-                    if (dateUtils.toIsoFormat(searchFromTime) != dateUtils.toIsoFormat(interval.to)) {
+                    if (dateUtils.toIsoFormat(searchFromTime) != dateUtils.toIsoFormat(segment.interval.to)) {
                         break;
                     }
-                    searchFromTime = interval.to;
+                    searchFromTime = segment.interval.to;
                 }
-            } while (interval);
+            } while (segment);
             startHour--;
         }
         throw new Error(`There is no space in ${timesheetMapping[0].date} for new timesheets`);
@@ -246,25 +251,40 @@ export class SyncController {
         } while (timesheetMapping.length > 0 && restTime > 0);
     }
 
-    protected getNextFreeTimeSegment(searchFromTime: Date, timesheetsToRemain: Timesheet[]): IInterval {
+    //TODO: BF: udelat test na to ze se tam pauza nikam nevejde
+    protected getNextFreeTimeSegment(
+        searchFromTime: Date,
+        timesheetsToRemain: Timesheet[],
+        isPauseApplied: boolean,
+        alreadyProcessedHours: number
+    ): { interval: IInterval; isPauseApplied: boolean } {
         const day = dateUtils.toIsoFormat(searchFromTime);
-        const timesheetsAfterTime = timesheetsToRemain.filter((t) => !dateUtils.isLowerOrEqualsThen(t.datetimeTo, searchFromTime));
-        while (timesheetsAfterTime.length > 0 && dateUtils.isLowerOrEqualsThen(timesheetsAfterTime[0].datetimeFrom, searchFromTime)) {
-            searchFromTime = dateUtils.toDate(timesheetsAfterTime[0].datetimeTo);
-            timesheetsAfterTime.shift();
-        }
-        // No space to end of day
-        if (day != dateUtils.toIsoFormat(searchFromTime)) {
-            return null;
-        }
+        let interval: IInterval = null;
+        do {
+            const timesheetsAfterTime = timesheetsToRemain.filter((t) => !dateUtils.isLowerOrEqualsThen(t.datetimeTo, searchFromTime));
+            while (timesheetsAfterTime.length > 0 && dateUtils.isLowerOrEqualsThen(timesheetsAfterTime[0].datetimeFrom, searchFromTime)) {
+                searchFromTime = dateUtils.toDate(timesheetsAfterTime[0].datetimeTo);
+                timesheetsAfterTime.shift();
+            }
+            // No space to end of day
+            if (day != dateUtils.toIsoFormat(searchFromTime)) {
+                return null;
+            }
 
-        return {
-            from: searchFromTime,
-            to:
-                timesheetsAfterTime.length == 0
-                    ? dateUtils.getStartOfDay(dateUtils.increaseDay(searchFromTime))
-                    : dateUtils.toDate(timesheetsAfterTime[0].datetimeFrom),
-        };
+            interval = {
+                from: searchFromTime,
+                to:
+                    timesheetsAfterTime.length == 0
+                        ? dateUtils.getStartOfDay(dateUtils.increaseDay(searchFromTime))
+                        : dateUtils.toDate(timesheetsAfterTime[0].datetimeFrom),
+            };
+            if (!isPauseApplied && alreadyProcessedHours >= 4 && dateUtils.secondsBetween(interval.from, interval.to) >= 1800) {
+                interval.from = dateUtils.increase(interval.from, "minutes", 30);
+                searchFromTime = interval.from;
+                isPauseApplied = true;
+            }
+        } while (dateUtils.areEquals(interval.from, interval.to));
+        return { interval, isPauseApplied };
     }
 }
 
