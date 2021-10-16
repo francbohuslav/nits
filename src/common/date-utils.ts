@@ -1,5 +1,5 @@
 // require because of Jest
-const moment = require("moment");
+import moment, { unitOfTime } from "moment";
 
 class DateUtils {
     public toDate(date: IDateType = new Date()): Date {
@@ -66,7 +66,7 @@ class DateUtils {
         return `${hourPart}:${minutePart.toFixed(0).padStart(2, "0")}`;
     }
 
-    public increase(date: IDateType, units: string, unitCount: number = 1): Date {
+    public increase(date: IDateType, units: unitOfTime.DurationConstructor, unitCount: number = 1): Date {
         if (typeof date === "string") {
             date = new Date(date);
         }
@@ -80,7 +80,7 @@ class DateUtils {
         return this.increase(date, "days", days);
     }
 
-    public substract(date: IDateType, units: string, unitCount: number = 1): Date {
+    public substract(date: IDateType, units: unitOfTime.DurationConstructor, unitCount: number = 1): Date {
         return this.increase(date, units, -unitCount);
     }
 
@@ -119,6 +119,8 @@ class DateUtils {
     }
 }
 
+const dateUtils = new DateUtils();
+
 type IDateType = string | number | Date;
 
-export default new DateUtils();
+export default dateUtils;

@@ -7,7 +7,8 @@
         "preserveConstEnums": true,
         "sourceMap": true,
         "jsx": "react",
-        "baseUrl": "."
+        "baseUrl": ".",
+        "esModuleInterop": true
     },
     "include": ["./src/common/**/*", "./src/web/**/*"]
 }
