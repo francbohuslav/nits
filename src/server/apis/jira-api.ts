@@ -9,13 +9,13 @@ export class JiraApi {
         this.client = new JiraClientApi(options);
     }
 
-    public async getUpdatedWorklogIds(sinceDays: number): Promise<number[]> {
-        let since = (dateUtils.toTimestamp() - sinceDays * 24 * 3600) * 1000;
+    public async getUpdatedWorklogIds(since: Date, toExcept: Date): Promise<number[]> {
+        let sinceTs = dateUtils.toTimestamp(since) * 1000;
         const worklogIdList = new Set<number>();
         let isLastPage = false;
         while (!isLastPage) {
             console.log("JIRA updatedWorklogs ...");
-            const response = await this.client.updatedWorklogs(since, undefined);
+            const response = await this.client.updatedWorklogs(sinceTs, undefined);
             response.values.forEach((value: any) => {
                 worklogIdList.add(value.worklogId);
             });
@@ -23,8 +23,11 @@ export class JiraApi {
             console.log("... " + response.values.length);
             isLastPage = response.lastPage;
             if (!isLastPage) {
-                since = response.until;
-                console.log("Next page since " + since);
+                sinceTs = response.until;
+                console.log("Next page since " + dateUtils.toDate(sinceTs / 1000).toISOString());
+            }
+            if (dateUtils.isLowerOrEqualsThen(toExcept, sinceTs / 1000)) {
+                isLastPage = true;
             }
         }
         return [...worklogIdList];

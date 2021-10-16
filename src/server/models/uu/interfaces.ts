@@ -9,7 +9,7 @@ export interface ITimesheetModel {
     removeTimesheets(timesheets: Timesheet[], report: ISyncReportUser): Promise<void>;
     getMyLastTimesheets(since: string): Promise<Timesheet[]>;
     convertWorklogsToTimesheetMappings(worklogList: Worklog[], report: ISyncReportUser): TimesheetMappingsPerDay;
-    getTimesheetsOfUsers(userUids: string[], lastDays: number, filter?: (t: Timesheet) => boolean): Promise<ITimesheetPerUser>;
+    getTimesheetsOfUsers(userUids: string[], since: Date, toExcept: Date, filter?: (t: Timesheet) => boolean): Promise<ITimesheetPerUser>;
 }
 
 export class Timesheet {

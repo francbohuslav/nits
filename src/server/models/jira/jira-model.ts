@@ -1,3 +1,4 @@
+import dateUtils from "../../../common/date-utils";
 import { JiraApi } from "../../apis/jira-api";
 import { IProjectConfig } from "../../project-config";
 import { IAccount, IIssue, Worklog } from "./interfaces";
@@ -5,9 +6,10 @@ import { IAccount, IIssue, Worklog } from "./interfaces";
 export class JiraModel {
     constructor(private jiraApi: JiraApi, private projectConfig: IProjectConfig) {}
 
-    public async getLastWorklogs(sinceDays: number): Promise<Worklog[]> {
-        const worklogIdList = await this.jiraApi.getUpdatedWorklogIds(sinceDays);
-        const worklogList = await this.jiraApi.getWorklogs(worklogIdList);
+    public async getLastWorklogs(since: Date, toExcept: Date): Promise<Worklog[]> {
+        const worklogIdList = await this.jiraApi.getUpdatedWorklogIds(since, toExcept);
+        let worklogList = await this.jiraApi.getWorklogs(worklogIdList);
+        worklogList = worklogList.filter((w) => dateUtils.isLowerThen(w.startedDate, toExcept));
         worklogList.forEach((w) => {
             w.commentAsText = this.convertCommentToText(w);
             w.startedDate = new Date(w.started);

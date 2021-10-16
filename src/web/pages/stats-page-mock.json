@@ -1,0 +1,290 @@
+[
+    {
+        "uid": "12-8835-1",
+        "name": "Franc Bohuslav",
+        "jiraHours": 9.083333333333334,
+        "wtmHours": 9.083333333333334,
+        "days": {
+            "2021-09-16": {
+                "date": "2021-09-16",
+                "jiraHours": 0,
+                "wtmHours": 1,
+                "artifacts": {}
+            },
+            "2021-09-17": {
+                "date": "2021-09-17",
+                "jiraHours": 2,
+                "wtmHours": 1,
+                "artifacts": {}
+            },
+            "2021-09-24": {
+                "date": "2021-09-24",
+                "jiraHours": 2.0833333333333335,
+                "wtmHours": 2.0833333333333335,
+                "artifacts": {}
+            },
+            "2021-10-04": {
+                "date": "2021-10-04",
+                "jiraHours": 1.5,
+                "wtmHours": 1.5,
+                "artifacts": {}
+            },
+            "2021-10-08": {
+                "date": "2021-10-08",
+                "jiraHours": 2.5,
+                "wtmHours": 2.5,
+                "artifacts": {}
+            },
+            "2021-10-14": {
+                "date": "2021-10-14",
+                "jiraHours": 1,
+                "wtmHours": 1,
+                "artifacts": {}
+            },
+            "2019-07-29": {
+                "date": "2019-07-29",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/19": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/19",
+                        "wtmHours": 0.75
+                    }
+                }
+            },
+            "2019-07-30": {
+                "date": "2019-07-30",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/19": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/19",
+                        "wtmHours": 0.5
+                    }
+                }
+            },
+            "2019-07-31": {
+                "date": "2019-07-31",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 1.25
+                    }
+                }
+            },
+            "2019-08-01": {
+                "date": "2019-08-01",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 0.75
+                    }
+                }
+            },
+            "2019-08-05": {
+                "date": "2019-08-05",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 0.75
+                    }
+                }
+            },
+            "2019-08-06": {
+                "date": "2019-08-06",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 1.25
+                    }
+                }
+            },
+            "2019-08-12": {
+                "date": "2019-08-12",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 0.75
+                    }
+                }
+            },
+            "2019-08-15": {
+                "date": "2019-08-15",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 0.75
+                    }
+                }
+            },
+            "2019-08-14": {
+                "date": "2019-08-14",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 0.25
+                    }
+                }
+            }
+        },
+        "lastSynchronization": "2021-10-15T13:46:42.853Z"
+    },
+    {
+        "uid": "12-8835-2",
+        "name": "Franta vonasek",
+        "jiraHours": 10.083333333333334,
+        "wtmHours": 10.083333333333334,
+        "days": {
+            "2021-09-16": {
+                "date": "2021-09-16",
+                "jiraHours": 1,
+                "wtmHours": 1,
+                "artifacts": {}
+            },
+            "2021-09-17": {
+                "date": "2021-09-17",
+                "jiraHours": 2,
+                "wtmHours": 2,
+                "artifacts": {}
+            },
+            "2021-09-24": {
+                "date": "2021-09-24",
+                "jiraHours": 2.0833333333333335,
+                "wtmHours": 2.0833333333333335,
+                "artifacts": {}
+            },
+            "2021-10-04": {
+                "date": "2021-10-04",
+                "jiraHours": 1.5,
+                "wtmHours": 1.5,
+                "artifacts": {}
+            },
+            "2021-10-08": {
+                "date": "2021-10-08",
+                "jiraHours": 2.5,
+                "wtmHours": 2.5,
+                "artifacts": {}
+            },
+            "2021-10-14": {
+                "date": "2021-10-14",
+                "jiraHours": 1,
+                "wtmHours": 1,
+                "artifacts": {}
+            },
+            "2019-07-29": {
+                "date": "2019-07-29",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/19": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/19",
+                        "wtmHours": 0.75
+                    }
+                }
+            },
+            "2019-07-30": {
+                "date": "2019-07-30",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/19": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/19",
+                        "wtmHours": 0.5
+                    }
+                }
+            },
+            "2019-07-31": {
+                "date": "2019-07-31",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 1.25
+                    }
+                }
+            },
+            "2019-08-01": {
+                "date": "2019-08-01",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 0.75
+                    }
+                }
+            },
+            "2019-08-05": {
+                "date": "2019-08-05",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 0.75
+                    }
+                }
+            },
+            "2019-08-06": {
+                "date": "2019-08-06",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 1.25
+                    }
+                }
+            },
+            "2019-08-12": {
+                "date": "2019-08-12",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 0.75
+                    }
+                }
+            },
+            "2019-08-15": {
+                "date": "2019-08-15",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 0.75
+                    }
+                }
+            },
+            "2019-08-14": {
+                "date": "2019-08-14",
+                "jiraHours": 0,
+                "wtmHours": 0,
+                "artifacts": {
+                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
+                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
+                        "wtmHours": 0.25
+                    }
+                }
+            }
+        },
+        "lastSynchronization": "2021-10-15T13:46:42.853Z"
+    }
+]

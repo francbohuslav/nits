@@ -23,7 +23,10 @@ export class SyncController {
         const report: ISyncReport = { users: [], log: [] };
 
         // Get all changed worklogs
-        let allWorklogList = await this.jiraModel.getLastWorklogs(this.projectConfig.syncDaysCount);
+        let allWorklogList = await this.jiraModel.getLastWorklogs(
+            dateUtils.increaseDay(new Date(), -this.projectConfig.syncDaysCount),
+            dateUtils.increaseDay(dateUtils.getStartOfDay())
+        );
 
         // Filter that worklogs be project settings. Only worklogs with artifact is relevant
         const wtmTsConfigPerWorklogs: IWtmTsConfigPerWorklogId = {};

@@ -113,6 +113,10 @@ class DateUtils {
     public getStartOfDay(date: IDateType = new Date()): Date {
         return this.toDate(this.toIsoFormat(date));
     }
+
+    public getStartOfMonth(date: IDateType = new Date()): Date {
+        return this.toDate(this.toIsoFormat(date).replace(/-\d+$/, "-01"));
+    }
 }
 
 type IDateType = string | number | Date;

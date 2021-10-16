@@ -9,17 +9,20 @@ import { ITimesheetModel, nitsTimesheetFilter, Timesheet, TimesheetModelFactoryH
 export class StatsController {
     constructor(private userDataModel: UserDataModel, private jiraModel: JiraModel, private timesheetModelFactory: TimesheetModelFactoryHandler) {}
 
-    public async getAdminStats(adminUid: string): Promise<IStats[]> {
-        const lastDays = 31;
+    public async getAdminStats(adminUid: string, month: string): Promise<IStats[]> {
+        const stats: IStats[] = [];
+
+        const since = dateUtils.toDate(month);
+        const toExcept = dateUtils.increase(since, "months", 1);
+        console.log(`Stats for ${dateUtils.toIsoFormat(since)} - ${dateUtils.toIsoFormat(toExcept)}`);
         const adminUserData = await this.userDataModel.getUserData(adminUid);
         const timesheetModel = this.timesheetModelFactory(adminUserData.uuAccessCode1, adminUserData.uuAccessCode2);
 
         const userDataList = await this.userDataModel.getAllValidUserData();
 
-        const { worklogsPerUserAndDay, worklogsPerUser } = await this.getJiraWorklogs(userDataList, lastDays);
-        const { timesheetsPerUserAndDay, timesheetsPerUser } = await this.getWtmTimesheets(timesheetModel, userDataList, lastDays);
+        const { worklogsPerUserAndDay, worklogsPerUser } = await this.getJiraWorklogs(userDataList, since, toExcept);
+        const { timesheetsPerUserAndDay, timesheetsPerUser } = await this.getWtmTimesheets(timesheetModel, userDataList, since, toExcept);
 
-        const stats: IStats[] = [];
         for (const userData of userDataList) {
             const days: IStatsDays = {};
 
@@ -74,11 +77,11 @@ export class StatsController {
 
     private async getJiraWorklogs(
         userDataList: IUserData[],
-        lastDays: number
+        since: Date,
+        toExcept: Date
     ): Promise<{ worklogsPerUser: IWorklogsPerUser; worklogsPerUserAndDay: IWorklogsPerUserAndDay }> {
         const validUserIds = userDataList.map((u) => u.jiraAccountId);
-        const worklogList = await this.jiraModel.getLastWorklogs(lastDays);
-
+        const worklogList = await this.jiraModel.getLastWorklogs(since, toExcept);
         const worklogsPerUser = arrayUtils.toGroups(
             worklogList.filter((w) => validUserIds.includes(w.author.accountId)),
             (w) => w.author.accountId
@@ -93,10 +96,11 @@ export class StatsController {
     private async getWtmTimesheets(
         timesheetModel: ITimesheetModel,
         userDataList: IUserData[],
-        lastDays: number
+        since: Date,
+        toExcept: Date
     ): Promise<{ timesheetsPerUser: ITimesheetsPerUser; timesheetsPerUserAndDay: ITimesheetsPerUserAndDay }> {
         const validUserIds = userDataList.map((u) => u.uid);
-        const timesheetsPerUser = await timesheetModel.getTimesheetsOfUsers(validUserIds, lastDays, nitsTimesheetFilter);
+        const timesheetsPerUser = await timesheetModel.getTimesheetsOfUsers(validUserIds, since, toExcept, nitsTimesheetFilter);
         const timesheetsPerUserAndDay: ITimesheetsPerUserAndDay = {};
         Object.entries(timesheetsPerUser).forEach(
             ([uid, ts]) => (timesheetsPerUserAndDay[uid] = arrayUtils.toGroups(ts, (t) => dateUtils.toIsoFormat(t.datetimeFrom)))

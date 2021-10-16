@@ -43,13 +43,12 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
         return timesheets;
     }
 
-    public async getTimesheetsOfUsers(userUids: string[], lastDays: number, filter?: (t: Timesheet) => boolean): Promise<ITimesheetPerUser> {
+    public async getTimesheetsOfUsers(userUids: string[], since: Date, toExcept: Date, filter?: (t: Timesheet) => boolean): Promise<ITimesheetPerUser> {
         const tokenResponse = await this.uuUserModel.getToken(this.accessCode1, this.accessCode2);
-        const to = new Date();
+        const to = dateUtils.increaseDay(toExcept, -1);
         const toStr = dateUtils.toIsoFormat(to);
-        const from = dateUtils.toDate(dateUtils.increaseDay(to, -lastDays));
-        const fromStr = dateUtils.toIsoFormat(from);
-        const fromMonthDate = new Date(from.getFullYear(), from.getMonth(), 1);
+        const fromStr = dateUtils.toIsoFormat(since);
+        const fromMonthDate = new Date(since.getFullYear(), since.getMonth(), 1);
         const toMonthDate = new Date(to.getFullYear(), to.getMonth(), 1);
         const timesheetsPerUser: ITimesheetPerUser = {};
         let time = fromMonthDate;

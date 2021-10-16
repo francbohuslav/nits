@@ -10,7 +10,7 @@ export class StatsRequester extends BaseRequester {
 
     public async getAdminStats(req: Request): Promise<IStats[]> {
         const uid = this.getUid(req);
-        return this.statsController.getAdminStats(uid);
+        return this.statsController.getAdminStats(uid, req.query.month as string);
     }
 
     public async getUserStats(req: Request): Promise<IUserStats> {
