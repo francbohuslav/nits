@@ -10,6 +10,11 @@ export interface IProjectConfig {
         clientSecret: string;
         cloudId: string;
     };
+    email: {
+        user: string;
+        password: string;
+        sender: string;
+    };
 }
 export class ProjectConfigurer {
     public getProjectConfig(): IProjectConfig {
@@ -28,6 +33,11 @@ export class ProjectConfigurer {
                     clientId: process.env.NITS_JIRA_CLIENT_ID,
                     clientSecret: process.env.NITS_JIRA_SECRET,
                     cloudId: process.env.NITS_JIRA_CLOUD_ID,
+                },
+                email: {
+                    user: process.env.NITS_EMAIL_USER,
+                    password: process.env.NITS_EMAIL_PASS,
+                    sender: process.env.NITS_EMAIL_SENDER,
                 },
             };
 

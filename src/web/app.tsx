@@ -16,6 +16,13 @@ const theme = createTheme({
     typography: {
         fontSize: 13,
     },
+    overrides: {
+        MuiButton: {
+            contained: {
+                color: "rgb(78,78,78)",
+            },
+        },
+    },
 });
 
 const pages = {

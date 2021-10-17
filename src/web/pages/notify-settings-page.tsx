@@ -10,6 +10,7 @@ import { IUserPublicData } from "../../common/interfaces";
 export const NotifySettingsPage = () => {
     const [email, setEmail] = useState<string>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isTesting, setIsTesting] = useState(false);
     const ajax = useAjax();
     const history = useHistory();
 
@@ -39,6 +40,17 @@ export const NotifySettingsPage = () => {
         saveData();
     };
 
+    const onTest = async () => {
+        setIsTesting(true);
+        const res = await ajax.post<boolean>("/server/notify/test", { email });
+        setIsTesting(false);
+        if (res.isOk) {
+            thisApp().toast("Odesláno");
+        } else {
+            thisApp().toast("Zprávu se neporařilo odeslat", "error");
+        }
+    };
+
     useEffect(() => {
         loadData();
     }, []);
@@ -64,7 +76,17 @@ export const NotifySettingsPage = () => {
                         />
 
                         <Box display="flex">
-                            <Box flexGrow={1}></Box>
+                            <Box flexGrow={1}>
+                                {isTesting ? (
+                                    <Box pt={2} width={210}>
+                                        <LinearProgress />
+                                    </Box>
+                                ) : (
+                                    <Button variant="contained" color="secondary" onClick={onTest}>
+                                        Poslat testovací zprávu
+                                    </Button>
+                                )}
+                            </Box>
                             <Box>
                                 <Button variant="contained" color="primary" type="submit">
                                     Uložit
@@ -77,7 +99,6 @@ export const NotifySettingsPage = () => {
                     </form>
                 </div>
             )}
-            {/* {JSON.stringify(userData)} */}
         </>
     );
 };

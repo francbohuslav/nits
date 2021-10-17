@@ -33,7 +33,7 @@ export const Alert = (props: IAlertProps) => {
     }, [props]);
 
     const handleClose = () => {
-        props?.onClose();
+        props.onClose && props.onClose();
         setOpen(false);
     };
     const stack = typeof props.stack === "string" ? props.stack : JSON.stringify(props.stack, null, 2);

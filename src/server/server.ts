@@ -31,6 +31,7 @@ import { ProjectDataModel } from "./models/project-data-model";
 import { NotifyRequester } from "./requesters/notify-requester";
 import { StatsRequester } from "./requesters/stats-requester";
 import { StatsController } from "./controllers/stats-controller";
+import { NotifyController } from "./controllers/notify-controller";
 dotenv.config();
 
 const isDevelopment = !!process.env.NITS_DEVEL_ACCOUNT;
@@ -61,6 +62,8 @@ const userController = new UserController(uuUserModel, userDataModel, projectCon
 const jiraController = new JiraController(userDataModel, crypt, projectConfig);
 const projectController = new ProjectController(projectDataModel, jiraApi);
 const statsController = new StatsController(userDataModel, jiraModel, (acc1, acc2) => new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi()));
+const notifyController = new NotifyController(projectConfig);
+
 // Requests
 const loginAuthorizer = new LoginAuthorizer(userController);
 const loginAuthorize = loginAuthorizer.loginAuthorize.bind(loginAuthorizer);
@@ -76,7 +79,7 @@ const syncController = new SyncController(
 );
 const syncRequester = new SyncRequester(syncController);
 const projectReqester = new ProjectRequester(projectController);
-const notifyRequester = new NotifyRequester(userController);
+const notifyRequester = new NotifyRequester(userController, notifyController);
 const statsRequester = new StatsRequester(statsController);
 
 const app = express();
@@ -113,6 +116,7 @@ const methods: IServerMethod[] = [
     m("get", "/server/jira/oauth", jiraRequester.oauth.bind(jiraRequester)),
     m("get", "/server/sync", syncRequester.sync.bind(syncRequester), undefined, { formatOutput: true }),
     m("post", "/server/notify/set", notifyRequester.setNotificationEmail.bind(notifyRequester), loginAuthorize),
+    m("post", "/server/notify/test", notifyRequester.testEmail.bind(notifyRequester), loginAuthorize),
     m("get", "/server/user-stats/get", statsRequester.getUserStats.bind(statsRequester), loginAuthorize),
 
     // admin commands
