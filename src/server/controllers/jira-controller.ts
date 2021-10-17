@@ -11,7 +11,7 @@ export class JiraController {
 
     public async processOAth(request: IJiraProcessRequest) {
         if (request.error) {
-            throw new Error(`${request.error}: ${request.error_description}`);
+            throw new Error(`Chyba autorizace s JIRA: ${request.error} - ${request.error_description}`);
         }
         const pattern = this.crypt.decrypt(request.state);
         const [uid, date] = pattern.split("|");

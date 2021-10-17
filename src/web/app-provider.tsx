@@ -1,7 +1,9 @@
 import React = require("react");
 import { IAlertProps, Alert } from "./components/alert";
 import { IToastProps, IToastSeverity, Toast } from "./components/toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useHistory } from "react-router";
+import { Router } from "./router";
 
 interface IAppProviderProps {
     children: any;
@@ -15,6 +17,7 @@ export interface IThisApp {
 const firstRun = true;
 
 export const AppProvider = (props: IAppProviderProps) => {
+    const history = useHistory();
     const [alert, setAlert] = useState<IAlertProps>({ time: new Date() });
     const [toast, setToast] = useState<IToastProps>({ time: new Date() });
     if (firstRun) {
@@ -31,6 +34,21 @@ export const AppProvider = (props: IAppProviderProps) => {
             },
         };
     }
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const obj: any = {};
+        Array.from(params.entries()).forEach((value) => (obj[value[0]] = value[1]));
+        if (obj.error) {
+            setAlert({
+                ...obj,
+                time: new Date(),
+                onClose: () => {
+                    history.push(Router.PageMain);
+                },
+            });
+        }
+    }, []);
 
     return (
         <div>

@@ -19,6 +19,7 @@ export interface IAlertProps {
     stack?: string;
     additional?: any;
     time?: Date;
+    onClose?: () => void;
 }
 
 export const Alert = (props: IAlertProps) => {
@@ -31,7 +32,10 @@ export const Alert = (props: IAlertProps) => {
         }
     }, [props]);
 
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        props?.onClose();
+        setOpen(false);
+    };
     const stack = typeof props.stack === "string" ? props.stack : JSON.stringify(props.stack, null, 2);
 
     return (

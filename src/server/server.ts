@@ -66,7 +66,7 @@ const loginAuthorizer = new LoginAuthorizer(userController);
 const loginAuthorize = loginAuthorizer.loginAuthorize.bind(loginAuthorizer);
 const adminAuthorize = loginAuthorizer.adminAuthorize.bind(loginAuthorizer);
 const userRequester = new UserRequester(userController, crypt);
-const jiraRequester = new JiraRequester(jiraController, crypt);
+const jiraRequester = new JiraRequester(jiraController);
 const syncController = new SyncController(
     userDataModel,
     jiraModel,
