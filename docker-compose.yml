@@ -2,6 +2,7 @@ version: "3"
 services:
     nits:
         image: node:12.19.0
+        restart: always
         ports:
             - "83:83"
         volumes:
@@ -9,6 +10,6 @@ services:
         command: /bin/sh -c "cd /nits; npm i; npm run build; npm run start"
 
 networks:
-  default:
-    external:
-      name: devtools          
+    default:
+        external:
+            name: devtools
