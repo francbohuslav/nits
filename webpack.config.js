@@ -62,7 +62,10 @@ module.exports = {
             hash: true,
         }),
         new CopyPlugin({
-            patterns: [{ from: "src/web/images", to: "images" }],
+            patterns: [
+                { from: "src/web/images", to: "images" },
+                { from: "src/web/privacy-policy.html", to: "privacy-policy.html" },
+            ],
         }),
         new webpack.DefinePlugin({
             "process.env": JSON.stringify({
