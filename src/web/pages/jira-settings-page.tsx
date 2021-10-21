@@ -1,14 +1,16 @@
 import { Button, LinearProgress, Typography } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import React = require("react");
 import { useHistory } from "react-router-dom";
 import { IUserPublicData } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
+import { DataContext, IDataContextValue } from "../data-context";
 import { Router } from "../router";
 // import process from "process";
 
 export const JiraSettingsPage = () => {
+    const { projectConfig } = useContext<IDataContextValue>(DataContext);
     const [sessionHash, setSessionHash] = useState<string>(null);
     const [userData, setUserData] = useState<IUserPublicData>(null);
     const history = useHistory();
@@ -44,8 +46,8 @@ export const JiraSettingsPage = () => {
         loadData();
     }, []);
 
-    const clientId = process.env.NITS_JIRA_CLIENT_ID;
-    const server = process.env.NITS_SERVER_ADDRESS.replace(/\/$/, "");
+    const clientId = projectConfig?.jiraClientId;
+    const server = projectConfig?.serverAddress?.replace(/\/$/, "");
     const url = sessionHash
         ? `https://auth.atlassian.com/authorize?audience=api.atlassian.com&client_id=${encodeURIComponent(
               clientId

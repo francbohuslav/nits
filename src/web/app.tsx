@@ -22,6 +22,11 @@ const theme = createTheme({
                 color: "rgb(78,78,78)",
             },
         },
+        MuiTooltip: {
+            tooltip: {
+                fontSize: "0.85em",
+            },
+        },
     },
 });
 

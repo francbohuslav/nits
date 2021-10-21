@@ -1,5 +1,5 @@
 import { IProjectSettings } from "../src/common/interfaces";
-import { IInterval, IWtmTsConfigPerWorklogId, SyncController } from "../src/server/controllers/sync-controller";
+import { IInterval, IWtmTsConfigPerIssueKey, SyncController } from "../src/server/controllers/sync-controller";
 import { ISyncReport, TimesheetMapping, TimesheetMappingsPerDay } from "../src/server/models/interfaces";
 import { IIssue, Worklog } from "../src/server/models/jira/interfaces";
 import { Timesheet } from "../src/server/models/uu/interfaces";
@@ -127,6 +127,12 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
             cryptoSalt: "test",
             syncDaysCount: 7,
             serverAddress: "",
+            dryRun: true,
+            email: {
+                password: "",
+                sender: "",
+                user: "",
+            },
             jira: {
                 clientId: "",
                 clientSecret: "",
@@ -163,17 +169,17 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
             issueId: "6",
         },
     ];
-    const wtmTsConfigPerWorklogs: IWtmTsConfigPerWorklogId = {};
+    const wtmTsConfigPerIssueId: IWtmTsConfigPerIssueKey = {};
     const report: ISyncReport = { log: [], users: [] };
-    const workLog = await syncController.publishedFilterWorklogsAndAssignWtmConfig(inputWorklogs as Worklog[], issuesById, wtmTsConfigPerWorklogs, report);
+    const workLog = await syncController.publishedFilterWorklogsAndAssignWtmConfig(inputWorklogs as Worklog[], issuesById, wtmTsConfigPerIssueId, report);
     expect(workLog).toHaveLength(4);
-    expect(wtmTsConfigPerWorklogs).toBeTruthy();
-    expect(wtmTsConfigPerWorklogs["10"].artifact).toBe("CET-WITHOUT-FIELD");
-    expect(wtmTsConfigPerWorklogs["20"].artifact).toBe("CET-WITH-NITS-1");
-    expect(wtmTsConfigPerWorklogs["30"].artifact).toBe("CET-WITH-NITS-2");
-    expect(wtmTsConfigPerWorklogs["40"].artifact).toBe("CET-WITHOUT-FIELD");
-    expect(wtmTsConfigPerWorklogs["50"]).toBeUndefined();
-    expect(wtmTsConfigPerWorklogs["60"]).toBeUndefined();
+    expect(wtmTsConfigPerIssueId).toBeTruthy();
+    expect(wtmTsConfigPerIssueId["CET-1"].wtmArtifact).toBe("CET-WITHOUT-FIELD");
+    expect(wtmTsConfigPerIssueId["CET-2"].wtmArtifact).toBe("CET-WITH-NITS-1");
+    expect(wtmTsConfigPerIssueId["CET-3"].wtmArtifact).toBe("CET-WITH-NITS-2");
+    expect(wtmTsConfigPerIssueId["CET-4"].wtmArtifact).toBe("CET-WITHOUT-FIELD");
+    expect(wtmTsConfigPerIssueId["5"]).toBeUndefined();
+    expect(wtmTsConfigPerIssueId["6"]).toBeUndefined();
     expect(report.log[3]).toContain("WARNING");
     expect(report.log[4]).toContain("skipped. Project OUT is not configured.");
     expect(report.log[5]).toContain("nor parent has no valid configuration");
@@ -598,7 +604,6 @@ describe("computeNewTimesheetInSegment", () => {
             datetimeFrom: "2021-10-12T06:00:00.000Z",
             datetimeTo: "2021-10-12T07:00:00.000Z",
             description: "desc",
-            highRate: false,
             subject: "UNI-BT:1",
             data: {
                 nits: {
@@ -667,7 +672,6 @@ describe("computeNewTimesheetInSegment", () => {
             datetimeFrom: "2021-10-12T06:00:00.000Z",
             datetimeTo: "2021-10-12T07:00:00.000Z",
             description: "desc",
-            highRate: false,
             subject: "UNI-BT:1",
             data: {
                 nits: {
@@ -684,10 +688,10 @@ class TestingSyncController extends SyncController {
     public async publishedFilterWorklogsAndAssignWtmConfig(
         worklogList: Worklog[],
         issuesById: { [id: string]: IIssue },
-        wtmTsConfigPerWorklogs: IWtmTsConfigPerWorklogId,
+        wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey,
         report: ISyncReport
     ): Promise<Worklog[]> {
-        return this.filterWorklogsAndAssignWtmConfig(worklogList, issuesById, wtmTsConfigPerWorklogs, report);
+        return this.filterWorklogsAndAssignWtmConfig(worklogList, issuesById, wtmTsConfigPerIssueKey, report);
     }
 
     public separateTimesheets2(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; timesheetsToRemain: Timesheet[] } {

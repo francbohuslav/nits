@@ -1,26 +1,25 @@
 import arrayUtils from "../../../common/array-utils";
 import dateUtils from "../../../common/date-utils";
 import { WtmApi, WtmError } from "../../apis/wtm-api";
+import { IWtmTsConfigPerIssueKey } from "../../controllers/sync-controller";
 import { ISyncReportUser, TimesheetMapping, TimesheetMappingsPerDay } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
 import { UuUserModel } from "../uu-user-model";
 import { ITimesheetModel, ITimesheetPerUser, Timesheet } from "./interfaces";
 
 export class ReadOnlyTimesheetModel implements ITimesheetModel {
-    constructor(private accessCode1: string, private accessCode2: string, private uuUserModel: UuUserModel, private wtmApi: WtmApi) {}
+    constructor(protected accessCode1: string, protected accessCode2: string, protected uuUserModel: UuUserModel, protected wtmApi: WtmApi) {}
 
     public async saveTimesheets(newTimesheets: Timesheet[], report: ISyncReportUser): Promise<void> {
         for (const ts of newTimesheets) {
             report.log.push(`Simulation of saving timesheet ${ts}`);
         }
-        //TODO: BF: implement in WritebleTimesheetModel
     }
 
     public async removeTimesheets(timesheets: Timesheet[], report: ISyncReportUser): Promise<void> {
         for (const ts of timesheets) {
             report.log.push(`Simulation of removing timesheet ${ts}`);
         }
-        //TODO: BF: implement in WritebleTimesheetModel
     }
 
     public async getMyLastTimesheets(since: string): Promise<Timesheet[]> {
@@ -88,7 +87,11 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
         return timesheetsPerUser;
     }
 
-    public convertWorklogsToTimesheetMappings(worklogList: Worklog[], report: ISyncReportUser): TimesheetMappingsPerDay {
+    public convertWorklogsToTimesheetMappings(
+        worklogList: Worklog[],
+        wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey,
+        report: ISyncReportUser
+    ): TimesheetMappingsPerDay {
         worklogList.forEach((w) => report.log.push(w.toString()));
         //TODO: BF: otestovat utc, zda se nahodou casy v 11vecer a v 1 ranu vykazou spravne
         const worklogsPerDay = arrayUtils.toGroups(worklogList, (w) => dateUtils.toIsoFormat(w.startedDate));
@@ -104,6 +107,7 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
                 mapping.description = worklogs.map((w) => w.commentAsText).join("\n");
                 mapping.spentSeconds = arrayUtils.sumAction(worklogs, (w) => w.timeSpentSeconds);
                 mapping.jiraWorklogs = worklogs;
+                mapping.wtmArtifact = wtmTsConfigPerIssueKey[issueKey].wtmArtifact;
                 timesheetsMapping.push(mapping);
             });
         });

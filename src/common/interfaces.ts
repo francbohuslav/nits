@@ -51,3 +51,10 @@ export interface IUserStats {
     wtmHours: number;
     lastSynchronization: string;
 }
+
+export interface IProjectConfigPublic {
+    /** If true, no changes are made. All is readonly. Default is true */
+    dryRun: boolean;
+    jiraClientId: string;
+    serverAddress: string;
+}

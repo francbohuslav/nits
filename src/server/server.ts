@@ -21,6 +21,7 @@ import { JiraApiOptions } from "jira-client";
 import { IBaseResponse } from "../common/ajax-interfaces";
 import dotenv from "dotenv";
 import { ReadOnlyTimesheetModel } from "./models/uu/readonly-timesheet-model";
+import { WritableTimesheetModel } from "./models/uu/writable-timesheet-model";
 import { UuUserModel } from "./models/uu-user-model";
 import { WtmApi, WtmError } from "./apis/wtm-api";
 import { JiraRequester } from "./requesters/jira-requester";
@@ -32,6 +33,8 @@ import { NotifyRequester } from "./requesters/notify-requester";
 import { StatsRequester } from "./requesters/stats-requester";
 import { StatsController } from "./controllers/stats-controller";
 import { NotifyController } from "./controllers/notify-controller";
+import { TimesheetModelFactoryHandler } from "./models/uu/interfaces";
+import { IProjectConfigPublic } from "../common/interfaces";
 dotenv.config();
 
 const isDevelopment = !!process.env.NITS_DEVEL_ACCOUNT;
@@ -56,12 +59,18 @@ const jiraApi = new JiraApi(
     },
     projectConfig
 );
+const timeSheetmodelFactory: TimesheetModelFactoryHandler = (acc1, acc2) => {
+    if (!projectConfig.dryRun) {
+        return new WritableTimesheetModel(acc1, acc2, uuUserModel, new WtmApi());
+    }
+    return new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi());
+};
 const jiraModel = new JiraModel(jiraApi, projectConfig);
 const uuUserModel = new UuUserModel(new UuIdendtityApi(), {});
 const userController = new UserController(uuUserModel, userDataModel, projectConfig);
 const jiraController = new JiraController(userDataModel, crypt, projectConfig);
 const projectController = new ProjectController(projectDataModel, jiraApi);
-const statsController = new StatsController(userDataModel, jiraModel, (acc1, acc2) => new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi()));
+const statsController = new StatsController(userDataModel, jiraModel, timeSheetmodelFactory);
 const notifyController = new NotifyController(projectConfig);
 
 // Requests
@@ -70,13 +79,7 @@ const loginAuthorize = loginAuthorizer.loginAuthorize.bind(loginAuthorizer);
 const adminAuthorize = loginAuthorizer.adminAuthorize.bind(loginAuthorizer);
 const userRequester = new UserRequester(userController, crypt);
 const jiraRequester = new JiraRequester(jiraController);
-const syncController = new SyncController(
-    userDataModel,
-    jiraModel,
-    projectController,
-    projectConfig,
-    (acc1, acc2) => new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi())
-);
+const syncController = new SyncController(userDataModel, jiraModel, projectController, projectConfig, timeSheetmodelFactory);
 const syncRequester = new SyncRequester(syncController);
 const projectReqester = new ProjectRequester(projectController);
 const notifyRequester = new NotifyRequester(userController, notifyController);
@@ -108,6 +111,20 @@ function sendError(res: Response, ex: any) {
 }
 
 const methods: IServerMethod[] = [
+    m(
+        "get",
+        "/server/config",
+        () => {
+            const ret: IProjectConfigPublic = {
+                dryRun: projectConfig.dryRun,
+                jiraClientId: projectConfig.jira?.clientId,
+                serverAddress: projectConfig.serverAddress,
+            };
+            return ret;
+        },
+        loginAuthorize
+    ),
+
     m("post", "/server/login", userRequester.login.bind(userRequester)),
     m("post", "/server/logout", userRequester.logout.bind(userRequester)),
     m("get", "/server/get-user-public-data", userRequester.getUserPublicData.bind(userRequester), loginAuthorize),

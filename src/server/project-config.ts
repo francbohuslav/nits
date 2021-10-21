@@ -4,6 +4,8 @@ export interface IProjectConfig {
     admins: string[];
     syncDaysCount: number;
     serverAddress: string;
+    /** If true, no changes are made. All is readonly. Default is true */
+    dryRun: boolean;
     jira: {
         nitsCustomField: string;
         clientId: string;
@@ -16,6 +18,7 @@ export interface IProjectConfig {
         sender: string;
     };
 }
+
 export class ProjectConfigurer {
     public getProjectConfig(): IProjectConfig {
         try {
@@ -28,6 +31,7 @@ export class ProjectConfigurer {
                 admins: process.env.NITS_ADMIN_UIDS.trim().split(/\s*,\s*/),
                 syncDaysCount: parseInt(process.env.NITS_SYNC_DAYS_COUNT || "7"),
                 serverAddress: process.env.NITS_SERVER_ADDRESS,
+                dryRun: process.env.NITS_DRY_RUN != "false",
                 jira: {
                     nitsCustomField: process.env.NITS_JIRA_CUSTOM_FIELD,
                     clientId: process.env.NITS_JIRA_CLIENT_ID,

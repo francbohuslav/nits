@@ -1,4 +1,5 @@
 import dateUtils from "../../../common/date-utils";
+import { IWtmTsConfigPerIssueKey } from "../../controllers/sync-controller";
 import { ISyncReportUser, TimesheetMappingsPerDay } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
 
@@ -8,17 +9,19 @@ export interface ITimesheetModel {
     saveTimesheets(newTimesheets: Timesheet[], report: ISyncReportUser): Promise<void>;
     removeTimesheets(timesheets: Timesheet[], report: ISyncReportUser): Promise<void>;
     getMyLastTimesheets(since: string): Promise<Timesheet[]>;
-    convertWorklogsToTimesheetMappings(worklogList: Worklog[], report: ISyncReportUser): TimesheetMappingsPerDay;
+    convertWorklogsToTimesheetMappings(
+        worklogList: Worklog[],
+        wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey,
+        report: ISyncReportUser
+    ): TimesheetMappingsPerDay;
     getTimesheetsOfUsers(userUids: string[], since: Date, toExcept: Date, filter?: (t: Timesheet) => boolean): Promise<ITimesheetPerUser>;
 }
 
 export class Timesheet {
+    public id: string;
     public datetimeFrom: string;
     public datetimeTo: string;
     public subject: string;
-    public supplierContract: string;
-    public category: string;
-    public highRate: boolean;
     public description: string;
     public data: ITimesheetData;
     public workerUuIdentity: string;

@@ -9,6 +9,7 @@ import { assert } from "../../common/core";
 import { IProjectConfig } from "../project-config";
 import { IProjectSettings } from "../../common/interfaces";
 import dateUtils from "../../common/date-utils";
+import { WtmError } from "../apis/wtm-api";
 
 export class SyncController {
     constructor(
@@ -29,10 +30,10 @@ export class SyncController {
         );
 
         // Filter that worklogs be project settings. Only worklogs with artifact is relevant
-        const wtmTsConfigPerWorklogs: IWtmTsConfigPerWorklogId = {};
+        const wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey = {};
         const issuesById = await this.getAllNeededIssues(allWorklogList);
         allWorklogList.forEach((w) => (w.issueKey = issuesById[w.issueId].key));
-        allWorklogList = await this.filterWorklogsAndAssignWtmConfig(allWorklogList, issuesById, wtmTsConfigPerWorklogs, report);
+        allWorklogList = await this.filterWorklogsAndAssignWtmConfig(allWorklogList, issuesById, wtmTsConfigPerIssueKey, report);
 
         // Split worklogs by user
         const worklogListPerAccountId: { [accountId: string]: Worklog[] } = {};
@@ -55,7 +56,7 @@ export class SyncController {
             try {
                 const timesheetModel = this.timesheetModelFactory(userData.uuAccessCode1, userData.uuAccessCode2);
                 // Join worklogs from same issue
-                const timesheetMappingsPerDay = timesheetModel.convertWorklogsToTimesheetMappings(worklogList, reportUser);
+                const timesheetMappingsPerDay = timesheetModel.convertWorklogsToTimesheetMappings(worklogList, wtmTsConfigPerIssueKey, reportUser);
                 const commentErrors = worklogList.filter((w) => w.commentAsTextErrors.length > 0).map((w) => w.commentAsTextErrors);
                 if (commentErrors.length) {
                     reportUser.log.push(commentErrors);
@@ -73,7 +74,11 @@ export class SyncController {
                 userData.lastSynchronization = new Date().toISOString();
                 this.userDataModel.setUserData(userData.uid, userData);
             } catch (err) {
-                if (err instanceof Error) {
+                if (err instanceof WtmError) {
+                    reportUser.log.push(err.message + "\n" + err.stack);
+                    reportUser.log.push(err.uuAppErrorMap);
+                    err.additionalData && reportUser.log.push(err.additionalData);
+                } else if (err instanceof Error) {
                     reportUser.log.push(err.message + "\n" + err.stack);
                 } else {
                     reportUser.log.push(err.toString());
@@ -86,7 +91,7 @@ export class SyncController {
     protected async filterWorklogsAndAssignWtmConfig(
         worklogList: Worklog[],
         issuesById: { [id: string]: IIssue },
-        wtmTsConfigPerWorklogs: IWtmTsConfigPerWorklogId,
+        wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey,
         report: ISyncReport
     ): Promise<Worklog[]> {
         const projectSettingsList = await this.projectController.getProjectSettings();
@@ -136,10 +141,7 @@ export class SyncController {
             }
             if (projectSettings) {
                 validWorklogs.push(workglog);
-                wtmTsConfigPerWorklogs[workglog.id] = {
-                    projectSettings,
-                    artifact: projectSettings.wtmArtifact,
-                };
+                wtmTsConfigPerIssueKey[issue.key] = projectSettings;
             } else {
                 report.log.push(`Worklog ${workglog.toString()} skipped. Neither issue ${issue.key} nor parent has no valid configuration.`);
             }
@@ -205,7 +207,6 @@ export class SyncController {
                 const alreadyProcessedHours = dateUtils.secondsBetween(startOfDay, searchFromTime) / 3600;
                 segment = this.getNextFreeTimeSegment(searchFromTime, timesheetsToRemain, segment?.isPauseApplied, alreadyProcessedHours);
                 if (segment) {
-                    //TODO: BF: predelat na delani vykazu pojednom
                     const endTime = this.computeNewTimesheetInSegment(segment.interval, newTimesheets, timesheetMappingToProcess);
                     if (timesheetMappingToProcess.length == 0) {
                         return newTimesheets;
@@ -235,7 +236,6 @@ export class SyncController {
         startTime = dateUtils.increase(startTime, "seconds", timeToSpent);
         ts.datetimeTo = startTime.toISOString();
         ts.subject = tsm.wtmArtifact;
-        ts.highRate = false;
         ts.data = {
             nits: {
                 issueKey: tsm.jiraIssueKey,
@@ -252,7 +252,6 @@ export class SyncController {
         return startTime;
     }
 
-    //TODO: BF: udelat test na to ze se tam pauza nikam nevejde
     protected getNextFreeTimeSegment(
         searchFromTime: Date,
         timesheetsToRemain: Timesheet[],
@@ -290,12 +289,7 @@ export class SyncController {
     }
 }
 
-export interface IWtmTsConfig {
-    artifact: string;
-    projectSettings: IProjectSettings;
-}
-
-export type IWtmTsConfigPerWorklogId = { [worklogId: string]: IWtmTsConfig };
+export type IWtmTsConfigPerIssueKey = { [issueId: string]: IProjectSettings };
 
 export interface IInterval {
     from: Date;
