@@ -11,14 +11,14 @@ import dateUtils from "../../common/date-utils";
 import { StatsStatus } from "../components/stats-status";
 import arrayUtils from "../../common/array-utils";
 
-const mockData: IStats[] = require("./stats-page-mock.json");
+// const mockData: IStats[] = require("./stats-page-mock.json");
 
 const useStyles = makeStyles({
     level1: {
         paddingLeft: "1em",
     },
     level1Cell: {
-        background: "#fffff6",
+        background: "#ffffe0",
     },
     firstRowCell: {
         boxShadow: "0px 4px 4px -4px rgba(0, 0, 0, 0.5) inset",
@@ -30,7 +30,7 @@ const useStyles = makeStyles({
         paddingLeft: "2em",
     },
     level2Cell: {
-        background: "#fffff0",
+        background: "#f6f6f6",
     },
 });
 
