@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Inject } from "injector";
 import { IJiraProcessRequest } from "../../common/ajax-interfaces";
 import dateUtils from "../../common/date-utils";
 import { JiraApi } from "../apis/jira-api";
@@ -6,8 +7,9 @@ import { Crypt } from "../helpers/crypt";
 import { UserDataModel } from "../models/user-data-model";
 import { IProjectConfig } from "../project-config";
 
+@Inject.Singleton
 export class JiraController {
-    constructor(private userDataModel: UserDataModel, private crypt: Crypt, private projectConfig: IProjectConfig) {}
+    constructor(private userDataModel: UserDataModel, private crypt: Crypt, @Inject.Value("projectConfig") private projectConfig: IProjectConfig) {}
 
     public async processOAth(request: IJiraProcessRequest) {
         if (request.error) {

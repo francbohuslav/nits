@@ -1,6 +1,8 @@
 import axios from "axios";
+import { Inject } from "injector";
 import dateUtils from "../../common/date-utils";
 
+@Inject.Singleton
 export class UuIdendtityApi {
     public async getToken(accessCode1: string, accessCode2: string): Promise<ITokenResponse> {
         const response = await axios.post<ITokenResponse>("https://uuidentity.plus4u.net/uu-oidc-maing02/bb977a99f4cc4c37a2afce3fd599d0a7/oidc/grantToken", {

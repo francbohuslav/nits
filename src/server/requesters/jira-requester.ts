@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
+import { Inject } from "injector";
 import { IJiraProcessRequest } from "../../common/ajax-interfaces";
 import { JiraController } from "../controllers/jira-controller";
 import { BaseRequester } from "./base-requester";
 
+@Inject.Singleton
 export class JiraRequester extends BaseRequester {
     constructor(private jiraController: JiraController) {
         super();

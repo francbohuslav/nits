@@ -17,6 +17,9 @@
             "dist/": true,
             "cache/": true
         },
-        "todo-tree.tree.scanMode": "workspace only"
+        "todo-tree.tree.scanMode": "workspace only",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
     }
 }

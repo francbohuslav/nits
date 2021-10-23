@@ -1,3 +1,4 @@
+import { Inject } from "injector";
 import arrayUtils from "../../common/array-utils";
 import dateUtils from "../../common/date-utils";
 import { IStats, IStatsDays, IUserData, IUserStats } from "../../common/interfaces";
@@ -6,8 +7,13 @@ import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
 import { ITimesheetModel, nitsTimesheetFilter, Timesheet, TimesheetModelFactoryHandler } from "../models/uu/interfaces";
 
+@Inject.Singleton
 export class StatsController {
-    constructor(private userDataModel: UserDataModel, private jiraModel: JiraModel, private timesheetModelFactory: TimesheetModelFactoryHandler) {}
+    constructor(
+        private userDataModel: UserDataModel,
+        private jiraModel: JiraModel,
+        @Inject.Value("timesheetModelFactory") private timesheetModelFactory: TimesheetModelFactoryHandler
+    ) {}
 
     public async getAdminStats(adminUid: string, month: string): Promise<IStats[]> {
         const stats: IStats[] = [];

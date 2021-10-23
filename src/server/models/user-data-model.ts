@@ -1,12 +1,18 @@
 import fs from "fs";
+import { Inject } from "injector";
 import { join } from "path";
 import { IUserData } from "../../common/interfaces";
 import { Crypt } from "../helpers/crypt";
 import { IProjectConfig } from "../project-config";
 const fsp = fs.promises;
 
+@Inject.Singleton
 export class UserDataModel {
-    constructor(private storageDir: string, private crypt: Crypt, private projectConfig: IProjectConfig) {
+    constructor(
+        @Inject.Value("userStorageDir") private storageDir: string,
+        private crypt: Crypt,
+        @Inject.Value("projectConfig") private projectConfig: IProjectConfig
+    ) {
         fs.mkdirSync(this.storageDir, {
             recursive: true,
         });

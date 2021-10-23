@@ -1,8 +1,10 @@
+import { Inject } from "injector";
 import nodemailer from "nodemailer";
 import { IProjectConfig } from "../project-config";
 
+@Inject.Singleton
 export class NotifyController {
-    constructor(private projectConfig: IProjectConfig) {}
+    constructor(@Inject.Value("projectConfig") private projectConfig: IProjectConfig) {}
 
     public async testEmail(email: string): Promise<void> {
         if (!this.projectConfig.email.user || !this.projectConfig.email.password) {

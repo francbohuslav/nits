@@ -1,10 +1,12 @@
+import { Inject } from "injector";
 import dateUtils from "../../../common/date-utils";
 import { JiraApi } from "../../apis/jira-api";
 import { IProjectConfig } from "../../project-config";
 import { IAccount, IIssue, Worklog } from "./interfaces";
 
+@Inject.Singleton
 export class JiraModel {
-    constructor(private jiraApi: JiraApi, private projectConfig: IProjectConfig) {}
+    constructor(private jiraApi: JiraApi, @Inject.Value("projectConfig") private projectConfig: IProjectConfig) {}
 
     public async getLastWorklogs(since: Date, toExcept: Date): Promise<Worklog[]> {
         const worklogIdList = await this.jiraApi.getUpdatedWorklogIds(since, toExcept);

@@ -1,8 +1,10 @@
 import { Request } from "express";
+import { Inject } from "injector";
 import { IStats, IUserStats } from "../../common/interfaces";
 import { StatsController } from "../controllers/stats-controller";
 import { BaseRequester } from "./base-requester";
 
+@Inject.Singleton
 export class StatsRequester extends BaseRequester {
     constructor(private statsController: StatsController) {
         super();

@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
+import { Inject } from "injector";
 import { UserController } from "../controllers/user-controller";
 import { ISession } from "../requesters/base-requester";
 
+@Inject.Singleton
 export class LoginAuthorizer {
     constructor(private userController: UserController) {}
 
