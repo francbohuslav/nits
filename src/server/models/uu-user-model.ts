@@ -1,9 +1,11 @@
+import { Inject } from "injector";
 import dateUtils from "../../common/date-utils";
 import { IIdentityResponse_Identity, ITokenResponse, UuIdendtityApi } from "../apis/uu-identity-api";
 const md5 = require("md5");
 
+@Inject.Singleton
 export class UuUserModel {
-    constructor(private uuIdendtityApi: UuIdendtityApi, private tokenCache: ITokensMemory) {}
+    constructor(private uuIdendtityApi: UuIdendtityApi, @Inject.Value("tokenCache") private tokenCache: ITokensMemory) {}
 
     public async getUuUserIdentity(accessCode1: string, accessCode2: string): Promise<IUserIdentity> {
         console.log("Auth: request");

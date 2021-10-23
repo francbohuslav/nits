@@ -1,10 +1,13 @@
 import crypto from "crypto";
+import { Inject } from "injector";
+import { IProjectConfig } from "../project-config";
 
+@Inject.Singleton
 export class Crypt {
     private algorithm = "aes-192-cbc";
     private iv = Buffer.from("gdfgsd1gsfd1fgda"); // do not change
 
-    constructor(private salt: string) {}
+    constructor(@Inject.Value("projectConfig") private projectConfig: IProjectConfig) {}
 
     public encrypt(text: string, password: string = "unused"): string {
         const cipher = crypto.createCipheriv(this.algorithm, this.getKey(password), this.iv);
@@ -17,6 +20,6 @@ export class Crypt {
     }
 
     private getKey(password: string) {
-        return crypto.scryptSync(password, this.salt, 24);
+        return crypto.scryptSync(password, this.projectConfig.cryptoSalt, 24);
     }
 }

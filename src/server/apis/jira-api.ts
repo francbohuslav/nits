@@ -1,11 +1,13 @@
+import { Inject } from "injector";
 import JiraClientApi, { JiraApiOptions } from "jira-client";
 import dateUtils from "../../common/date-utils";
 import { IAccount, IIssue, Worklog } from "../models/jira/interfaces";
 import { IProjectConfig } from "../project-config";
 
+@Inject.Singleton
 export class JiraApi {
     private client: JiraClientApi;
-    constructor(options: JiraApiOptions, private projectConfig: IProjectConfig) {
+    constructor(@Inject.Value("jiraApiOptions") options: JiraApiOptions, @Inject.Value("projectConfig") private projectConfig: IProjectConfig) {
         this.client = new JiraClientApi(options);
     }
 

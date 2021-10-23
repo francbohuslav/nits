@@ -1,23 +1,25 @@
+import { Inject } from "injector";
 import arrayUtils from "../../common/array-utils";
+import { assert } from "../../common/core";
+import dateUtils from "../../common/date-utils";
+import { IProjectSettings } from "../../common/interfaces";
+import { WtmError } from "../apis/wtm-api";
 import { ISyncReport, ISyncReportUser, TimesheetMapping, TimesheetMappingsPerDay } from "../models/interfaces";
 import { IIssue, IIssueCustomField, Worklog } from "../models/jira/interfaces";
 import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
 import { nitsTimesheetFilter, Timesheet, TimesheetModelFactoryHandler } from "../models/uu/interfaces";
-import { ProjectController } from "./project-controller";
-import { assert } from "../../common/core";
 import { IProjectConfig } from "../project-config";
-import { IProjectSettings } from "../../common/interfaces";
-import dateUtils from "../../common/date-utils";
-import { WtmError } from "../apis/wtm-api";
+import { ProjectController } from "./project-controller";
 
+@Inject.Singleton
 export class SyncController {
     constructor(
         private userDataModel: UserDataModel,
         private jiraModel: JiraModel,
         private projectController: ProjectController,
-        private projectConfig: IProjectConfig,
-        private timesheetModelFactory: TimesheetModelFactoryHandler
+        @Inject.Value("projectConfig") private projectConfig: IProjectConfig,
+        @Inject.Value("timesheetModelFactory") private timesheetModelFactory: TimesheetModelFactoryHandler
     ) {}
 
     public async sync(): Promise<ISyncReport> {

@@ -1,9 +1,11 @@
+import { Inject } from "injector";
 import arrayUtils from "../../common/array-utils";
 import dateUtils from "../../common/date-utils";
 import { IProjectSettings } from "../../common/interfaces";
 import { JiraApi } from "../apis/jira-api";
 import { ProjectDataModel } from "../models/project-data-model";
 
+@Inject.Singleton
 export class ProjectController {
     private getNitsFiledValuesLastTime: number = 0;
     private getNitsFiledValuesCache: { [key: string]: string };

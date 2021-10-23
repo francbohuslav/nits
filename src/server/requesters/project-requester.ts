@@ -1,8 +1,10 @@
 import { Request } from "express";
+import { Inject } from "injector";
 import { IProjectSettingsResponse } from "../../common/ajax-interfaces";
 import { IProjectSettings } from "../../common/interfaces";
 import { ProjectController } from "../controllers/project-controller";
 
+@Inject.Singleton
 export class ProjectRequester {
     constructor(private projectController: ProjectController) {}
 

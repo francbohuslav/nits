@@ -1,12 +1,14 @@
+import { Inject } from "injector";
 import { IUserData } from "../../common/interfaces";
 import { UserDataModel } from "../models/user-data-model";
 import { IUserIdentity, UuUserModel } from "../models/uu-user-model";
 import { IProjectConfig } from "../project-config";
 
+@Inject.Singleton
 export class UserController {
     private authenticatedUsers: IUserIdentity[] = [];
 
-    constructor(private uuUserModel: UuUserModel, private userDataModel: UserDataModel, private projectConfig: IProjectConfig) {}
+    constructor(private uuUserModel: UuUserModel, private userDataModel: UserDataModel, @Inject.Value("projectConfig") private projectConfig: IProjectConfig) {}
 
     /**
      * @returns UID

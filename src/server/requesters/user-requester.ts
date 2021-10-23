@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { Inject } from "injector";
 import { ILoginRequest } from "../../common/ajax-interfaces";
 import dateUtils from "../../common/date-utils";
 import { IUserPublicData } from "../../common/interfaces";
@@ -6,6 +7,7 @@ import { UserController } from "../controllers/user-controller";
 import { Crypt } from "../helpers/crypt";
 import { BaseRequester } from "./base-requester";
 
+@Inject.Singleton
 export class UserRequester extends BaseRequester {
     constructor(private userController: UserController, private crypt: Crypt) {
         super();

@@ -1,89 +1,71 @@
 import express = require("express");
 import compression from "compression";
-import session = require("express-session");
+import dotenv from "dotenv";
+import { Response } from "express-serve-static-core";
 import fs from "fs";
 import http from "http";
-const json = require("body-parser").json;
-import path = require("path");
-import { Response } from "express-serve-static-core";
-import { UserRequester } from "./requesters/user-requester";
-import { ProjectConfigurer } from "./project-config";
-import { Crypt } from "./helpers/crypt";
-import { UserController } from "./controllers/user-controller";
-import { UuIdendtityApi } from "./apis/uu-identity-api";
-import { LoginAuthorizer } from "./helpers/login-authorizer";
-import { UserDataModel } from "./models/user-data-model";
-import { SyncRequester } from "./requesters/sync-requester";
-import { SyncController } from "./controllers/sync-controller";
-import { JiraModel } from "./models/jira/jira-model";
-import { JiraApi } from "./apis/jira-api";
-import { JiraApiOptions } from "jira-client";
+import { Container } from "injector";
 import { IBaseResponse } from "../common/ajax-interfaces";
-import dotenv from "dotenv";
+import { IProjectConfigPublic } from "../common/interfaces";
+import { WtmApi, WtmError } from "./apis/wtm-api";
+import { LoginAuthorizer } from "./helpers/login-authorizer";
+import { UuUserModel } from "./models/uu-user-model";
+import { TimesheetModelFactoryHandler } from "./models/uu/interfaces";
 import { ReadOnlyTimesheetModel } from "./models/uu/readonly-timesheet-model";
 import { WritableTimesheetModel } from "./models/uu/writable-timesheet-model";
-import { UuUserModel } from "./models/uu-user-model";
-import { WtmApi, WtmError } from "./apis/wtm-api";
+import { ProjectConfigurer } from "./project-config";
 import { JiraRequester } from "./requesters/jira-requester";
-import { JiraController } from "./controllers/jira-controller";
-import { ProjectRequester } from "./requesters/project-requester";
-import { ProjectController } from "./controllers/project-controller";
-import { ProjectDataModel } from "./models/project-data-model";
 import { NotifyRequester } from "./requesters/notify-requester";
+import { ProjectRequester } from "./requesters/project-requester";
 import { StatsRequester } from "./requesters/stats-requester";
-import { StatsController } from "./controllers/stats-controller";
-import { NotifyController } from "./controllers/notify-controller";
-import { TimesheetModelFactoryHandler } from "./models/uu/interfaces";
-import { IProjectConfigPublic } from "../common/interfaces";
+import { SyncRequester } from "./requesters/sync-requester";
+import { UserRequester } from "./requesters/user-requester";
+import session = require("express-session");
+const json = require("body-parser").json;
+import path = require("path");
 dotenv.config();
 
 const isDevelopment = !!process.env.NITS_DEVEL_ACCOUNT;
 
 console.log(`Using JIRA username '${process.env.NITS_JIRA_USERNAME}'`);
 
-const jiraConnectionSettings: JiraApiOptions = {
+const container = new Container();
+
+const projectConfig = new ProjectConfigurer().getProjectConfig();
+
+container.bindValue("projectConfig", projectConfig);
+container.bindValue("jiraApiOptions", {
     protocol: "https",
     host: "intelis.atlassian.net",
     apiVersion: "3",
     strictSSL: true,
-};
-const projectConfig = new ProjectConfigurer().getProjectConfig();
-const crypt = new Crypt(projectConfig.cryptoSalt);
-const userDataModel = new UserDataModel(path.join(__dirname, "../../../userdata/users"), crypt, projectConfig);
-const projectDataModel = new ProjectDataModel(path.join(__dirname, "../../../userdata/projects"));
-const jiraApi = new JiraApi(
-    {
-        ...jiraConnectionSettings,
-        username: process.env.NITS_JIRA_USERNAME,
-        password: process.env.NITS_JIRA_API_TOKEN,
-    },
-    projectConfig
-);
-const timeSheetmodelFactory: TimesheetModelFactoryHandler = (acc1, acc2) => {
+    username: process.env.NITS_JIRA_USERNAME,
+    password: process.env.NITS_JIRA_API_TOKEN,
+});
+container.bindValue("tokenCache", {});
+container.bindValue("userStorageDir", path.join(__dirname, "../../../userdata/users"));
+container.bindValue("projectStorageDir", path.join(__dirname, "../../../userdata/projects"));
+
+const uuUserModel = container.resolveClass(UuUserModel);
+const timesheetModelFactory: TimesheetModelFactoryHandler = (acc1, acc2) => {
     if (!projectConfig.dryRun) {
         return new WritableTimesheetModel(acc1, acc2, uuUserModel, new WtmApi());
     }
     return new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi());
 };
-const jiraModel = new JiraModel(jiraApi, projectConfig);
-const uuUserModel = new UuUserModel(new UuIdendtityApi(), {});
-const userController = new UserController(uuUserModel, userDataModel, projectConfig);
-const jiraController = new JiraController(userDataModel, crypt, projectConfig);
-const projectController = new ProjectController(projectDataModel, jiraApi);
-const statsController = new StatsController(userDataModel, jiraModel, timeSheetmodelFactory);
-const notifyController = new NotifyController(projectConfig);
 
-// Requests
-const loginAuthorizer = new LoginAuthorizer(userController);
+container.bindValue("timesheetModelFactory", timesheetModelFactory);
+
+const loginAuthorizer = container.resolveClass(LoginAuthorizer);
 const loginAuthorize = loginAuthorizer.loginAuthorize.bind(loginAuthorizer);
 const adminAuthorize = loginAuthorizer.adminAuthorize.bind(loginAuthorizer);
-const userRequester = new UserRequester(userController, crypt);
-const jiraRequester = new JiraRequester(jiraController);
-const syncController = new SyncController(userDataModel, jiraModel, projectController, projectConfig, timeSheetmodelFactory);
-const syncRequester = new SyncRequester(syncController);
-const projectReqester = new ProjectRequester(projectController);
-const notifyRequester = new NotifyRequester(userController, notifyController);
-const statsRequester = new StatsRequester(statsController);
+
+const userRequester = container.resolveClass(UserRequester);
+const jiraRequester = container.resolveClass(JiraRequester);
+const syncRequester = container.resolveClass(SyncRequester);
+const projectReqester = container.resolveClass(ProjectRequester);
+const notifyRequester = container.resolveClass(NotifyRequester);
+const statsRequester = container.resolveClass(StatsRequester);
 
 const app = express();
 app.use(compression());

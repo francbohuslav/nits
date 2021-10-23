@@ -1,10 +1,12 @@
 import fs from "fs";
+import { Inject } from "injector";
 import { join } from "path";
 import { IProjectSettings } from "../../common/interfaces";
 const fsp = fs.promises;
 
+@Inject.Singleton
 export class ProjectDataModel {
-    constructor(private storageDir: string) {
+    constructor(@Inject.Value("projectStorageDir") private storageDir: string) {
         fs.mkdirSync(this.storageDir, {
             recursive: true,
         });
