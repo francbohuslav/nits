@@ -1,15 +1,15 @@
-import { Box, Button, IconButton, LinearProgress, Tooltip, Typography } from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+import { Box, Button, Card, CardContent, Grid, IconButton, LinearProgress, TextField, Tooltip, Typography } from "@material-ui/core";
+import { DataGrid, GridCellEditCommitParams, GridColumns } from "@material-ui/data-grid";
 import AddIcon from "@material-ui/icons/AddCircleRounded";
+import CloseIcon from "@material-ui/icons/Close";
 import { useEffect, useState } from "react";
-import React = require("react");
+import { useHistory } from "react-router";
+import { IProjectSettingsResponse } from "../../common/ajax-interfaces";
 import { IProjectSettings } from "../../common/interfaces";
 import { useAjax } from "../ajax";
-import { DataGrid, GridCellEditCommitParams, GridColumns } from "@material-ui/data-grid";
-import { useHistory } from "react-router";
-import { Router } from "../router";
 import { thisApp } from "../app-provider";
-import { IProjectSettingsResponse } from "../../common/ajax-interfaces";
+import { Router } from "../router";
+import React = require("react");
 
 export const ProjectSettingsPage = () => {
     const [projectSettings, setProjectSettings] = useState<IProjectSettings[]>(null);
@@ -115,34 +115,76 @@ export const ProjectSettingsPage = () => {
         c.sortable = false;
     });
 
+    //TODO: BF: udelat ulzeni
+    const adminUids = "";
+    const syncDaysCount = 7;
+
     return isLoading ? (
         <LinearProgress />
     ) : (
         <>
             {rows && (
                 <>
-                    <Typography paragraph>
-                        <DataGrid
-                            columns={columns}
-                            rows={rows}
-                            density="compact"
-                            autoHeight
-                            disableColumnMenu
-                            hideFooterPagination
-                            hideFooter
-                            onCellEditCommit={handleCellEditCommit}
-                        />
-                    </Typography>
+                    <Box mb={3}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant="h6">Artefakty</Typography>
+                                <Typography paragraph>
+                                    <DataGrid
+                                        columns={columns}
+                                        rows={rows}
+                                        density="compact"
+                                        autoHeight
+                                        disableColumnMenu
+                                        hideFooterPagination
+                                        hideFooter
+                                        onCellEditCommit={handleCellEditCommit}
+                                    />
+                                </Typography>
+                                <Box display="flex">
+                                    <Box flexGrow={1}>
+                                        <Button variant="contained" color="secondary" href={Router.PageSynchronization} target="_blank">
+                                            Spustit synchronizaci
+                                        </Button>
+                                    </Box>
+                                    <Box>
+                                        <Button variant="contained" color="primary" onClick={onSave}>
+                                            Uložit
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    </Box>
+                    <Box mb={3}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant="h6">Obecná nastavení</Typography>
+                                <form noValidate>
+                                    {/* // onSubmit={onSubmit} */}
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={6}>
+                                            <TextField id="adminUids" label="UID administrátorů" helperText="oddělené čárkou" value={adminUids} fullWidth />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <TextField id="syncDaysCount" label="Počet dnů k synchronizaci" value={syncDaysCount} fullWidth type="number" />
+                                        </Grid>
+                                    </Grid>
+                                    <Box display="flex">
+                                        <Box flexGrow={1}></Box>
+                                        <Box>
+                                            <Button variant="contained" color="primary" type="submit">
+                                                Uložit
+                                            </Button>
+                                        </Box>
+                                    </Box>
+                                </form>
+                            </CardContent>
+                        </Card>
+                    </Box>
                     <Box display="flex">
-                        <Box flexGrow={1}>
-                            <Button variant="contained" color="secondary" href={Router.PageSynchronization} target="_blank">
-                                Spustit synchronizaci
-                            </Button>
-                        </Box>
+                        <Box flexGrow={1}></Box>
                         <Box>
-                            <Button variant="contained" color="primary" onClick={onSave}>
-                                Uložit
-                            </Button>{" "}
                             <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
                                 Zpět
                             </Button>
