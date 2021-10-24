@@ -5,8 +5,6 @@ import { Timesheet } from "./interfaces";
 import { ReadOnlyTimesheetModel } from "./readonly-timesheet-model";
 
 export class WritableTimesheetModel extends ReadOnlyTimesheetModel {
-    private limitOnlyToUser = "12-8835-1";
-
     constructor(accessCode1: string, accessCode2: string, uuUserModel: UuUserModel, wtmApi: WtmApi) {
         super(accessCode1, accessCode2, uuUserModel, wtmApi);
     }
@@ -14,10 +12,6 @@ export class WritableTimesheetModel extends ReadOnlyTimesheetModel {
     public async saveTimesheets(newTimesheets: Timesheet[], report: ISyncReportUser): Promise<void> {
         if (newTimesheets.length == 0) {
             return;
-        }
-        if (this.limitOnlyToUser && report.uid != this.limitOnlyToUser) {
-            report.log.push(`Test mode: saving can be done only by user ${this.limitOnlyToUser}`);
-            return await super.saveTimesheets(newTimesheets, report);
         }
         const tokenResponse = await this.uuUserModel.getToken(this.accessCode1, this.accessCode2);
         for (const ts of newTimesheets) {
@@ -36,10 +30,6 @@ export class WritableTimesheetModel extends ReadOnlyTimesheetModel {
     public async removeTimesheets(timesheets: Timesheet[], report: ISyncReportUser): Promise<void> {
         if (timesheets.length == 0) {
             return;
-        }
-        if (this.limitOnlyToUser && report.uid != this.limitOnlyToUser) {
-            report.log.push(`Test mode: deleting can be done only by user ${this.limitOnlyToUser}`);
-            return await super.removeTimesheets(timesheets, report);
         }
         for (const ts of timesheets) {
             report.log.push(`Deleting timesheet ${ts} ...`);

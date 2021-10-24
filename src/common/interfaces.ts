@@ -5,6 +5,7 @@ interface IUserDataBase {
     name: string;
     notificationEmail: string;
     lastSynchronization: string;
+    state: IUserState;
 }
 
 export interface IUserPublicData extends IUserDataBase {
@@ -54,7 +55,7 @@ export interface IUserStats {
 
 export interface IProjectConfigPublic {
     /** If true, no changes are made. All is readonly. Default is true */
-    dryRun: boolean;
     jiraClientId: string;
     serverAddress: string;
 }
+export type IUserState = "disabled" | "readonly" | "active";

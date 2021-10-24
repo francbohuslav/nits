@@ -1,5 +1,5 @@
 import { Inject } from "injector";
-import { IUserData } from "../../common/interfaces";
+import { IUserData, IUserPublicData } from "../../common/interfaces";
 import { UserDataModel } from "../models/user-data-model";
 import { IUserIdentity, UuUserModel } from "../models/uu-user-model";
 import { IProjectConfig } from "../project-config";
@@ -50,5 +50,22 @@ export class UserController {
 
     public isAdmin(uid: string): boolean {
         return this.projectConfig.admins.includes(uid);
+    }
+
+    public getAllUsers(): Promise<IUserData[]> {
+        return this.userDataModel.getAllValidUserData();
+    }
+
+    public convertToPublicData(userData: IUserData): IUserPublicData {
+        return {
+            jiraAccountId: userData.jiraAccountId,
+            jiraName: userData.jiraName,
+            name: userData.name,
+            uid: userData.uid,
+            notificationEmail: userData.notificationEmail,
+            lastSynchronization: userData.lastSynchronization,
+            isAdmin: this.isAdmin(userData.uid),
+            state: userData.state,
+        };
     }
 }

@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { Inject } from "injector";
-import { ILoginRequest } from "../../common/ajax-interfaces";
+import { IAllUsersResponse, ILoginRequest, IUserSetStateRequest } from "../../common/ajax-interfaces";
+import { assert } from "../../common/core";
 import dateUtils from "../../common/date-utils";
 import { IUserPublicData } from "../../common/interfaces";
 import { UserController } from "../controllers/user-controller";
@@ -31,15 +32,7 @@ export class UserRequester extends BaseRequester {
     public async getUserPublicData(req: Request): Promise<IUserPublicData> {
         const uid = this.getUid(req);
         const userData = await this.userController.getUserData(uid);
-        return {
-            jiraAccountId: userData.jiraAccountId,
-            jiraName: userData.jiraName,
-            name: userData.name,
-            uid: userData.uid,
-            notificationEmail: userData.notificationEmail,
-            lastSynchronization: userData.lastSynchronization,
-            isAdmin: this.userController.isAdmin(uid),
-        } as IUserPublicData;
+        return this.userController.convertToPublicData(userData);
     }
 
     public async logoutJira(req: Request): Promise<void> {
@@ -53,5 +46,23 @@ export class UserRequester extends BaseRequester {
         const uid = this.getUid(req);
         const pattern = uid + "|" + dateUtils.toIsoFormat();
         return this.crypt.encrypt(pattern);
+    }
+
+    public async getAllUsers(): Promise<IAllUsersResponse> {
+        const users = await this.userController.getAllUsers();
+        const result = {
+            users: users.map((u) => this.userController.convertToPublicData(u)),
+        };
+        return result;
+    }
+
+    public async setUserState(req: Request): Promise<IAllUsersResponse> {
+        const request: IUserSetStateRequest = req.body;
+        assert(request.uid);
+        assert(request.state);
+        const userData = await this.userController.getUserData(request.uid);
+        userData.state = request.state;
+        await this.userController.setUserData(request.uid, userData);
+        return await this.getAllUsers();
     }
 }

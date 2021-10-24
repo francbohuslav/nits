@@ -1,4 +1,4 @@
-import { IProjectSettings, IStats } from "./interfaces";
+import { IProjectSettings, IStats, IUserPublicData, IUserState } from "./interfaces";
 
 export interface IBaseResponse<T> {
     message?: string;
@@ -31,4 +31,12 @@ export interface IJiraProcessRequest {
     state: string; //8088418f6756b9c5dd499e01b93596f9cc21a47f35f0da78a7a0e1f6bfca6f41
     error: string; //access_denied
     error_description: string; //User%20did%20not%20authorize%20the%20request
+}
+
+export interface IAllUsersResponse {
+    users: IUserPublicData[];
+}
+export interface IUserSetStateRequest {
+    uid: string;
+    state: IUserState;
 }

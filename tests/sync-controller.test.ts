@@ -127,7 +127,6 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
             cryptoSalt: "test",
             syncDaysCount: 7,
             serverAddress: "",
-            dryRun: true,
             email: {
                 password: "",
                 sender: "",

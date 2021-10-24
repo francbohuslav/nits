@@ -6,7 +6,7 @@ import fs from "fs";
 import http from "http";
 import { Container } from "injector";
 import { IBaseResponse } from "../common/ajax-interfaces";
-import { IProjectConfigPublic } from "../common/interfaces";
+import { IProjectConfigPublic, IUserData } from "../common/interfaces";
 import { WtmApi, WtmError } from "./apis/wtm-api";
 import { LoginAuthorizer } from "./helpers/login-authorizer";
 import { UuUserModel } from "./models/uu-user-model";
@@ -47,11 +47,11 @@ container.bindValue("userStorageDir", path.join(__dirname, "../../../userdata/us
 container.bindValue("projectStorageDir", path.join(__dirname, "../../../userdata/projects"));
 
 const uuUserModel = container.resolveClass(UuUserModel);
-const timesheetModelFactory: TimesheetModelFactoryHandler = (acc1, acc2) => {
-    if (!projectConfig.dryRun) {
-        return new WritableTimesheetModel(acc1, acc2, uuUserModel, new WtmApi());
+const timesheetModelFactory: TimesheetModelFactoryHandler = (user: IUserData) => {
+    if (user.state == "active") {
+        return new WritableTimesheetModel(user.uuAccessCode1, user.uuAccessCode2, uuUserModel, new WtmApi());
     }
-    return new ReadOnlyTimesheetModel(acc1, acc2, uuUserModel, new WtmApi());
+    return new ReadOnlyTimesheetModel(user.uuAccessCode1, user.uuAccessCode2, uuUserModel, new WtmApi());
 };
 
 container.bindValue("timesheetModelFactory", timesheetModelFactory);
@@ -98,7 +98,6 @@ const methods: IServerMethod[] = [
         "/server/config",
         () => {
             const ret: IProjectConfigPublic = {
-                dryRun: projectConfig.dryRun,
                 jiraClientId: projectConfig.jira?.clientId,
                 serverAddress: projectConfig.serverAddress,
             };
@@ -122,6 +121,8 @@ const methods: IServerMethod[] = [
     m("get", "/server/project-settings/get", projectReqester.getProjectSettings.bind(projectReqester), adminAuthorize),
     m("post", "/server/project-settings/set", projectReqester.setProjectSettings.bind(projectReqester), adminAuthorize),
     m("get", "/server/admin-stats/get", statsRequester.getAdminStats.bind(statsRequester), adminAuthorize),
+    m("get", "/server/admin-users/get", userRequester.getAllUsers.bind(userRequester), adminAuthorize),
+    m("post", "/server/admin-users/set-user-state", userRequester.setUserState.bind(userRequester), adminAuthorize),
 ];
 
 const processRequest = (method: IServerAction, options: IServerMethodOptions) => async (req: express.Request, res: express.Response) => {

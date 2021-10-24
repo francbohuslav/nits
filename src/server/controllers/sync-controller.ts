@@ -46,7 +46,8 @@ export class SyncController {
         });
 
         // Process user's worklogs
-        const userDataList = await this.userDataModel.getAllValidUserData();
+        let userDataList = await this.userDataModel.getAllValidUserData();
+        userDataList = userDataList.filter((u) => u.state == "active" || u.state == "readonly");
         for (const userData of userDataList) {
             const worklogList = worklogListPerAccountId[userData.jiraAccountId] || [];
             const reportUser: ISyncReportUser = {
@@ -56,7 +57,7 @@ export class SyncController {
             };
             report.users.push(reportUser);
             try {
-                const timesheetModel = this.timesheetModelFactory(userData.uuAccessCode1, userData.uuAccessCode2);
+                const timesheetModel = this.timesheetModelFactory(userData);
                 // Join worklogs from same issue
                 const timesheetMappingsPerDay = timesheetModel.convertWorklogsToTimesheetMappings(worklogList, wtmTsConfigPerIssueKey, reportUser);
                 const commentErrors = worklogList.filter((w) => w.commentAsTextErrors.length > 0).map((w) => w.commentAsTextErrors);

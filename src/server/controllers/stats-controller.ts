@@ -22,7 +22,7 @@ export class StatsController {
         const toExcept = dateUtils.increase(since, "months", 1);
         console.log(`Stats for ${dateUtils.toIsoFormat(since)} - ${dateUtils.toIsoFormat(toExcept)}`);
         const adminUserData = await this.userDataModel.getUserData(adminUid);
-        const timesheetModel = this.timesheetModelFactory(adminUserData.uuAccessCode1, adminUserData.uuAccessCode2);
+        const timesheetModel = this.timesheetModelFactory(adminUserData);
 
         const userDataList = await this.userDataModel.getAllValidUserData();
 
@@ -71,7 +71,7 @@ export class StatsController {
 
     public async getUserStats(uid: string): Promise<IUserStats> {
         const userData = await this.userDataModel.getUserData(uid);
-        const timesheetModel = this.timesheetModelFactory(userData.uuAccessCode1, userData.uuAccessCode2);
+        const timesheetModel = this.timesheetModelFactory(userData);
         const from = new Date();
         const timesheets = await timesheetModel.getMyLastTimesheets(dateUtils.toIsoFormat(new Date(from.getFullYear(), from.getMonth(), 1)));
         const stats: IUserStats = {

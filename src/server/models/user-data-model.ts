@@ -28,6 +28,7 @@ export class UserDataModel {
             jiraName: "",
             notificationEmail: "",
             lastSynchronization: "",
+            state: "disabled",
         };
         const filePath = this.getUserFilePath(uid);
         try {
@@ -41,7 +42,9 @@ export class UserDataModel {
             return emptyUserData;
         }
         const decryptedContent = this.projectConfig.userDataEncrypted ? this.crypt.decrypt(encryptedContent) : encryptedContent;
-        return JSON.parse(decryptedContent);
+        const userData: IUserData = JSON.parse(decryptedContent);
+        this.normalizeUserData(userData);
+        return userData;
     }
 
     public async setUserData(uid: string, userData: IUserData): Promise<void> {
@@ -59,6 +62,7 @@ export class UserDataModel {
         const userDataList: IUserData[] = [];
         for (const uid of userUidList) {
             const userData = await this.getUserData(uid);
+            this.normalizeUserData(userData);
             if (userData.jiraAccountId) {
                 userDataList.push(userData);
             }
@@ -68,5 +72,9 @@ export class UserDataModel {
 
     private getUserFilePath(uid: string): string {
         return join(this.storageDir, uid + ".data");
+    }
+
+    private normalizeUserData(userData: IUserData) {
+        userData.state = userData.state || "disabled";
     }
 }

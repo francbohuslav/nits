@@ -1,9 +1,10 @@
 import dateUtils from "../../../common/date-utils";
+import { IUserData } from "../../../common/interfaces";
 import { IWtmTsConfigPerIssueKey } from "../../controllers/sync-controller";
 import { ISyncReportUser, TimesheetMappingsPerDay } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
 
-export type TimesheetModelFactoryHandler = (accessCode1: string, accessCode2: string) => ITimesheetModel;
+export type TimesheetModelFactoryHandler = (userData: IUserData) => ITimesheetModel;
 
 export interface ITimesheetModel {
     saveTimesheets(newTimesheets: Timesheet[], report: ISyncReportUser): Promise<void>;

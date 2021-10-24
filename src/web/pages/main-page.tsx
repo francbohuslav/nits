@@ -1,22 +1,23 @@
 import { Box, Button, Grid, Tooltip, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
-import React = require("react");
-import EmailIcon from "@material-ui/icons/Email";
-import CheckIcon from "@material-ui/icons/Check";
-import InfoIcon from "@material-ui/icons/Info";
-import CloseIcon from "@material-ui/icons/Close";
-import SettingsIcon from "@material-ui/icons/Settings";
-import red from "@material-ui/core/colors/red";
 import green from "@material-ui/core/colors/green";
+import red from "@material-ui/core/colors/red";
 import StatsIcon from "@material-ui/icons/BarChart";
+import CheckIcon from "@material-ui/icons/Check";
+import CloseIcon from "@material-ui/icons/Close";
+import EmailIcon from "@material-ui/icons/Email";
 import ExitIcon from "@material-ui/icons/ExitToApp";
-import { useAjax } from "../ajax";
-import { useHistory } from "react-router-dom";
-import { Router } from "../router";
-import { DataContext, IDataContextValue } from "../data-context";
+import InfoIcon from "@material-ui/icons/Info";
+import PeopleIcon from "@material-ui/icons/People";
+import SettingsIcon from "@material-ui/icons/Settings";
+import { makeStyles } from "@material-ui/styles";
 import { useContext, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { useAjax } from "../ajax";
 import { Info } from "../components/info";
 import { MainPageStats } from "../components/main-page-stats";
+import { DataContext, IDataContextValue } from "../data-context";
+import { Router } from "../router";
+import React = require("react");
 
 const useStyles = makeStyles({
     button: {
@@ -53,6 +54,7 @@ export const MainPage = () => {
     const onNotify = () => history.push(Router.PageNotification);
     const onProjectSetting = () => history.push(Router.PageProjectSettings);
     const onStats = () => history.push(Router.PageStats);
+    const onUsers = () => history.push(Router.PageUsers);
 
     const onLogout = async () => {
         await ajax.post<boolean>(Router.PageLogout);
@@ -127,6 +129,13 @@ export const MainPage = () => {
                 <ButtonRow>
                     <Button className={classes.button} variant="contained" startIcon={<StatsIcon />} fullWidth onClick={onStats}>
                         Statistiky
+                    </Button>
+                </ButtonRow>
+            )}
+            {userData?.isAdmin && (
+                <ButtonRow>
+                    <Button className={classes.button} variant="contained" startIcon={<PeopleIcon />} fullWidth onClick={onUsers}>
+                        Uživatelé
                     </Button>
                 </ButtonRow>
             )}

@@ -1,17 +1,17 @@
-import { Box, Button, Grid, LinearProgress, Link, makeStyles, Tooltip, Typography } from "@material-ui/core";
+import { Box, Button, LinearProgress, Link, makeStyles, Paper, Tab, Tabs, Tooltip, Typography } from "@material-ui/core";
 import { DataGrid, GridColumns, GridRowData } from "@material-ui/data-grid";
+import MuiAlert from "@material-ui/lab/Alert";
 import { useEffect, useState } from "react";
-import React = require("react");
+import { useHistory } from "react-router-dom";
+import arrayUtils from "../../common/array-utils";
+import dateUtils from "../../common/date-utils";
 import { IStats, IStatsArt, IStatsDay } from "../../common/interfaces";
 import { useAjax } from "../ajax";
-import MuiAlert from "@material-ui/lab/Alert";
-import { Router } from "../router";
-import { useHistory } from "react-router-dom";
-import dateUtils from "../../common/date-utils";
 import { StatsStatus } from "../components/stats-status";
-import arrayUtils from "../../common/array-utils";
+import { Router } from "../router";
+import React = require("react");
 
-// const mockData: IStats[] = require("./stats-page-mock.json");
+const mockData: IStats[] = require("./stats-page-mock.json");
 
 const useStyles = makeStyles({
     level1: {
@@ -60,17 +60,17 @@ export const StatsPage = () => {
     };
 
     useEffect(() => {
-        loadData();
-        //setStats(mockData);
+        if (mockData) {
+            setStats(mockData);
+        } else {
+            loadData();
+        }
     }, [selectedMonth]);
 
-    const idGetter = (row: GridRowData) => {
-        console.log(row);
-        return (row as IStats).uid || (row as IStatsDay).date || (row as IStatsArt).artifact;
-    };
-
-    const onMonthSelected = (monthShift: number) => () =>
+    const idGetter = (row: GridRowData) => (row as IStats).uid || (row as IStatsDay).date || (row as IStatsArt).artifact;
+    const onMonthSelected = (monthShift: number) => {
         setSelectedMonth(monthShift == 0 ? actualMonth : monthShift == 1 ? previousMonth : beforePreviousMonth);
+    };
 
     const badUserCount = arrayUtils.sumAction(stats, (s) => (Object.values(s.days).some((d) => d.jiraHours != d.wtmHours) ? 1 : 0));
 
@@ -194,7 +194,7 @@ export const StatsPage = () => {
     stats.sort((a, b) => a.name.localeCompare(b.name));
 
     const userSyncWarning = stats.some((r) => r.jiraHours != r.wtmHours);
-
+    const selectedMonthTabIndex = dateUtils.areEquals(selectedMonth, actualMonth) ? 0 : dateUtils.areEquals(selectedMonth, previousMonth) ? 1 : 2;
     return (
         <>
             {isLoading ? (
@@ -211,40 +211,14 @@ export const StatsPage = () => {
                             </MuiAlert>
                         )}
                     </Typography>
-                    <Typography paragraph>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} sm={4}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    color={dateUtils.areEquals(selectedMonth, actualMonth) ? "primary" : "default"}
-                                    onClick={onMonthSelected(0)}
-                                >
-                                    {actualMonth.toLocaleString(undefined, { month: "long" })}
-                                </Button>
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    color={dateUtils.areEquals(selectedMonth, previousMonth) ? "primary" : "default"}
-                                    onClick={onMonthSelected(1)}
-                                >
-                                    {previousMonth.toLocaleString(undefined, { month: "long" })}
-                                </Button>
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    color={dateUtils.areEquals(selectedMonth, beforePreviousMonth) ? "primary" : "default"}
-                                    onClick={onMonthSelected(2)}
-                                >
-                                    {beforePreviousMonth.toLocaleString(undefined, { month: "long" })}
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </Typography>
+
+                    <Paper square>
+                        <Tabs value={selectedMonthTabIndex} indicatorColor="primary" textColor="primary" centered onChange={(e, v) => onMonthSelected(v)}>
+                            <Tab label={actualMonth.toLocaleString(undefined, { month: "long" })} />
+                            <Tab label={previousMonth.toLocaleString(undefined, { month: "long" })} />
+                            <Tab label={beforePreviousMonth.toLocaleString(undefined, { month: "long" })} />
+                        </Tabs>
+                    </Paper>
                     <DataGrid
                         getRowId={idGetter}
                         columns={columns}

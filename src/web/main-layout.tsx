@@ -1,11 +1,10 @@
-import { AppBar, Toolbar, Box, Typography, makeStyles, Container, Tooltip } from "@material-ui/core";
-import { useContext } from "react";
-import React = require("react");
+import { AppBar, Box, Container, makeStyles, Toolbar, Tooltip, Typography } from "@material-ui/core";
 import TimerIcon from "@material-ui/icons/Timer";
-import WarningIcon from "@material-ui/icons/Warning";
-import { DataContext, IDataContextValue } from "./data-context";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { DataContext, IDataContextValue } from "./data-context";
 import { Router } from "./router";
+import React = require("react");
 
 const useStyles = makeStyles({
     alignCenter: {
@@ -25,7 +24,7 @@ interface IMainLayoutProps {
 }
 
 export const MainLayout = (props: IMainLayoutProps) => {
-    const { userData, projectConfig } = useContext<IDataContextValue>(DataContext);
+    const { userData } = useContext<IDataContextValue>(DataContext);
 
     const classes = useStyles();
     return (
@@ -42,15 +41,6 @@ export const MainLayout = (props: IMainLayoutProps) => {
                             </Tooltip>
                         </Link>
                     </Box>
-                    {projectConfig?.dryRun && (
-                        <Box mr={4}>
-                            <Tooltip title="Během synchronizace nebudou provedeny žádné změny do WTM ani JIRA">
-                                <Typography variant="h6" color="error">
-                                    <WarningIcon style={{ verticalAlign: "middle" }} /> <span style={{ verticalAlign: "middle" }}>Readonly režim</span>
-                                </Typography>
-                            </Tooltip>
-                        </Box>
-                    )}
                     <Typography variant="h6">
                         {userData?.name}
                         {userData?.isAdmin ? " (admin)" : ""}
