@@ -2,23 +2,25 @@ import { Box, Button, Card, CardContent, Grid, IconButton, LinearProgress, TextF
 import { DataGrid, GridCellEditCommitParams, GridColumns } from "@material-ui/data-grid";
 import AddIcon from "@material-ui/icons/AddCircleRounded";
 import CloseIcon from "@material-ui/icons/Close";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { IProjectSettingsResponse } from "../../common/ajax-interfaces";
-import { IProjectSettings } from "../../common/interfaces";
+import { IArtifactSettingsResponse } from "../../common/ajax-interfaces";
+import { IArtifactSettings, ISystemConfig } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
 import { Router } from "../router";
 import React = require("react");
 
 export const ProjectSettingsPage = () => {
-    const [projectSettings, setProjectSettings] = useState<IProjectSettings[]>(null);
+    const [artifactSettings, setArtifactSettings] = useState<IArtifactSettings[]>(null);
     const [nitsFieldValues, setNitsFieldValues] = useState<{ [id: string]: string }>({});
     const [projects, setProjects] = useState<{ [id: string]: string }>({});
-    projectSettings?.sort(
+    const [systemConfig, setSystemConfig] = useState<ISystemConfig>(null);
+    const [adminUidsAsStr, setAdminUidsAsStr] = useState<string>("");
+    artifactSettings?.sort(
         (p1, p2) => (p1.jiraProjectKey || "").localeCompare(p2.jiraProjectKey || "") || (p1.jiraNitsField || "").localeCompare(p2.jiraNitsField || "")
     );
-    const rows = projectSettings?.map((p, index) => ({ ...p, id: index }));
+    const rows = artifactSettings?.map((p, index) => ({ ...p, id: index }));
 
     const [isLoading, setIsLoading] = useState(false);
     const ajax = useAjax();
@@ -27,38 +29,58 @@ export const ProjectSettingsPage = () => {
     const handleCellEditCommit = React.useCallback(
         ({ id, field, value }: GridCellEditCommitParams) => {
             const updatedRows = rows.map((row) => (row.id === id ? { ...row, [field]: value } : row));
-            setProjectSettings(updatedRows);
+            setArtifactSettings(updatedRows);
         },
-        [projectSettings]
+        [artifactSettings]
     );
 
     const loadData = async () => {
         setIsLoading(true);
-        const res = await ajax.get<IProjectSettingsResponse>("/server/project-settings/get");
+        const res = await ajax.get<IArtifactSettingsResponse>("/server/project-settings/get-artifacts");
+        const res2 = await ajax.get<ISystemConfig>("/server/project-settings/get-config");
         if (res.isOk) {
-            setProjectSettings(res.data.records);
+            setArtifactSettings(res.data.records);
             setNitsFieldValues(res.data.nitsFiledValues);
             setProjects(res.data.projects);
+        }
+        if (res2.isOk) {
+            setSystemConfig(res2.data);
+            setAdminUidsAsStr(res2.data.adminUids.join(", "));
         }
         setIsLoading(false);
     };
 
     const onSave = async () => {
         setIsLoading(true);
-        const res = await ajax.post<boolean>("/server/project-settings/set", projectSettings);
+        const res = await ajax.post<boolean>("/server/project-settings/set-artifacts", artifactSettings);
         setIsLoading(false);
         if (res.isOk) {
             thisApp().toast("Uloženo");
-            // history.push(Router.PageMain);
         } else {
             thisApp().toast("Data nebyla uložena", "error");
         }
     };
 
-    const onAdd = () => setProjectSettings([...projectSettings, { jiraNitsField: "", jiraProjectKey: "", wtmArtifact: "" }]);
+    const onAdd = () => setArtifactSettings([...artifactSettings, { jiraNitsField: "", jiraProjectKey: "", wtmArtifact: "" }]);
     const onDelete = (index: number) => {
         if (confirm("Opravdu smazat tento záznam?")) {
-            setProjectSettings(projectSettings.filter((_v, i) => index != i));
+            setArtifactSettings(artifactSettings.filter((_v, i) => index != i));
+        }
+    };
+
+    const onAdminUids = (e: ChangeEvent<HTMLInputElement>) => setAdminUidsAsStr(e.target.value);
+    const onSyncDaysCount = (e: ChangeEvent<HTMLInputElement>) => setSystemConfig({ ...systemConfig, syncDaysCount: parseInt(e.target.value) });
+
+    const onSystemConfigSubmit = async () => {
+        setIsLoading(true);
+        const systemConfigToSave = { ...systemConfig };
+        systemConfigToSave.adminUids = adminUidsAsStr.trim().split(/\s*,\s*/);
+        const res = await ajax.post<void>("/server/project-settings/set-config", systemConfigToSave);
+        setIsLoading(false);
+        if (res.isOk) {
+            thisApp().toast("Uloženo");
+        } else {
+            thisApp().toast("Data nebyla uložena", "error");
         }
     };
 
@@ -115,10 +137,6 @@ export const ProjectSettingsPage = () => {
         c.sortable = false;
     });
 
-    //TODO: BF: udelat ulzeni
-    const adminUids = "";
-    const syncDaysCount = 7;
-
     return isLoading ? (
         <LinearProgress />
     ) : (
@@ -128,7 +146,9 @@ export const ProjectSettingsPage = () => {
                     <Box mb={3}>
                         <Card>
                             <CardContent>
-                                <Typography variant="h6">Artefakty</Typography>
+                                <Typography variant="h6" paragraph>
+                                    Artefakty
+                                </Typography>
                                 <Typography paragraph>
                                     <DataGrid
                                         columns={columns}
@@ -159,15 +179,32 @@ export const ProjectSettingsPage = () => {
                     <Box mb={3}>
                         <Card>
                             <CardContent>
-                                <Typography variant="h6">Obecná nastavení</Typography>
-                                <form noValidate>
-                                    {/* // onSubmit={onSubmit} */}
+                                <Typography variant="h6" paragraph>
+                                    Obecná nastavení
+                                </Typography>
+                                <form noValidate onSubmit={onSystemConfigSubmit}>
                                     <Grid container spacing={2}>
                                         <Grid item xs={6}>
-                                            <TextField id="adminUids" label="UID administrátorů" helperText="oddělené čárkou" value={adminUids} fullWidth />
+                                            <TextField
+                                                id="adminUids"
+                                                label="UID administrátorů"
+                                                helperText="oddělené čárkou"
+                                                value={adminUidsAsStr}
+                                                fullWidth
+                                                required
+                                                onChange={onAdminUids}
+                                            />
                                         </Grid>
                                         <Grid item xs={6}>
-                                            <TextField id="syncDaysCount" label="Počet dnů k synchronizaci" value={syncDaysCount} fullWidth type="number" />
+                                            <TextField
+                                                id="syncDaysCount"
+                                                label="Počet dnů k synchronizaci"
+                                                value={systemConfig?.syncDaysCount || 1}
+                                                fullWidth
+                                                required
+                                                type="number"
+                                                onChange={onSyncDaysCount}
+                                            />
                                         </Grid>
                                     </Grid>
                                     <Box display="flex">

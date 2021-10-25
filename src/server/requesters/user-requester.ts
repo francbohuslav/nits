@@ -32,7 +32,8 @@ export class UserRequester extends BaseRequester {
     public async getUserPublicData(req: Request): Promise<IUserPublicData> {
         const uid = this.getUid(req);
         const userData = await this.userController.getUserData(uid);
-        return this.userController.convertToPublicData(userData);
+        const admins = await this.userController.getAdmins();
+        return this.userController.convertToPublicData(userData, admins);
     }
 
     public async logoutJira(req: Request): Promise<void> {
@@ -50,8 +51,9 @@ export class UserRequester extends BaseRequester {
 
     public async getAllUsers(): Promise<IAllUsersResponse> {
         const users = await this.userController.getAllUsers();
+        const admins = await this.userController.getAdmins();
         const result = {
-            users: users.map((u) => this.userController.convertToPublicData(u)),
+            users: users.map((u) => this.userController.convertToPublicData(u, admins)),
         };
         return result;
     }

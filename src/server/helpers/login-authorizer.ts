@@ -21,12 +21,13 @@ export class LoginAuthorizer {
         next();
     };
 
-    public adminAuthorize = (req: Request, res: Response, next: () => void) => {
+    public adminAuthorize = async (req: Request, res: Response, next: () => void) => {
         const session: ISession = req.session as any;
         if (process.env.NITS_DEVEL_ACCOUNT) {
             session.uid = process.env.NITS_DEVEL_ACCOUNT;
         }
-        if (!session.uid || !this.userController.isAdmin(session.uid)) {
+        const admins = session.uid ? await this.userController.getAdmins() : [];
+        if (!session.uid || !admins.includes(session.uid)) {
             return res.status(401).json({
                 status: 401,
                 message: "UNAUTHORIZED",

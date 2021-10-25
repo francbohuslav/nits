@@ -17,7 +17,7 @@ export interface IUserData extends IUserDataBase {
     uuAccessCode2: string;
 }
 
-export interface IProjectSettings {
+export interface IArtifactSettings {
     jiraProjectKey: string;
     jiraNitsField: string;
     wtmArtifact: string;
@@ -59,3 +59,8 @@ export interface IProjectConfigPublic {
     serverAddress: string;
 }
 export type IUserState = "disabled" | "readonly" | "active";
+
+export interface ISystemConfig {
+    adminUids: string[];
+    syncDaysCount: number;
+}

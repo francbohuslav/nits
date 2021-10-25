@@ -52,7 +52,7 @@ export const MainPage = () => {
 
     const onJira = () => history.push(Router.PageJiraSettings);
     const onNotify = () => history.push(Router.PageNotification);
-    const onProjectSetting = () => history.push(Router.PageProjectSettings);
+    const onArtifactSettings = () => history.push(Router.PageArtifactSettings);
     const onStats = () => history.push(Router.PageStats);
     const onUsers = () => history.push(Router.PageUsers);
 
@@ -118,13 +118,11 @@ export const MainPage = () => {
                     </Grid>
                 </Grid>
             </Box>
-            {userData?.isAdmin && (
-                <ButtonRow>
-                    <Button className={classes.button} variant="contained" startIcon={<SettingsIcon />} fullWidth onClick={onProjectSetting}>
-                        Nastavení
-                    </Button>
-                </ButtonRow>
-            )}
+            <ButtonRow>
+                <Button className={classes.button} variant="contained" startIcon={<InfoIcon />} fullWidth onClick={() => setInfoOpen(true)}>
+                    Info
+                </Button>
+            </ButtonRow>
             {userData?.isAdmin && (
                 <ButtonRow>
                     <Button className={classes.button} variant="contained" startIcon={<StatsIcon />} fullWidth onClick={onStats}>
@@ -139,11 +137,13 @@ export const MainPage = () => {
                     </Button>
                 </ButtonRow>
             )}
-            <ButtonRow>
-                <Button className={classes.button} variant="contained" startIcon={<InfoIcon />} fullWidth onClick={() => setInfoOpen(true)}>
-                    Info
-                </Button>
-            </ButtonRow>
+            {userData?.isAdmin && (
+                <ButtonRow>
+                    <Button className={classes.button} variant="contained" startIcon={<SettingsIcon />} fullWidth onClick={onArtifactSettings}>
+                        Nastavení
+                    </Button>
+                </ButtonRow>
+            )}
             <ButtonRow>
                 <Button className={classes.button} variant="contained" startIcon={<ExitIcon color="error" />} fullWidth onClick={onLogout}>
                     Odhlášení

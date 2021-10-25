@@ -1,25 +1,33 @@
 import { Request } from "express";
 import { Inject } from "injector";
-import { IProjectSettingsResponse } from "../../common/ajax-interfaces";
-import { IProjectSettings } from "../../common/interfaces";
+import { IArtifactSettingsResponse } from "../../common/ajax-interfaces";
+import { IArtifactSettings, ISystemConfig } from "../../common/interfaces";
 import { ProjectController } from "../controllers/project-controller";
 
 @Inject.Singleton
 export class ProjectRequester {
     constructor(private projectController: ProjectController) {}
 
-    public async getProjectSettings(): Promise<IProjectSettingsResponse> {
-        const records = await this.projectController.getProjectSettings();
+    public async getArtifactSettings(): Promise<IArtifactSettingsResponse> {
+        const records = await this.projectController.getArtifactSettings();
         const nitsFiledValues = await this.projectController.getNitsFieldValues();
         return {
             records,
             projects: await this.projectController.getJiraProjects(),
             nitsFiledValues,
-        } as IProjectSettingsResponse;
+        } as IArtifactSettingsResponse;
     }
 
-    public setProjectSettings(req: Request): Promise<void> {
-        const projectSettings = req.body as IProjectSettings[];
-        return this.projectController.setProjectSettings(projectSettings);
+    public setArtifactSettings(req: Request): Promise<void> {
+        const artifactSettings = req.body as IArtifactSettings[];
+        return this.projectController.setArtifactSettings(artifactSettings);
+    }
+
+    public getSystemConfig(): Promise<ISystemConfig> {
+        return this.projectController.getSystemConfig();
+    }
+
+    public setSystemConfig(req: Request): Promise<void> {
+        return this.projectController.setSystemConfig(req.body as ISystemConfig);
     }
 }

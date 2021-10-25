@@ -118,8 +118,10 @@ const methods: IServerMethod[] = [
     m("get", "/server/user-stats/get", statsRequester.getUserStats.bind(statsRequester), loginAuthorize),
 
     // admin commands
-    m("get", "/server/project-settings/get", projectReqester.getProjectSettings.bind(projectReqester), adminAuthorize),
-    m("post", "/server/project-settings/set", projectReqester.setProjectSettings.bind(projectReqester), adminAuthorize),
+    m("get", "/server/project-settings/get-artifacts", projectReqester.getArtifactSettings.bind(projectReqester), adminAuthorize),
+    m("post", "/server/project-settings/set-artifacts", projectReqester.setArtifactSettings.bind(projectReqester), adminAuthorize),
+    m("get", "/server/project-settings/get-config", projectReqester.getSystemConfig.bind(projectReqester), adminAuthorize),
+    m("post", "/server/project-settings/set-config", projectReqester.setSystemConfig.bind(projectReqester), adminAuthorize),
     m("get", "/server/admin-stats/get", statsRequester.getAdminStats.bind(statsRequester), adminAuthorize),
     m("get", "/server/admin-users/get", userRequester.getAllUsers.bind(userRequester), adminAuthorize),
     m("post", "/server/admin-users/set-user-state", userRequester.setUserState.bind(userRequester), adminAuthorize),

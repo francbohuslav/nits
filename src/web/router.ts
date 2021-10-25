@@ -5,7 +5,7 @@ export class Router<TQueryParams> {
     public static PageLogin = "/page/login/";
     public static PageJiraSettings = "/page/jira-settings/";
     public static PageNotification = "/page/notification/";
-    public static PageProjectSettings = "/page/project-settings/";
+    public static PageArtifactSettings = "/page/project-settings/";
     public static PageStats = "/page/stats/";
     public static PageUsers = "/page/users/";
     public static PageSynchronization = "/server/sync/";

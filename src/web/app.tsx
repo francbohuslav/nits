@@ -35,7 +35,7 @@ const pages = {
     [Router.PageLogin]: "sm",
     [Router.PageJiraSettings]: "sm",
     [Router.PageNotification]: "sm",
-    [Router.PageProjectSettings]: "md",
+    [Router.PageArtifactSettings]: "md",
     [Router.PageStats]: "sm",
     [Router.PageUsers]: "sm",
     [Router.PageMain]: "sm",
@@ -57,7 +57,7 @@ export const App = () => {
                                             {path == Router.PageMain ? <MainPage /> : ""}
                                             {path == Router.PageJiraSettings ? <JiraSettingsPage /> : ""}
                                             {path == Router.PageNotification ? <NotifySettingsPage /> : ""}
-                                            {path == Router.PageProjectSettings ? <ProjectSettingsPage /> : ""}
+                                            {path == Router.PageArtifactSettings ? <ProjectSettingsPage /> : ""}
                                             {path == Router.PageStats ? <StatsPage /> : ""}
                                             {path == Router.PageUsers ? <UsersPage /> : ""}
                                         </MainLayout>

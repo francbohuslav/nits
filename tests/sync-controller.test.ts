@@ -1,4 +1,4 @@
-import { IProjectSettings } from "../src/common/interfaces";
+import { IArtifactSettings } from "../src/common/interfaces";
 import { IInterval, IWtmTsConfigPerIssueKey, SyncController } from "../src/server/controllers/sync-controller";
 import { ISyncReport, TimesheetMapping, TimesheetMappingsPerDay } from "../src/server/models/interfaces";
 import { IIssue, Worklog } from "../src/server/models/jira/interfaces";
@@ -9,7 +9,7 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
     const NITS_FIELD_VALUE_2 = "2";
     const NITS_FIELD_UNKNOWN_VALUE = "3";
     const projectController = {
-        async getProjectSettings(): Promise<IProjectSettings[]> {
+        async getArtifactSettings(): Promise<IArtifactSettings[]> {
             return [
                 {
                     jiraProjectKey: "CET",
@@ -121,11 +121,10 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
     const syncController = new TestingSyncController(
         null,
         null,
+        null,
         projectController,
         {
-            admins: [],
             cryptoSalt: "test",
-            syncDaysCount: 7,
             serverAddress: "",
             email: {
                 password: "",
@@ -185,7 +184,7 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
 });
 
 test("separateTimesheets", async () => {
-    const syncController = new TestingSyncController(null, null, null, null, null);
+    const syncController = new TestingSyncController(null, null, null, null, null, null);
     const result = syncController.separateTimesheets2([
         {
             data: undefined,
@@ -216,7 +215,7 @@ test("separateTimesheets", async () => {
 
 describe("computeNewTimesheets", () => {
     test("split_to_days", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const result = syncController.computeNewTimesheets2(
             {
                 "2021-10-11": [
@@ -295,7 +294,7 @@ describe("getNextFreeTimeSegment", () => {
     let searchFromTime: Date;
 
     beforeEach(() => {
-        syncController = new TestingSyncController(null, null, null, null, null);
+        syncController = new TestingSyncController(null, null, null, null, null, null);
         searchFromTime = new Date("2021-10-12T06:00:00Z");
     });
 
@@ -405,12 +404,12 @@ describe("getNextFreeTimeSegment", () => {
 
 describe("computeNewTimesheetsInDay", () => {
     test("empty", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         expect(syncController.computeNewTimesheetsInDay2([], []).length).toBe(0);
     });
 
     test("no_remaining_timesheets", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const tsmBase = {
             date: "2021-10-12",
             description: "desc",
@@ -462,7 +461,7 @@ describe("computeNewTimesheetsInDay", () => {
     });
 
     test("time_shift_because_of_too_much", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const tsmBase = {
             date: "2021-10-12",
             description: "desc",
@@ -502,7 +501,7 @@ describe("computeNewTimesheetsInDay", () => {
     });
 
     test("no_space_for_timesheets", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const tsmBase = {
             date: "2021-10-12",
             description: "desc",
@@ -524,7 +523,7 @@ describe("computeNewTimesheetsInDay", () => {
     });
 
     test("full_test_with_splitted", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const tsmBase = {
             date: "2021-10-12",
             description: "desc",
@@ -574,14 +573,14 @@ describe("computeNewTimesheetsInDay", () => {
 
 describe("computeNewTimesheetInSegment", () => {
     test("empty", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const newTimesheets: Timesheet[] = [];
         syncController.computeNewTimesheetInSegment2({ from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T06:00:00Z") }, newTimesheets, []);
         expect(newTimesheets.length).toBe(0);
     });
 
     test("timesheet_shorter_then_segment", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const newTimesheets: Timesheet[] = [];
         const timesheetMappings: TimesheetMapping[] = [
             {
@@ -615,7 +614,7 @@ describe("computeNewTimesheetInSegment", () => {
     });
 
     test("timesheet_longer_then_segment", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const newTimesheets: Timesheet[] = [];
         const timesheetMappings: TimesheetMapping[] = [
             {
@@ -640,7 +639,7 @@ describe("computeNewTimesheetInSegment", () => {
     });
 
     test("timesheets_exact_as_segment", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const newTimesheets: Timesheet[] = [];
         const timesheetMappings: TimesheetMapping[] = [
             {

@@ -1,8 +1,6 @@
 export interface IProjectConfig {
     cryptoSalt: string;
     userDataEncrypted: boolean;
-    admins: string[];
-    syncDaysCount: number;
     serverAddress: string;
     /** If true, no changes are made. All is readonly. Default is true */
     jira: {
@@ -27,8 +25,6 @@ export class ProjectConfigurer {
             const projectConfig: IProjectConfig = {
                 cryptoSalt: process.env.NITS_CRYPTO_SALT,
                 userDataEncrypted: true,
-                admins: process.env.NITS_ADMIN_UIDS.trim().split(/\s*,\s*/),
-                syncDaysCount: parseInt(process.env.NITS_SYNC_DAYS_COUNT || "7"),
                 serverAddress: process.env.NITS_SERVER_ADDRESS,
                 jira: {
                     nitsCustomField: process.env.NITS_JIRA_CUSTOM_FIELD,

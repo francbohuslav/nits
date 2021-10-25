@@ -1,4 +1,4 @@
-import { IProjectSettings, IStats, IUserPublicData, IUserState } from "./interfaces";
+import { IArtifactSettings, IStats, IUserPublicData, IUserState } from "./interfaces";
 
 export interface IBaseResponse<T> {
     message?: string;
@@ -16,8 +16,8 @@ export interface ILoginRequest {
     accessCode2: string;
 }
 
-export interface IProjectSettingsResponse {
-    records: IProjectSettings[];
+export interface IArtifactSettingsResponse {
+    records: IArtifactSettings[];
     nitsFiledValues: { [key: string]: string };
     projects: { [key: string]: string };
 }

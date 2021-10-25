@@ -1,5 +1,6 @@
 import { Inject } from "injector";
 import { IUserData, IUserPublicData } from "../../common/interfaces";
+import { SystemDataModel } from "../models/system-data-model";
 import { UserDataModel } from "../models/user-data-model";
 import { IUserIdentity, UuUserModel } from "../models/uu-user-model";
 import { IProjectConfig } from "../project-config";
@@ -8,7 +9,12 @@ import { IProjectConfig } from "../project-config";
 export class UserController {
     private authenticatedUsers: IUserIdentity[] = [];
 
-    constructor(private uuUserModel: UuUserModel, private userDataModel: UserDataModel, @Inject.Value("projectConfig") private projectConfig: IProjectConfig) {}
+    constructor(
+        private uuUserModel: UuUserModel,
+        private userDataModel: UserDataModel,
+        private systemDataModel: SystemDataModel,
+        @Inject.Value("projectConfig") private projectConfig: IProjectConfig
+    ) {}
 
     /**
      * @returns UID
@@ -48,15 +54,16 @@ export class UserController {
         await this.userDataModel.setUserData(uid, userData);
     }
 
-    public isAdmin(uid: string): boolean {
-        return this.projectConfig.admins.includes(uid);
+    public async getAdmins(): Promise<string[]> {
+        const systemConfig = await this.systemDataModel.getSystemConfig();
+        return systemConfig.adminUids;
     }
 
     public getAllUsers(): Promise<IUserData[]> {
         return this.userDataModel.getAllValidUserData();
     }
 
-    public convertToPublicData(userData: IUserData): IUserPublicData {
+    public convertToPublicData(userData: IUserData, admins: string[]): IUserPublicData {
         return {
             jiraAccountId: userData.jiraAccountId,
             jiraName: userData.jiraName,
@@ -64,7 +71,7 @@ export class UserController {
             uid: userData.uid,
             notificationEmail: userData.notificationEmail,
             lastSynchronization: userData.lastSynchronization,
-            isAdmin: this.isAdmin(userData.uid),
+            isAdmin: admins.includes(userData.uid),
             state: userData.state,
         };
     }

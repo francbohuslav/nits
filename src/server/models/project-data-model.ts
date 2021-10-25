@@ -1,7 +1,7 @@
 import fs from "fs";
 import { Inject } from "injector";
 import { join } from "path";
-import { IProjectSettings } from "../../common/interfaces";
+import { IArtifactSettings } from "../../common/interfaces";
 const fsp = fs.promises;
 
 @Inject.Singleton
@@ -12,7 +12,7 @@ export class ProjectDataModel {
         });
     }
 
-    public async getProjectSettings(): Promise<IProjectSettings[]> {
+    public async getArtifactSettings(): Promise<IArtifactSettings[]> {
         const filePath = this.getFilePath();
         try {
             await fsp.stat(filePath);
@@ -27,9 +27,9 @@ export class ProjectDataModel {
         return JSON.parse(content);
     }
 
-    public async setProjectSettings(projectSettings: IProjectSettings[]): Promise<void> {
+    public async setArtifactSettings(artifactSettings: IArtifactSettings[]): Promise<void> {
         const filePath = this.getFilePath();
-        const content = JSON.stringify(projectSettings, null, 2);
+        const content = JSON.stringify(artifactSettings, null, 2);
         await fsp.writeFile(filePath, content, {
             encoding: "utf8",
         });
