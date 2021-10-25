@@ -108,6 +108,7 @@ export const StatsPage = () => {
                     Object.keys(params.row.artifacts).length ? (
                         <Tooltip title="Zobrazit artefakty">
                             <div className={classes.level1}>
+                                {params.row.last ? "└" : "├"}&nbsp;&nbsp;&nbsp;
                                 <Link
                                     href="#"
                                     onClick={(e: any) => {
@@ -124,10 +125,14 @@ export const StatsPage = () => {
                             </div>
                         </Tooltip>
                     ) : (
-                        <div className={classes.level1}>{dateUtils.formatDate(params.value as string)}</div>
+                        <div className={classes.level1}>
+                            {params.row.last ? "└" : "├"}&nbsp;&nbsp;&nbsp;{dateUtils.formatDate(params.value as string)}
+                        </div>
                     )
                 ) : (
-                    <div className={classes.level2}>{params.value}</div>
+                    <div className={classes.level2}>
+                        {params.row.last ? "└" : "├"}&nbsp;&nbsp;&nbsp;{params.value}
+                    </div>
                 ),
         },
         {
