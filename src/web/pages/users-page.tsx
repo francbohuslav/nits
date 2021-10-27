@@ -1,6 +1,7 @@
 import { Box, Button, IconButton, LinearProgress, Tooltip } from "@material-ui/core";
 import { DataGrid, GridColumns, GridRowData } from "@material-ui/data-grid";
 import CircleIcon from "@material-ui/icons/FiberManualRecord";
+import MuiAlert from "@material-ui/lab/Alert";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { IAllUsersResponse, IUserSetStateRequest } from "../../common/ajax-interfaces";
@@ -60,7 +61,7 @@ export const UsersPage = () => {
             field: "lastSynchronization",
             headerName: `Poslední synchronizace`,
             flex: 1,
-            renderCell: (p) => dateUtils.formatDateTime(p.value as string),
+            renderCell: (p) => (p.value ? dateUtils.formatDateTime(p.value as string) : "ani jednou"),
         },
         {
             field: "state",
@@ -93,8 +94,12 @@ export const UsersPage = () => {
                     </>
                 )}
             </Box>
-            {users && users.length && (
+            {users && users.length > 0 ? (
                 <DataGrid getRowId={idGetter} columns={columns} rows={users} density="compact" autoHeight disableColumnMenu hideFooterPagination hideFooter />
+            ) : (
+                <MuiAlert variant="filled" severity="warning">
+                    Nikdo nemá aktivní účet
+                </MuiAlert>
             )}
 
             <Box display="flex" mt={2}>
