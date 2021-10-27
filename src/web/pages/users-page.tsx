@@ -8,6 +8,7 @@ import { IAllUsersResponse, IUserSetStateRequest } from "../../common/ajax-inter
 import dateUtils from "../../common/date-utils";
 import { IStats, IUserPublicData, IUserState } from "../../common/interfaces";
 import { useAjax } from "../ajax";
+import { Header } from "../components/header";
 import { Router } from "../router";
 import React = require("react");
 
@@ -86,7 +87,7 @@ export const UsersPage = () => {
 
     users.sort((a, b) => a.name.localeCompare(b.name));
     return (
-        <>
+        <Header header="Uživatelé">
             <Box height={3}>
                 {isLoading && (
                     <>
@@ -114,6 +115,6 @@ export const UsersPage = () => {
                     </Button>
                 </Box>
             </Box>
-        </>
+        </Header>
     );
 };

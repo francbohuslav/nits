@@ -41,6 +41,11 @@ const useStyles = makeStyles({
         overflow: "hidden",
         cursor: "pointer",
     },
+    logo: {
+        // margin: "2em 0",
+        maxWidth: "100%",
+        height: "140px",
+    },
 });
 
 export const MainPage = () => {
@@ -67,7 +72,7 @@ export const MainPage = () => {
                 Vítejte v aplikaci Network Inventory Time Sheets (NITS)
             </Typography>
             <Typography variant="body1" align="center" paragraph>
-                <img src="/images/logo.png" height="200" />
+                <img src="/images/logo.png" className={classes.logo} />
             </Typography>
             <MainPageStats />
             <Box mt={4} mb={1}>

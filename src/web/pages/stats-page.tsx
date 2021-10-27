@@ -7,6 +7,7 @@ import arrayUtils from "../../common/array-utils";
 import dateUtils from "../../common/date-utils";
 import { IStats, IStatsArt, IStatsDay } from "../../common/interfaces";
 import { useAjax } from "../ajax";
+import { Header } from "../components/header";
 import { StatsStatus } from "../components/stats-status";
 import { Router } from "../router";
 import React = require("react");
@@ -196,7 +197,7 @@ export const StatsPage = () => {
     const userSyncWarning = stats.some((r) => r.jiraHours != r.wtmHours);
     const selectedMonthTabIndex = dateUtils.areEquals(selectedMonth, actualMonth) ? 0 : dateUtils.areEquals(selectedMonth, previousMonth) ? 1 : 2;
     return (
-        <>
+        <Header header="Statistiky">
             {isLoading ? (
                 <>
                     <Typography paragraph>Dat bývá hodně, zabere to necelou minutku.</Typography>
@@ -243,6 +244,6 @@ export const StatsPage = () => {
                     </Button>
                 </Box>
             </Box>
-        </>
+        </Header>
     );
 };

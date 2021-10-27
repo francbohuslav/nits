@@ -1,11 +1,12 @@
-import { Box, Button, LinearProgress, TextField, Typography } from "@material-ui/core";
+import { Box, Button, LinearProgress, TextField } from "@material-ui/core";
 import { useEffect, useState } from "react";
-import React = require("react");
-import { useAjax } from "../ajax";
 import { useHistory } from "react-router";
-import { Router } from "../router";
-import { thisApp } from "../app-provider";
 import { IUserPublicData } from "../../common/interfaces";
+import { useAjax } from "../ajax";
+import { thisApp } from "../app-provider";
+import { Header } from "../components/header";
+import { Router } from "../router";
+import React = require("react");
 
 export const NotifySettingsPage = () => {
     const [email, setEmail] = useState<string>(null);
@@ -56,49 +57,44 @@ export const NotifySettingsPage = () => {
     }, []);
 
     return (
-        <>
+        <Header header="Nastavení notifikace">
             {isLoading ? (
                 <LinearProgress></LinearProgress>
             ) : (
-                <div>
-                    <Typography component="h1" variant="h5" paragraph>
-                        Nastavení notifikace
-                    </Typography>
-                    <form noValidate onSubmit={onSubmit}>
-                        <TextField
-                            id="notificationEmail"
-                            label="E-mail"
-                            value={email}
-                            type="email"
-                            fullWidth
-                            margin="dense"
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
+                <form noValidate onSubmit={onSubmit}>
+                    <TextField
+                        id="notificationEmail"
+                        label="E-mail"
+                        value={email}
+                        type="email"
+                        fullWidth
+                        margin="dense"
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
 
-                        <Box display="flex">
-                            <Box flexGrow={1}>
-                                {isTesting ? (
-                                    <Box pt={2} width={210}>
-                                        <LinearProgress />
-                                    </Box>
-                                ) : (
-                                    <Button variant="contained" color="secondary" onClick={onTest}>
-                                        Poslat testovací zprávu
-                                    </Button>
-                                )}
-                            </Box>
-                            <Box>
-                                <Button variant="contained" color="primary" type="submit">
-                                    Uložit
-                                </Button>{" "}
-                                <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
-                                    Zpět
+                    <Box display="flex">
+                        <Box flexGrow={1}>
+                            {isTesting ? (
+                                <Box pt={2} width={210}>
+                                    <LinearProgress />
+                                </Box>
+                            ) : (
+                                <Button variant="contained" color="secondary" onClick={onTest}>
+                                    Poslat testovací zprávu
                                 </Button>
-                            </Box>
+                            )}
                         </Box>
-                    </form>
-                </div>
+                        <Box>
+                            <Button variant="contained" color="primary" type="submit">
+                                Uložit
+                            </Button>{" "}
+                            <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
+                                Zpět
+                            </Button>
+                        </Box>
+                    </Box>
+                </form>
             )}
-        </>
+        </Header>
     );
 };

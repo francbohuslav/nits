@@ -1,12 +1,13 @@
 import { Button, LinearProgress, Typography } from "@material-ui/core";
 import { useContext, useEffect, useState } from "react";
-import React = require("react");
 import { useHistory } from "react-router-dom";
 import { IUserPublicData } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
+import { Header } from "../components/header";
 import { DataContext, IDataContextValue } from "../data-context";
 import { Router } from "../router";
+import React = require("react");
 // import process from "process";
 
 export const JiraSettingsPage = () => {
@@ -56,41 +57,45 @@ export const JiraSettingsPage = () => {
           )}&response_type=code&prompt=consent`
         : "#";
 
-    return isLoading ? (
-        <LinearProgress />
-    ) : (
-        <>
-            {userData?.jiraAccountId ? (
-                <>
-                    <Typography variant="body1" align="center" paragraph>
-                        Přihlášen jako {userData.jiraName}
-                    </Typography>
-                    <Typography variant="body1" align="center">
-                        <Button variant="contained" color="secondary" onClick={onLogout}>
-                            Zrušit propojení s JIRA
-                        </Button>{" "}
-                        <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
-                            Zpět
-                        </Button>
-                    </Typography>
-                </>
+    return (
+        <Header header="JIRA propojení">
+            {isLoading ? (
+                <LinearProgress />
             ) : (
                 <>
-                    <Typography variant="body1" align="center" paragraph>
-                        Nepřihlášen
-                    </Typography>
-                    <Typography variant="body1" align="center">
-                        {sessionHash && (
-                            <Button variant="contained" color="primary" rel="noreferrer" href={url}>
-                                Přihlásit se do JIRA
-                            </Button>
-                        )}{" "}
-                        <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
-                            Zpět
-                        </Button>
-                    </Typography>
+                    {userData?.jiraAccountId ? (
+                        <>
+                            <Typography variant="body1" align="center" paragraph>
+                                Přihlášen jako {userData.jiraName}
+                            </Typography>
+                            <Typography variant="body1" align="center">
+                                <Button variant="contained" color="secondary" onClick={onLogout}>
+                                    Zrušit propojení s JIRA
+                                </Button>{" "}
+                                <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
+                                    Zpět
+                                </Button>
+                            </Typography>
+                        </>
+                    ) : (
+                        <>
+                            <Typography variant="body1" align="center" paragraph>
+                                Nepřihlášen
+                            </Typography>
+                            <Typography variant="body1" align="center">
+                                {sessionHash && (
+                                    <Button variant="contained" color="primary" rel="noreferrer" href={url}>
+                                        Přihlásit se do JIRA
+                                    </Button>
+                                )}{" "}
+                                <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
+                                    Zpět
+                                </Button>
+                            </Typography>
+                        </>
+                    )}
                 </>
             )}
-        </>
+        </Header>
     );
 };

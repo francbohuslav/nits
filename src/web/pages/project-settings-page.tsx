@@ -8,6 +8,7 @@ import { IArtifactSettingsResponse } from "../../common/ajax-interfaces";
 import { IArtifactSettings, ISystemConfig } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
+import { Header } from "../components/header";
 import { Router } from "../router";
 import React = require("react");
 
@@ -137,98 +138,102 @@ export const ProjectSettingsPage = () => {
         c.sortable = false;
     });
 
-    return isLoading ? (
-        <LinearProgress />
-    ) : (
-        <>
-            {rows && (
+    return (
+        <Header header="Nastavení">
+            {isLoading ? (
+                <LinearProgress />
+            ) : (
                 <>
-                    <Box mb={3}>
-                        <Card>
-                            <CardContent>
-                                <Typography variant="h6" paragraph>
-                                    Artefakty
-                                </Typography>
-                                <Typography paragraph>
-                                    <DataGrid
-                                        columns={columns}
-                                        rows={rows}
-                                        density="compact"
-                                        autoHeight
-                                        disableColumnMenu
-                                        hideFooterPagination
-                                        hideFooter
-                                        onCellEditCommit={handleCellEditCommit}
-                                    />
-                                </Typography>
-                                <Box display="flex">
-                                    <Box flexGrow={1}>
-                                        <Button variant="contained" color="secondary" href={Router.PageSynchronization} target="_blank">
-                                            Spustit synchronizaci
-                                        </Button>
-                                    </Box>
-                                    <Box>
-                                        <Button variant="contained" color="primary" onClick={onSave}>
-                                            Uložit
-                                        </Button>
-                                    </Box>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    </Box>
-                    <Box mb={3}>
-                        <Card>
-                            <CardContent>
-                                <Typography variant="h6" paragraph>
-                                    Obecná nastavení
-                                </Typography>
-                                <form noValidate onSubmit={onSystemConfigSubmit}>
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={6}>
-                                            <TextField
-                                                id="adminUids"
-                                                label="UID administrátorů"
-                                                helperText="oddělené čárkou"
-                                                value={adminUidsAsStr}
-                                                fullWidth
-                                                required
-                                                onChange={onAdminUids}
+                    {rows && (
+                        <>
+                            <Box mb={3}>
+                                <Card>
+                                    <CardContent>
+                                        <Typography variant="h6" paragraph>
+                                            Artefakty
+                                        </Typography>
+                                        <Typography paragraph>
+                                            <DataGrid
+                                                columns={columns}
+                                                rows={rows}
+                                                density="compact"
+                                                autoHeight
+                                                disableColumnMenu
+                                                hideFooterPagination
+                                                hideFooter
+                                                onCellEditCommit={handleCellEditCommit}
                                             />
-                                        </Grid>
-                                        <Grid item xs={6}>
-                                            <TextField
-                                                id="syncDaysCount"
-                                                label="Počet dnů k synchronizaci"
-                                                value={systemConfig?.syncDaysCount || 1}
-                                                fullWidth
-                                                required
-                                                type="number"
-                                                onChange={onSyncDaysCount}
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                    <Box display="flex">
-                                        <Box flexGrow={1}></Box>
-                                        <Box>
-                                            <Button variant="contained" color="primary" type="submit">
-                                                Uložit
-                                            </Button>
+                                        </Typography>
+                                        <Box display="flex">
+                                            <Box flexGrow={1}>
+                                                <Button variant="contained" color="secondary" href={Router.PageSynchronization} target="_blank">
+                                                    Spustit synchronizaci
+                                                </Button>
+                                            </Box>
+                                            <Box>
+                                                <Button variant="contained" color="primary" onClick={onSave}>
+                                                    Uložit
+                                                </Button>
+                                            </Box>
                                         </Box>
-                                    </Box>
-                                </form>
-                            </CardContent>
-                        </Card>
-                    </Box>
-                    <Box display="flex">
-                        <Box flexGrow={1}></Box>
-                        <Box>
-                            <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
-                                Zpět
-                            </Button>
-                        </Box>
-                    </Box>
+                                    </CardContent>
+                                </Card>
+                            </Box>
+                            <Box mb={3}>
+                                <Card>
+                                    <CardContent>
+                                        <Typography variant="h6" paragraph>
+                                            Obecná nastavení
+                                        </Typography>
+                                        <form noValidate onSubmit={onSystemConfigSubmit}>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={12} sm={6}>
+                                                    <TextField
+                                                        id="adminUids"
+                                                        label="UID administrátorů"
+                                                        helperText="oddělené čárkou"
+                                                        value={adminUidsAsStr}
+                                                        fullWidth
+                                                        required
+                                                        onChange={onAdminUids}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                    <TextField
+                                                        id="syncDaysCount"
+                                                        label="Počet dnů k synchronizaci"
+                                                        value={systemConfig?.syncDaysCount || 1}
+                                                        fullWidth
+                                                        required
+                                                        type="number"
+                                                        onChange={onSyncDaysCount}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                            <Box display="flex" mt={1}>
+                                                <Box flexGrow={1}></Box>
+                                                <Box>
+                                                    <Button variant="contained" color="primary" type="submit">
+                                                        Uložit
+                                                    </Button>
+                                                </Box>
+                                            </Box>
+                                        </form>
+                                    </CardContent>
+                                </Card>
+                            </Box>
+                            <Box display="flex">
+                                <Box flexGrow={1}></Box>
+                                <Box>
+                                    <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
+                                        Zpět
+                                    </Button>
+                                </Box>
+                            </Box>
+                        </>
+                    )}
                 </>
             )}
-        </>
+        </Header>
     );
 };

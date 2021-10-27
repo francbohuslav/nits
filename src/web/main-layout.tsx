@@ -7,10 +7,10 @@ import { Router } from "./router";
 import React = require("react");
 
 const useStyles = makeStyles({
-    alignCenter: {
+    leftPart: {
         display: "flex",
         alignItems: "center",
-        marginRight: "2em",
+        minWidth: "100px",
     },
     mainPageLink: {
         color: "white",
@@ -34,14 +34,14 @@ export const MainLayout = (props: IMainLayoutProps) => {
                     <Box flexGrow={1}>
                         <Link to={Router.PageMain} className={classes.mainPageLink}>
                             <Tooltip title="Přejít na domovskou stránku" placement="bottom-start">
-                                <Typography variant="h5" className={classes.alignCenter}>
+                                <Typography variant="h5" className={classes.leftPart}>
                                     <TimerIcon fontSize="large" />
-                                    &nbsp; NITS
+                                    <div>&nbsp; NITS</div>
                                 </Typography>
                             </Tooltip>
                         </Link>
                     </Box>
-                    <Typography variant="h6">
+                    <Typography variant="h6" align="right">
                         {userData?.name}
                         {userData?.isAdmin ? " (admin)" : ""}
                     </Typography>
