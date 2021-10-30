@@ -79,8 +79,8 @@ export const UsersPage = () => {
     const handleCellEditCommit = React.useCallback(
         ({ id, field, value }: GridCellEditCommitParams) => {
             const user = users.find((u) => u.uid == id);
-            user[field] = value;
             if (field == "jiraAccountId") {
+                user.jiraAccountId = value as string;
                 const option = jiraAccountSelectOptions.find((ja) => ja.value == value);
                 if (option) {
                     user.jiraName = option.label;
