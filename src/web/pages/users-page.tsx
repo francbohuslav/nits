@@ -1,13 +1,14 @@
-import { Box, Button, IconButton, LinearProgress, Tooltip } from "@material-ui/core";
-import { DataGrid, GridColumns, GridRowData } from "@material-ui/data-grid";
+import { Box, Button, IconButton, LinearProgress, Tooltip, Typography } from "@material-ui/core";
+import { DataGrid, GridCellEditCommitParams, GridColumns, GridRowData } from "@material-ui/data-grid";
 import CircleIcon from "@material-ui/icons/FiberManualRecord";
 import MuiAlert from "@material-ui/lab/Alert";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { IAllUsersResponse, IUserSetStateRequest } from "../../common/ajax-interfaces";
+import { IAllUsersResponse, IUserSetJiraAccountRequest, IUserSetStateRequest } from "../../common/ajax-interfaces";
 import dateUtils from "../../common/date-utils";
-import { IStats, IUserPublicData, IUserState } from "../../common/interfaces";
+import { IJiraAccount, IStats, IUserPublicData, IUserState } from "../../common/interfaces";
 import { useAjax } from "../ajax";
+import { thisApp } from "../app-provider";
 import { Header } from "../components/header";
 import { Router } from "../router";
 import React = require("react");
@@ -15,6 +16,7 @@ import React = require("react");
 export const UsersPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [users, setUsers] = useState<IUserPublicData[]>([]);
+    const [jiraAccounts, setJiraAccounts] = useState<IJiraAccount[]>([]);
     const ajax = useAjax();
     const history = useHistory();
 
@@ -23,6 +25,7 @@ export const UsersPage = () => {
         const res = await ajax.get<IAllUsersResponse>("/server/admin-users/get");
         if (res.isOk) {
             setUsers(res.data.users);
+            setJiraAccounts(res.data.jiraAccounts || []);
         }
         setIsLoading(false);
     };
@@ -44,6 +47,50 @@ export const UsersPage = () => {
         }
         setIsLoading(false);
     };
+    const saveJiraAccount = async (user: IUserPublicData) => {
+        setIsLoading(true);
+        const res = await ajax.post<void>("/server/admin-users/set-jira-account", {
+            uid: user.uid,
+            jiraName: user.jiraName,
+            jiraAccountId: user.jiraAccountId,
+        } as IUserSetJiraAccountRequest);
+        if (!res.isOk) {
+            thisApp().alert("Nepodařilo se uložit nastavení JIRA účtu");
+        }
+        setIsLoading(false);
+    };
+
+    const jiraAccountSelectOptions = jiraAccounts.map((ja) => ({
+        label: ja.name,
+        value: ja.id,
+    }));
+    users
+        .filter((u) => u.jiraAccountId)
+        .forEach((u) => {
+            if (!jiraAccountSelectOptions.some((ja) => ja.value == u.jiraAccountId)) {
+                jiraAccountSelectOptions.push({
+                    label: u.jiraName,
+                    value: u.jiraAccountId,
+                });
+            }
+        });
+    jiraAccountSelectOptions.sort((a, b) => a.label.localeCompare(b.label));
+
+    const handleCellEditCommit = React.useCallback(
+        ({ id, field, value }: GridCellEditCommitParams) => {
+            const user = users.find((u) => u.uid == id);
+            user[field] = value;
+            if (field == "jiraAccountId") {
+                const option = jiraAccountSelectOptions.find((ja) => ja.value == value);
+                if (option) {
+                    user.jiraName = option.label;
+                }
+            }
+            setUsers([...users]);
+            saveJiraAccount(user);
+        },
+        [jiraAccountSelectOptions]
+    );
 
     const stateToColor = (state: IUserState): string => (state == "active" ? "green" : state == "readonly" ? "orange" : "red");
     const stateToTitle = (state: IUserState): string =>
@@ -63,6 +110,23 @@ export const UsersPage = () => {
             headerName: `Poslední synchronizace`,
             flex: 1,
             renderCell: (p) => (p.value ? dateUtils.formatDateTime(p.value as string) : "ani jednou"),
+        },
+        {
+            field: "jiraAccountId",
+            headerName: `JIRA účet`,
+            flex: 1,
+            renderCell: (p) => {
+                if (p.value) return (p.row as IUserPublicData).jiraName;
+
+                return (
+                    <Tooltip title="Dvojklikem změň">
+                        <Typography color="secondary">nespárován</Typography>
+                    </Tooltip>
+                );
+            },
+            editable: true,
+            type: "singleSelect",
+            valueOptions: jiraAccountSelectOptions,
         },
         {
             field: "state",
@@ -96,11 +160,23 @@ export const UsersPage = () => {
                 )}
             </Box>
             {users && users.length > 0 ? (
-                <DataGrid getRowId={idGetter} columns={columns} rows={users} density="compact" autoHeight disableColumnMenu hideFooterPagination hideFooter />
+                <DataGrid
+                    getRowId={idGetter}
+                    columns={columns}
+                    rows={users}
+                    density="compact"
+                    onCellEditCommit={handleCellEditCommit}
+                    autoHeight
+                    disableColumnMenu
+                    hideFooterPagination
+                    hideFooter
+                />
             ) : (
-                <MuiAlert variant="filled" severity="warning">
-                    Nikdo nemá aktivní účet
-                </MuiAlert>
+                !isLoading && (
+                    <MuiAlert variant="filled" severity="warning">
+                        Nikdo nemá aktivní účet
+                    </MuiAlert>
+                )
             )}
 
             <Box display="flex" mt={2}>

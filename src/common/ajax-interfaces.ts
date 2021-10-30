@@ -1,4 +1,4 @@
-import { IArtifactSettings, IStats, IUserPublicData, IUserState } from "./interfaces";
+import { IArtifactSettings, IJiraAccount, IStats, IUserPublicData, IUserState } from "./interfaces";
 
 export interface IBaseResponse<T> {
     message?: string;
@@ -35,8 +35,14 @@ export interface IJiraProcessRequest {
 
 export interface IAllUsersResponse {
     users: IUserPublicData[];
+    jiraAccounts: IJiraAccount[];
 }
 export interface IUserSetStateRequest {
     uid: string;
     state: IUserState;
+}
+export interface IUserSetJiraAccountRequest {
+    uid: string;
+    jiraName: string;
+    jiraAccountId: string;
 }

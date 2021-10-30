@@ -24,8 +24,8 @@ export class UserDataModel {
             name: "",
             uuAccessCode1: "",
             uuAccessCode2: "",
-            jiraAccountId: "",
-            jiraName: "",
+            jiraAccountId: null,
+            jiraName: null,
             notificationEmail: "",
             lastSynchronization: "",
             state: "disabled",
@@ -56,18 +56,20 @@ export class UserDataModel {
         });
     }
 
-    public async getAllValidUserData(): Promise<IUserData[]> {
+    public async getAllUserData(): Promise<IUserData[]> {
         const fileList = await fsp.readdir(this.storageDir);
         const userUidList = fileList.filter((f) => f.match(/^[\d-]+\.data$/)).map((f) => f.match(/^([\d-]+)\.data$/)[1]);
         const userDataList: IUserData[] = [];
         for (const uid of userUidList) {
             const userData = await this.getUserData(uid);
             this.normalizeUserData(userData);
-            if (userData.jiraAccountId) {
-                userDataList.push(userData);
-            }
+            userDataList.push(userData);
         }
         return userDataList;
+    }
+
+    public async getAllValidUserData(): Promise<IUserData[]> {
+        return (await this.getAllUserData()).filter((u) => u.jiraAccountId);
     }
 
     private getUserFilePath(uid: string): string {
@@ -76,5 +78,6 @@ export class UserDataModel {
 
     private normalizeUserData(userData: IUserData) {
         userData.state = userData.state || "disabled";
+        userData.jiraName = userData.jiraAccountId ? userData.jiraName : null;
     }
 }

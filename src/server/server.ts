@@ -125,6 +125,7 @@ const methods: IServerMethod[] = [
     m("get", "/server/admin-stats/get", statsRequester.getAdminStats.bind(statsRequester), adminAuthorize),
     m("get", "/server/admin-users/get", userRequester.getAllUsers.bind(userRequester), adminAuthorize),
     m("post", "/server/admin-users/set-user-state", userRequester.setUserState.bind(userRequester), adminAuthorize),
+    m("post", "/server/admin-users/set-jira-account", userRequester.setJiraAccount.bind(userRequester), adminAuthorize),
 ];
 
 const processRequest = (method: IServerAction, options: IServerMethodOptions) => async (req: express.Request, res: express.Response) => {

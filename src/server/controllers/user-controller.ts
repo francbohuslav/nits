@@ -60,7 +60,7 @@ export class UserController {
     }
 
     public getAllUsers(): Promise<IUserData[]> {
-        return this.userDataModel.getAllValidUserData();
+        return this.userDataModel.getAllUserData();
     }
 
     public convertToPublicData(userData: IUserData, admins: string[]): IUserPublicData {

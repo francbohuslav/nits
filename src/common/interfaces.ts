@@ -64,3 +64,7 @@ export interface ISystemConfig {
     adminUids: string[];
     syncDaysCount: number;
 }
+export interface IJiraAccount {
+    name: string;
+    id: string;
+}

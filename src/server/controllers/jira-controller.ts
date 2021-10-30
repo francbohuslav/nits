@@ -2,14 +2,21 @@ import axios from "axios";
 import { Inject } from "injector";
 import { IJiraProcessRequest } from "../../common/ajax-interfaces";
 import dateUtils from "../../common/date-utils";
+import { IJiraAccount } from "../../common/interfaces";
 import { JiraApi } from "../apis/jira-api";
 import { Crypt } from "../helpers/crypt";
+import { JiraModel } from "../models/jira/jira-model";
 import { UserDataModel } from "../models/user-data-model";
 import { IProjectConfig } from "../project-config";
 
 @Inject.Singleton
 export class JiraController {
-    constructor(private userDataModel: UserDataModel, private crypt: Crypt, @Inject.Value("projectConfig") private projectConfig: IProjectConfig) {}
+    constructor(
+        private userDataModel: UserDataModel,
+        private jiraModel: JiraModel,
+        private crypt: Crypt,
+        @Inject.Value("projectConfig") private projectConfig: IProjectConfig
+    ) {}
 
     public async processOAth(request: IJiraProcessRequest) {
         if (request.error) {
@@ -49,5 +56,19 @@ export class JiraController {
         userData.jiraName = account.displayName;
 
         await this.userDataModel.setUserData(uid, userData);
+    }
+
+    public async getJiraAccountsUsedLastTime(): Promise<IJiraAccount[]> {
+        const worklogs = await this.jiraModel.getLastWorklogs(dateUtils.substractDay(new Date(), 10), dateUtils.increaseDay(new Date()));
+        const accounts: { [id: string]: IJiraAccount } = {};
+        worklogs.forEach((w) => {
+            if (!accounts[w.author.accountId]) {
+                accounts[w.author.accountId] = {
+                    id: w.author.accountId,
+                    name: w.author.displayName,
+                };
+            }
+        });
+        return Object.values(accounts);
     }
 }

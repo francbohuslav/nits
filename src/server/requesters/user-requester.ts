@@ -1,16 +1,17 @@
 import { Request } from "express";
 import { Inject } from "injector";
-import { IAllUsersResponse, ILoginRequest, IUserSetStateRequest } from "../../common/ajax-interfaces";
+import { IAllUsersResponse, ILoginRequest, IUserSetJiraAccountRequest, IUserSetStateRequest } from "../../common/ajax-interfaces";
 import { assert } from "../../common/core";
 import dateUtils from "../../common/date-utils";
 import { IUserPublicData } from "../../common/interfaces";
+import { JiraController } from "../controllers/jira-controller";
 import { UserController } from "../controllers/user-controller";
 import { Crypt } from "../helpers/crypt";
 import { BaseRequester } from "./base-requester";
 
 @Inject.Singleton
 export class UserRequester extends BaseRequester {
-    constructor(private userController: UserController, private crypt: Crypt) {
+    constructor(private userController: UserController, private jiraController: JiraController, private crypt: Crypt) {
         super();
     }
 
@@ -40,6 +41,7 @@ export class UserRequester extends BaseRequester {
         const uid = this.getUid(req);
         const userData = await this.userController.getUserData(uid);
         userData.jiraAccountId = null;
+        userData.jiraName = "";
         await this.userController.setUserData(uid, userData);
     }
 
@@ -52,8 +54,9 @@ export class UserRequester extends BaseRequester {
     public async getAllUsers(): Promise<IAllUsersResponse> {
         const users = await this.userController.getAllUsers();
         const admins = await this.userController.getAdmins();
-        const result = {
+        const result: IAllUsersResponse = {
             users: users.map((u) => this.userController.convertToPublicData(u, admins)),
+            jiraAccounts: await this.jiraController.getJiraAccountsUsedLastTime(),
         };
         return result;
     }
@@ -66,5 +69,16 @@ export class UserRequester extends BaseRequester {
         userData.state = request.state;
         await this.userController.setUserData(request.uid, userData);
         return await this.getAllUsers();
+    }
+
+    public async setJiraAccount(req: Request): Promise<boolean> {
+        const request: IUserSetJiraAccountRequest = req.body;
+        assert(request.uid);
+        assert(request.jiraAccountId);
+        const userData = await this.userController.getUserData(request.uid);
+        userData.jiraAccountId = request.jiraAccountId;
+        userData.jiraName = request.jiraName;
+        await this.userController.setUserData(request.uid, userData);
+        return true;
     }
 }
