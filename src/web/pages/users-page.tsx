@@ -149,7 +149,8 @@ export const UsersPage = () => {
         c.sortable = false;
     });
 
-    users.sort((a, b) => a.name.localeCompare(b.name));
+    const sortedUsers = [...users];
+    sortedUsers.sort((a, b) => a.name.localeCompare(b.name));
     return (
         <Header header="Uživatelé">
             <Box height={3}>
@@ -159,11 +160,11 @@ export const UsersPage = () => {
                     </>
                 )}
             </Box>
-            {users && users.length > 0 ? (
+            {sortedUsers && sortedUsers.length > 0 ? (
                 <DataGrid
                     getRowId={idGetter}
                     columns={columns}
-                    rows={users}
+                    rows={sortedUsers}
                     density="compact"
                     onCellEditCommit={handleCellEditCommit}
                     autoHeight
