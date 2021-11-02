@@ -16,7 +16,7 @@ export class JiraApi {
         const worklogIdList = new Set<number>();
         let isLastPage = false;
         while (!isLastPage) {
-            console.log("JIRA updatedWorklogs ...");
+            console.log(`JIRA updatedWorklogs since ${sinceTs} ...`);
             const response = await this.client.updatedWorklogs(sinceTs, undefined);
             response.values.forEach((value: any) => {
                 worklogIdList.add(value.worklogId);

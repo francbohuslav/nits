@@ -1,5 +1,6 @@
 // require because of Jest
 import moment, { unitOfTime } from "moment";
+import { assert } from "./core";
 
 class DateUtils {
     public toDate(date: IDateType = new Date()): Date {
@@ -99,14 +100,20 @@ class DateUtils {
     }
 
     public areEquals(date1: IDateType, date2: IDateType): boolean {
+        assert(date1);
+        assert(date2);
         return this.toTimestamp(date1) == this.toTimestamp(date2);
     }
 
     public isLowerThen(lowerDate: IDateType, higherDate: IDateType): boolean {
+        assert(lowerDate);
+        assert(higherDate);
         return this.toTimestamp(lowerDate) < this.toTimestamp(higherDate);
     }
 
     public isLowerOrEqualsThen(lowerDate: IDateType, higherDate: IDateType): boolean {
+        assert(lowerDate);
+        assert(higherDate);
         return this.toTimestamp(lowerDate) <= this.toTimestamp(higherDate);
     }
 
