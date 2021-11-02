@@ -23,6 +23,7 @@ import { UserRequester } from "./requesters/user-requester";
 import session = require("express-session");
 const json = require("body-parser").json;
 import path = require("path");
+import { DropboxCachedFs } from "./dropbox-fs/dropbox-cached-fs";
 dotenv.config();
 
 const isDevelopment = !!process.env.NITS_DEVEL_ACCOUNT;
@@ -46,6 +47,9 @@ container.bindValue("tokenCache", {});
 container.bindValue("userStorageDir", path.join(__dirname, "../../../userdata/users"));
 container.bindValue("projectStorageDir", path.join(__dirname, "../../../userdata/projects"));
 
+const dropboxCachedFs = new DropboxCachedFs(process.env.NITS_DROPBOX_TOKEN, "/userdata", path.join(__dirname, "../../../userdata2"));
+container.bindClassFactory(DropboxCachedFs, () => dropboxCachedFs);
+
 const uuUserModel = container.resolveClass(UuUserModel);
 const timesheetModelFactory: TimesheetModelFactoryHandler = (user: IUserData) => {
     if (user.state == "active") {
@@ -55,6 +59,7 @@ const timesheetModelFactory: TimesheetModelFactoryHandler = (user: IUserData) =>
 };
 
 container.bindValue("timesheetModelFactory", timesheetModelFactory);
+container.bindValue;
 
 const loginAuthorizer = container.resolveClass(LoginAuthorizer);
 const loginAuthorize = loginAuthorizer.loginAuthorize.bind(loginAuthorizer);
