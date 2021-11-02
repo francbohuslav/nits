@@ -34,7 +34,7 @@ export class DropboxCachedFs {
         if (this.client) {
             const remoteFilePath = path.join(this.remoteDir, filePath);
             await this.client.uploadFile(localFilePath, remoteFilePath);
-            const remotedir = path.dirname(filePath);
+            const remotedir = path.dirname(remoteFilePath);
             console.log(`Invalidate cache ${remotedir}`);
             delete this.cache[remotedir];
         }
