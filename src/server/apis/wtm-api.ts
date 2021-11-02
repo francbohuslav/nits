@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { assert } from "../../common/core";
 import { IMonthlyEvaluation, Timesheet } from "../models/uu/interfaces";
 
@@ -24,9 +24,9 @@ export class WtmApi {
         } catch (ex) {
             if (ex instanceof WtmError) {
                 if (
-                    ex.uuAppErrorMap &&
-                    Object.values(ex.uuAppErrorMap).length == 1 &&
-                    !ex.uuAppErrorMap["uu-specialistwtm-main/listWorkerTimesheetItemsByMonth/timesheetItemsNotFound"]
+                    ex.response?.uuAppErrorMap &&
+                    Object.values(ex.response?.uuAppErrorMap).length == 1 &&
+                    !ex.response?.uuAppErrorMap["uu-specialistwtm-main/listWorkerTimesheetItemsByMonth/timesheetItemsNotFound"]
                 ) {
                     throw ex;
                 }
@@ -71,8 +71,10 @@ export class WtmApi {
             const response = await this.serverRequest<ICreateTimesheetItemResponse>(idToken, "createTimesheetItem", newTimesheet);
             return response.createdTimesheetItem.id;
         } catch (err) {
-            const data = err.response?.data;
-            throw new WtmError(err.message, data?.uuAppErrorMap, newTimesheet);
+            if (err instanceof WtmError) {
+                err.additionalData = newTimesheet;
+            }
+            throw err;
         }
     }
 
@@ -88,8 +90,10 @@ export class WtmApi {
                 throw new Error(`Nelze smazat některé výkazy. Více v logách na serveru.`);
             }
         } catch (err) {
-            const data = err.response?.data;
-            throw new WtmError(err.message, data?.uuAppErrorMap, ids);
+            if (err instanceof WtmError) {
+                err.additionalData = ids;
+            }
+            throw err;
         }
     }
 
@@ -102,26 +106,44 @@ export class WtmApi {
     }
 
     private async serverRequest<T extends IBaseResponse>(idToken: string, command: string, dtoIn: any): Promise<T> {
-        console.log("/" + command);
-        const response = await axios.post(this.wtmUrl + "/" + command, dtoIn, {
-            headers: { Authorization: `Bearer ${idToken}` },
-        });
-        const data = response.data as T;
-        if (data.uuAppErrorMap && Object.keys(data.uuAppErrorMap).length) {
-            throw new WtmError("UU WTM error", data.uuAppErrorMap);
+        try {
+            console.log("/" + command);
+            const response = await axios.post(this.wtmUrl + "/" + command, dtoIn, {
+                headers: { Authorization: `Bearer ${idToken}` },
+            });
+            const data = response.data as T;
+            if (data.uuAppErrorMap && Object.keys(data.uuAppErrorMap).length) {
+                throw new WtmError("UU WTM error", data);
+            }
+            return data;
+        } catch (err) {
+            const error = err as AxiosError<IBaseResponse>;
+            if (error.isAxiosError) {
+                const response: IErrorResponse = {
+                    ...error.response.data,
+                    status: error.response.status,
+                    statusText: error.response.statusText,
+                };
+                throw new WtmError(err.message, response);
+            }
+            throw new WtmError(err.message, err.response?.data);
         }
-        return data;
     }
 }
 
 export class WtmError extends Error {
-    constructor(message: string, public uuAppErrorMap: any, public additionalData?: any) {
+    constructor(message: string, public response: IBaseResponse, public additionalData?: any) {
         super(message);
     }
 }
 
 interface IBaseResponse {
     uuAppErrorMap: any;
+}
+
+interface IErrorResponse extends IBaseResponse {
+    status: number;
+    statusText: string;
 }
 
 interface IPagedResponse extends IBaseResponse {

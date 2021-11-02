@@ -6,7 +6,7 @@ interface IUserDataBase {
     notificationEmail: string;
     lastSynchronization: string;
     state: IUserState;
-    lastError: any;
+    lastError: ILastError;
 }
 
 export interface IUserPublicData extends IUserDataBase {
@@ -16,6 +16,19 @@ export interface IUserPublicData extends IUserDataBase {
 export interface IUserData extends IUserDataBase {
     uuAccessCode1: string;
     uuAccessCode2: string;
+}
+
+export interface ILastError {
+    message: string;
+    stack: string;
+    response: ILastErrorResponse;
+    additionalData: any;
+}
+
+export interface ILastErrorResponse {
+    uuAppErrorMap: any;
+    status: number;
+    statusText: string;
 }
 
 export interface IArtifactSettings {

@@ -87,7 +87,7 @@ function sendError(res: Response, ex: any) {
         stack: ex.response?.data || ex.stack,
     };
     if (ex instanceof WtmError) {
-        errorStructure.additional = (ex as WtmError).uuAppErrorMap;
+        errorStructure.additional = (ex as WtmError).response?.uuAppErrorMap;
     }
     res.send(JSON.stringify(errorStructure as IBaseResponse<unknown>, null, 2));
 }

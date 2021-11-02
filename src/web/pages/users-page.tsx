@@ -25,7 +25,7 @@ import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { IAllUsersResponse, IUserSetJiraAccountRequest, IUserSetStateRequest } from "../../common/ajax-interfaces";
 import dateUtils from "../../common/date-utils";
-import { IJiraAccount, IStats, IUserPublicData, IUserState } from "../../common/interfaces";
+import { IJiraAccount, ILastError, IStats, IUserPublicData, IUserState } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
 import { Header } from "../components/header";
@@ -47,7 +47,7 @@ export const UsersPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [users, setUsers] = useState<IUserPublicData[]>([]);
     const [jiraAccounts, setJiraAccounts] = useState<IJiraAccount[]>([]);
-    const [lastError, setLastError] = useState<any>(null);
+    const [lastError, setLastError] = useState<ILastError>(null);
     const [userOfError, setUserOfError] = useState<string>(null);
     const ajax = useAjax();
     const history = useHistory();
@@ -276,11 +276,11 @@ export const UsersPage = () => {
                                     </Card>
                                 </Box>
                             )}
-                            {lastError.uuAppErrorMap && (
+                            {lastError.response && (
                                 <Box my={2}>
                                     <Card>
                                         <Box m={2}>
-                                            <strong>uuAppErrorMap</strong> <pre>{JSON.stringify(lastError.uuAppErrorMap, null, 2)}</pre>
+                                            <strong>response</strong> <pre>{JSON.stringify(lastError.response, null, 2)}</pre>
                                         </Box>
                                     </Card>
                                 </Box>

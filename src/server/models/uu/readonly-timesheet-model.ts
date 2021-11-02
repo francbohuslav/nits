@@ -70,9 +70,11 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
             } catch (ex) {
                 if (ex instanceof WtmError) {
                     if (
-                        ex.uuAppErrorMap["uu-specialistwtm-main/listConfirmerMonthlyEvaluations/monthlyEvaluationsNotFound"] &&
-                        ex.uuAppErrorMap["uu-specialistwtm-main/listConfirmerMonthlyEvaluations/confirmerMonthlyTimesheetNotFound"] &&
-                        Object.keys(ex.uuAppErrorMap).length == 2
+                        ex.response &&
+                        ex.response.uuAppErrorMap &&
+                        ex.response.uuAppErrorMap["uu-specialistwtm-main/listConfirmerMonthlyEvaluations/monthlyEvaluationsNotFound"] &&
+                        ex.response.uuAppErrorMap["uu-specialistwtm-main/listConfirmerMonthlyEvaluations/confirmerMonthlyTimesheetNotFound"] &&
+                        Object.keys(ex.response.uuAppErrorMap).length == 2
                     ) {
                         // This is not error for us. Just empty data
                     } else {

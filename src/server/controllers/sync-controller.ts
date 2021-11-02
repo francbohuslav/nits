@@ -85,7 +85,9 @@ export class SyncController {
                 isAtLeastOneError = true;
                 if (err instanceof WtmError) {
                     reportUser.log.push(err.message + "\n" + err.stack);
-                    reportUser.log.push(err.uuAppErrorMap);
+                    if (err.response?.uuAppErrorMap) {
+                        reportUser.log.push(err.response?.uuAppErrorMap);
+                    }
                     err.additionalData && reportUser.log.push(err.additionalData);
                 } else if (err instanceof Error) {
                     reportUser.log.push(err.message + "\n" + err.stack);
@@ -95,7 +97,7 @@ export class SyncController {
                 userData.lastError = {
                     message: err.message,
                     stack: err.stack,
-                    uuAppErrorMap: err.uuAppErrorMap,
+                    response: err.response,
                     additionalData: err.additionalData,
                 };
                 this.userDataModel.setUserData(userData.uid, userData);
