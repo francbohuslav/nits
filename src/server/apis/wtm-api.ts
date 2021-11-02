@@ -71,8 +71,8 @@ export class WtmApi {
             const response = await this.serverRequest<ICreateTimesheetItemResponse>(idToken, "createTimesheetItem", newTimesheet);
             return response.createdTimesheetItem.id;
         } catch (err) {
-            const data = err.response.data;
-            throw new WtmError(err.message, data.uuAppErrorMap, newTimesheet);
+            const data = err.response?.data;
+            throw new WtmError(err.message, data?.uuAppErrorMap, newTimesheet);
         }
     }
 
@@ -88,8 +88,8 @@ export class WtmApi {
                 throw new Error(`Nelze smazat některé výkazy. Více v logách na serveru.`);
             }
         } catch (err) {
-            const data = err.response.data;
-            throw new WtmError(err.message, data.uuAppErrorMap, ids);
+            const data = err.response?.data;
+            throw new WtmError(err.message, data?.uuAppErrorMap, ids);
         }
     }
 
