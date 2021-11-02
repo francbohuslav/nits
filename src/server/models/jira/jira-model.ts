@@ -11,10 +11,12 @@ export class JiraModel {
     public async getLastWorklogs(since: Date, toExcept: Date): Promise<Worklog[]> {
         const worklogIdList = await this.jiraApi.getUpdatedWorklogIds(since, toExcept);
         let worklogList = await this.jiraApi.getWorklogs(worklogIdList);
-        worklogList = worklogList.filter((w) => dateUtils.isLowerThen(w.startedDate, toExcept));
+        worklogList.forEach((w) => {
+            w.startedDate = new Date(w.started);
+        });
+        worklogList = worklogList.filter((w) => dateUtils.isLowerThen(w.startedDate, toExcept) && dateUtils.isLowerOrEqualsThen(since, w.startedDate));
         worklogList.forEach((w) => {
             w.commentAsText = this.convertCommentToText(w);
-            w.startedDate = new Date(w.started);
         });
         worklogList.sort((a, b) => a.startedDate.getTime() - b.startedDate.getTime());
         return worklogList;

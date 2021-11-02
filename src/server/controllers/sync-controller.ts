@@ -31,11 +31,16 @@ export class SyncController {
         let isAtLeastOneError = false;
         const syncDaysCount = (await this.systemDataModel.getSystemConfig()).syncDaysCount;
 
+        let startDate = dateUtils.increaseDay(dateUtils.getStartOfDay(), -syncDaysCount + 1);
+        if (dateUtils.isLowerThen(startDate, dateUtils.getStartOfMonth())) {
+            startDate = dateUtils.getStartOfMonth();
+            report.log.push("Range was shortened, because of new month");
+        }
+        const endDate = dateUtils.increaseDay(dateUtils.getStartOfDay());
+        report.log.push("Sync range: " + startDate.toISOString() + " - " + endDate.toISOString());
+
         // Get all changed worklogs
-        let allWorklogList = await this.jiraModel.getLastWorklogs(
-            dateUtils.increaseDay(new Date(), -syncDaysCount),
-            dateUtils.increaseDay(dateUtils.getStartOfDay())
-        );
+        let allWorklogList = await this.jiraModel.getLastWorklogs(startDate, endDate);
 
         // Filter that worklogs be project settings. Only worklogs with artifact is relevant
         const wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey = {};
@@ -70,7 +75,7 @@ export class SyncController {
                 if (commentErrors.length) {
                     reportUser.log.push(commentErrors);
                 }
-                const exitingTimesheets = await timesheetModel.getMyLastTimesheets(dateUtils.toIsoFormat(dateUtils.increaseDay(new Date(), -syncDaysCount)));
+                const exitingTimesheets = await timesheetModel.getMyLastTimesheets(dateUtils.toIsoFormat(startDate));
                 const { timesheetsToDelete, timesheetsToRemain } = this.separateTimesheets(exitingTimesheets);
                 const newTimesheets = this.computeNewTimesheets(timesheetMappingsPerDay, timesheetsToRemain);
                 // reportUser.log.push({ timesheetMappingsPerDay });

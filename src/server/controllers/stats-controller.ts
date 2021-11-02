@@ -20,7 +20,7 @@ export class StatsController {
 
         const since = dateUtils.toDate(month);
         const toExcept = dateUtils.increase(since, "months", 1);
-        console.log(`Stats for ${dateUtils.toIsoFormat(since)} - ${dateUtils.toIsoFormat(toExcept)}`);
+        console.log(`Stats for ${since.toISOString()} - ${toExcept.toISOString()}`);
         const adminUserData = await this.userDataModel.getUserData(adminUid);
         const timesheetModel = this.timesheetModelFactory(adminUserData);
 

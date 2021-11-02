@@ -126,6 +126,9 @@ export class WtmApi {
                 };
                 throw new WtmError(err.message, response);
             }
+            if (err instanceof WtmError) {
+                throw err;
+            }
             throw new WtmError(err.message, err.response?.data);
         }
     }
