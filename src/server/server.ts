@@ -8,6 +8,7 @@ import { Container } from "injector";
 import { IBaseResponse } from "../common/ajax-interfaces";
 import { IProjectConfigPublic, IUserData } from "../common/interfaces";
 import { WtmApi, WtmError } from "./apis/wtm-api";
+import { DropboxCachedFs } from "./dropbox-fs/dropbox-cached-fs";
 import { LoginAuthorizer } from "./helpers/login-authorizer";
 import { UuUserModel } from "./models/uu-user-model";
 import { TimesheetModelFactoryHandler } from "./models/uu/interfaces";
@@ -23,7 +24,6 @@ import { UserRequester } from "./requesters/user-requester";
 import session = require("express-session");
 const json = require("body-parser").json;
 import path = require("path");
-import { DropboxCachedFs } from "./dropbox-fs/dropbox-cached-fs";
 dotenv.config();
 
 const isDevelopment = !!process.env.NITS_DEVEL_ACCOUNT;
@@ -44,10 +44,14 @@ container.bindValue("jiraApiOptions", {
     password: process.env.NITS_JIRA_API_TOKEN,
 });
 container.bindValue("tokenCache", {});
-container.bindValue("userStorageDir", path.join(__dirname, "../../../userdata/users"));
-container.bindValue("projectStorageDir", path.join(__dirname, "../../../userdata/projects"));
+container.bindValue("userStorageDir", "/users");
+container.bindValue("projectStorageDir", "/projects");
 
-const dropboxCachedFs = new DropboxCachedFs(process.env.NITS_DROPBOX_TOKEN, "/userdata", path.join(__dirname, "../../../userdata2"));
+const dropboxCachedFs = new DropboxCachedFs(
+    process.env.NITS_DROPBOX_TOKEN,
+    "/" + process.env.NITS_DROPBOX_FOLDER + "/userdata",
+    path.join(__dirname, "../../../userdata")
+);
 container.bindClassFactory(DropboxCachedFs, () => dropboxCachedFs);
 
 const uuUserModel = container.resolveClass(UuUserModel);

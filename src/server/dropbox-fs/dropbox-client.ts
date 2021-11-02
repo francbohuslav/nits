@@ -1,5 +1,5 @@
-import { promisify } from "util";
 import * as fs from "fs";
+import { promisify } from "util";
 
 const dropboxV2Api = require("dropbox-v2-api");
 
@@ -22,7 +22,8 @@ export class DropboxClient {
     }
 
     public async listFiles(folder: string): Promise<string[]> {
-        console.log("Dropbox: list files...");
+        folder = this.normalizeFilePath(folder);
+        console.log(`Dropbox: list files ${folder} ...`);
         let response: any;
         const files: string[] = [];
         response = await this.client({
@@ -47,12 +48,13 @@ export class DropboxClient {
             });
             response.entries.forEach((e: any) => files.push(e.name));
         }
-        console.log(`Dropbox: ...${files.length}`);
+        console.log(`Dropbox: ... ${files.length} files`);
         return files;
     }
 
     public downloadFile(path: string, targetFile: string): Promise<void> {
-        console.log(`Dropbox: download file ${path}...`);
+        path = this.normalizeFilePath(path);
+        console.log(`Dropbox: download file ${path} ...`);
         return new Promise((resolve, reject) => {
             const stream = this.clientRaw(
                 {
@@ -69,14 +71,15 @@ export class DropboxClient {
                 }
             ).pipe(fs.createWriteStream(targetFile));
             stream.on("finish", () => {
-                console.log(`Dropbox: ...done`);
+                console.log(`Dropbox: ... done`);
                 resolve();
             });
         });
     }
 
     public uploadFile(targetFile: string, targetPath: string): Promise<void> {
-        console.log(`Dropbox: upload file ${targetPath}...`);
+        targetPath = this.normalizeFilePath(targetPath);
+        console.log(`Dropbox: upload file ${targetPath} ...`);
         return new Promise((resolve, reject) => {
             const uploadStream = this.clientRaw(
                 {
@@ -91,12 +94,16 @@ export class DropboxClient {
                         console.log(`Dropbox ERROR: ` + err);
                         reject(err);
                     } else {
-                        console.log(`Dropbox: ...done`);
+                        console.log(`Dropbox: ... done`);
                         resolve();
                     }
                 }
             );
             fs.createReadStream(targetFile).pipe(uploadStream);
         });
+    }
+
+    private normalizeFilePath(filePath: string): string {
+        return filePath.replace(/\\/g, "/");
     }
 }

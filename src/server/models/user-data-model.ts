@@ -1,11 +1,9 @@
-import fs from "fs";
 import { Inject } from "injector";
 import { join } from "path";
 import { IUserData } from "../../common/interfaces";
 import { DropboxCachedFs } from "../dropbox-fs/dropbox-cached-fs";
 import { Crypt } from "../helpers/crypt";
 import { IProjectConfig } from "../project-config";
-const fsp = fs.promises;
 
 @Inject.Singleton
 export class UserDataModel {
@@ -14,11 +12,7 @@ export class UserDataModel {
         private dropboxFs: DropboxCachedFs,
         private crypt: Crypt,
         @Inject.Value("projectConfig") private projectConfig: IProjectConfig
-    ) {
-        fs.mkdirSync(this.storageDir, {
-            recursive: true,
-        });
-    }
+    ) {}
 
     public async getUserData(uid: string): Promise<IUserData> {
         const emptyUserData: IUserData = {
@@ -34,12 +28,10 @@ export class UserDataModel {
             lastError: null,
         };
         const filePath = this.getUserFilePath(uid);
-        try {
-            await fsp.stat(filePath);
-        } catch {
+        if (!(await this.dropboxFs.fileExists(filePath))) {
             return emptyUserData;
         }
-        const encryptedContent = await fsp.readFile(filePath, { encoding: "utf8" });
+        const encryptedContent = await this.dropboxFs.readFile(filePath);
         if (!encryptedContent) {
             console.error(`Crypted content is empty for user ${uid}`);
             return emptyUserData;
@@ -54,13 +46,11 @@ export class UserDataModel {
         const filePath = this.getUserFilePath(uid);
         const decryptedContent = JSON.stringify(userData, null, 2);
         const encryptedContent = this.projectConfig.userDataEncrypted ? this.crypt.encrypt(decryptedContent) : decryptedContent;
-        await fsp.writeFile(filePath, encryptedContent, {
-            encoding: "utf8",
-        });
+        await this.dropboxFs.writeFile(filePath, encryptedContent);
     }
 
     public async getAllUserData(): Promise<IUserData[]> {
-        const fileList = await fsp.readdir(this.storageDir);
+        const fileList = await this.dropboxFs.readdir(this.storageDir);
         const userUidList = fileList.filter((f) => f.match(/^[\d-]+\.data$/)).map((f) => f.match(/^([\d-]+)\.data$/)[1]);
         const userDataList: IUserData[] = [];
         for (const uid of userUidList) {

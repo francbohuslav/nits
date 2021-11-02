@@ -1,4 +1,5 @@
 import arrayUtils from "../../../common/array-utils";
+import { assert } from "../../../common/core";
 import dateUtils from "../../../common/date-utils";
 import { WtmApi, WtmError } from "../../apis/wtm-api";
 import { IWtmTsConfigPerIssueKey } from "../../controllers/sync-controller";
@@ -23,6 +24,8 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
     }
 
     public async getMyLastTimesheets(since: string): Promise<Timesheet[]> {
+        assert(this.accessCode1);
+        assert(this.accessCode2);
         const tokenResponse = await this.uuUserModel.getToken(this.accessCode1, this.accessCode2);
         const to = new Date();
         const toStr = dateUtils.toIsoFormat(to);
@@ -43,6 +46,8 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
     }
 
     public async getTimesheetsOfUsers(userUids: string[], since: Date, toExcept: Date, filter?: (t: Timesheet) => boolean): Promise<ITimesheetPerUser> {
+        assert(this.accessCode1);
+        assert(this.accessCode2);
         const tokenResponse = await this.uuUserModel.getToken(this.accessCode1, this.accessCode2);
         const to = dateUtils.increaseDay(toExcept, -1);
         const toStr = dateUtils.toIsoFormat(to);
