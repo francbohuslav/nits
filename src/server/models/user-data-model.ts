@@ -29,6 +29,7 @@ export class UserDataModel {
             notificationEmail: "",
             lastSynchronization: "",
             state: "disabled",
+            lastError: null,
         };
         const filePath = this.getUserFilePath(uid);
         try {

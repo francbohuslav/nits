@@ -11,6 +11,7 @@ import { SystemDataModel } from "../models/system-data-model";
 import { UserDataModel } from "../models/user-data-model";
 import { nitsTimesheetFilter, Timesheet, TimesheetModelFactoryHandler } from "../models/uu/interfaces";
 import { IProjectConfig } from "../project-config";
+import { NotifyController } from "./notify-controller";
 import { ProjectController } from "./project-controller";
 
 @Inject.Singleton
@@ -20,13 +21,14 @@ export class SyncController {
         private systemDataModel: SystemDataModel,
         private jiraModel: JiraModel,
         private projectController: ProjectController,
+        private notifyController: NotifyController,
         @Inject.Value("projectConfig") private projectConfig: IProjectConfig,
         @Inject.Value("timesheetModelFactory") private timesheetModelFactory: TimesheetModelFactoryHandler
     ) {}
 
     public async sync(): Promise<ISyncReport> {
         const report: ISyncReport = { users: [], log: [] };
-
+        let isAtLeastOneError = false;
         const syncDaysCount = (await this.systemDataModel.getSystemConfig()).syncDaysCount;
 
         // Get all changed worklogs
@@ -77,8 +79,10 @@ export class SyncController {
                 await timesheetModel.removeTimesheets(timesheetsToDelete, reportUser);
                 await timesheetModel.saveTimesheets(newTimesheets, reportUser);
                 userData.lastSynchronization = new Date().toISOString();
+                userData.lastError = null;
                 this.userDataModel.setUserData(userData.uid, userData);
             } catch (err) {
+                isAtLeastOneError = true;
                 if (err instanceof WtmError) {
                     reportUser.log.push(err.message + "\n" + err.stack);
                     reportUser.log.push(err.uuAppErrorMap);
@@ -88,7 +92,21 @@ export class SyncController {
                 } else {
                     reportUser.log.push(err.toString());
                 }
+                userData.lastError = {
+                    message: err.message,
+                    stack: err.stack,
+                    uuAppErrorMap: err.uuAppErrorMap,
+                    additionalData: err.additionalData,
+                };
+                this.userDataModel.setUserData(userData.uid, userData);
             }
+        }
+        try {
+            if (isAtLeastOneError) {
+                await this.notifyController.syncError();
+            }
+        } catch (err) {
+            report.log.push(err.message + "\n" + err.stack);
         }
         return report;
     }

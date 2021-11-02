@@ -6,6 +6,7 @@ interface IUserDataBase {
     notificationEmail: string;
     lastSynchronization: string;
     state: IUserState;
+    lastError: any;
 }
 
 export interface IUserPublicData extends IUserDataBase {

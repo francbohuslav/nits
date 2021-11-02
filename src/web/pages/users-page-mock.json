@@ -1,0 +1,165 @@
+{
+    "users": [
+        {
+            "jiraAccountId": null,
+            "jiraName": null,
+            "name": "Franc Bohuslav",
+            "uid": "12-8835-1",
+            "notificationEmail": "franc.bohuslav@gmail.com",
+            "lastSynchronization": "2021-10-25T06:06:42.853Z",
+            "isAdmin": true,
+            "state": "readonly",
+            "lastError": {
+                "message": "nejaka chyba",
+                "stack": "fsfsdf\nfsdfsd",
+                "additionalData": {
+                    "tefsd": "fsdfsd",
+                    "teffsdsd": "fsdfsd",
+                    "tefasdfsd": "fsdfsd",
+                    "tegasfsd": "fsdfsd"
+                }
+            }
+        },
+        {
+            "jiraAccountId": null,
+            "jiraName": null,
+            "name": "Franc Bohuslav2",
+            "uid": "12-8835-2",
+            "notificationEmail": "franc.bohuslav@gmail.com",
+            "lastSynchronization": "2021-10-25T06:06:42.853Z",
+            "isAdmin": true,
+            "state": "readonly",
+            "lastError": null
+        }
+    ],
+    "jiraAccounts": [
+        {
+            "id": "5cd96d838ad0f60dca00926a",
+            "name": "Miroslav Balej"
+        },
+        {
+            "id": "5d42b9985ca9700dac0effe0",
+            "name": "Marek Endlicher"
+        },
+        {
+            "id": "60dae6d7fe89c6006967f6f7",
+            "name": "Michal Svoboda"
+        },
+        {
+            "id": "5cd971c2eba5870dd546126a",
+            "name": "Jan Medek"
+        },
+        {
+            "id": "5cd9795736e2870fd20216c0",
+            "name": "Petr Lojík"
+        },
+        {
+            "id": "5cc2bd19174d2a0e4b04b25d",
+            "name": "Tomáš Vazač"
+        },
+        {
+            "id": "5ca5dd0a3270b449b4feca0d",
+            "name": "Tomáš Kuba"
+        },
+        {
+            "id": "5dd680e6b63a210fb4b6e3c6",
+            "name": "Marek Zinke"
+        },
+        {
+            "id": "5dd680e0b3a9c80fc0a345ee",
+            "name": "Jiří Suchomel"
+        },
+        {
+            "id": "5cd97d93c33a5d0dcf0b1dd9",
+            "name": "Jan Ducháč"
+        },
+        {
+            "id": "5e53b78b2110470c8da27eab",
+            "name": "Luděk Králík"
+        },
+        {
+            "id": "610290cefc68c100699708ca",
+            "name": "Tomáš Míl"
+        },
+        {
+            "id": "5cd978518fa24d0dd2de2563",
+            "name": "Radoslav Hájek"
+        },
+        {
+            "id": "5cd977e7c9167e0d6ea24a37",
+            "name": "Martin Kinkor"
+        },
+        {
+            "id": "5cd9795aeba5870dd5461311",
+            "name": "Petr Holec"
+        },
+        {
+            "id": "5e8736a9be756f0c22fabed6",
+            "name": "Tomáš Záluský"
+        },
+        {
+            "id": "557058:11074f96-8f3f-4d3a-a647-f190fad2fa2a",
+            "name": "Jiří Hronek"
+        },
+        {
+            "id": "5cd977f18b5ac40dccaa6d84",
+            "name": "Jiří Illetško"
+        },
+        {
+            "id": "5cd9796583de300fe5d4f653",
+            "name": "martin.bilek@intelis.cz"
+        },
+        {
+            "id": "60dae6d8ad9bba006a7eb08c",
+            "name": "Tomáš Hejlek"
+        },
+        {
+            "id": "5cd979594326200dc97212da",
+            "name": "Jan Pojsl"
+        },
+        {
+            "id": "5cc2bd13c07bd90e5ec1418d",
+            "name": "René Urbiš"
+        },
+        {
+            "id": "5cd975eddfe2e60fdd111a04",
+            "name": "Jiří Jelínek"
+        },
+        {
+            "id": "5cd96d84c9167e0d6ea24993",
+            "name": "Martin Medlík"
+        },
+        {
+            "id": "557058:a5b3ea1e-1f98-4df7-9aeb-7c3d69ab0676",
+            "name": "Jan Bára"
+        },
+        {
+            "id": "5d2595cc86bc8c0c4b43ed36",
+            "name": "Hana Chmielová"
+        },
+        {
+            "id": "5cd971c4f348990dbc3c31bc",
+            "name": "Kamila Samohelová"
+        },
+        {
+            "id": "5cd97959f348990dbc3c3256",
+            "name": "Jana Charvátová"
+        },
+        {
+            "id": "5cd977eaee37080febefaa95",
+            "name": "Petr Kolář"
+        },
+        {
+            "id": "5cd971c47aecfb0fea318fdd",
+            "name": "Jan Tajč"
+        },
+        {
+            "id": "5ed4deafd385dd0c267fdcf6",
+            "name": "Leoš Hlavička"
+        },
+        {
+            "id": "6138a0763912120070668f1b",
+            "name": "Bohuslav Franc"
+        }
+    ]
+}

@@ -61,14 +61,14 @@ export class UserRequester extends BaseRequester {
         return result;
     }
 
-    public async setUserState(req: Request): Promise<IAllUsersResponse> {
+    public async setUserState(req: Request): Promise<boolean> {
         const request: IUserSetStateRequest = req.body;
         assert(request.uid);
         assert(request.state);
         const userData = await this.userController.getUserData(request.uid);
         userData.state = request.state;
         await this.userController.setUserData(request.uid, userData);
-        return await this.getAllUsers();
+        return true;
     }
 
     public async setJiraAccount(req: Request): Promise<boolean> {

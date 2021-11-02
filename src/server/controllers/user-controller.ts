@@ -73,6 +73,7 @@ export class UserController {
             lastSynchronization: userData.lastSynchronization,
             isAdmin: admins.includes(userData.uid),
             state: userData.state,
+            lastError: userData.lastError,
         };
     }
 }

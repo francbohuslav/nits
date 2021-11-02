@@ -1,7 +1,26 @@
-import { Box, Button, IconButton, LinearProgress, Tooltip, Typography } from "@material-ui/core";
+import {
+    Box,
+    Button,
+    Card,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    IconButton,
+    LinearProgress,
+    Tooltip,
+    Typography,
+} from "@material-ui/core";
+import green from "@material-ui/core/colors/green";
+import orange from "@material-ui/core/colors/orange";
+import red from "@material-ui/core/colors/red";
 import { DataGrid, GridCellEditCommitParams, GridColumns, GridRowData } from "@material-ui/data-grid";
+import CheckIcon from "@material-ui/icons/Check";
 import CircleIcon from "@material-ui/icons/FiberManualRecord";
+import WarningIcon from "@material-ui/icons/Warning";
 import MuiAlert from "@material-ui/lab/Alert";
+import { makeStyles } from "@material-ui/styles";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { IAllUsersResponse, IUserSetJiraAccountRequest, IUserSetStateRequest } from "../../common/ajax-interfaces";
@@ -13,12 +32,26 @@ import { Header } from "../components/header";
 import { Router } from "../router";
 import React = require("react");
 
+const mockData: IAllUsersResponse = null; //require("./users-page-mock.json");
+
+const useStyles = makeStyles({
+    greenIcon: {
+        color: green[600],
+    },
+    orangeIcon: {
+        color: orange[600],
+    },
+});
+
 export const UsersPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [users, setUsers] = useState<IUserPublicData[]>([]);
     const [jiraAccounts, setJiraAccounts] = useState<IJiraAccount[]>([]);
+    const [lastError, setLastError] = useState<any>(null);
+    const [userOfError, setUserOfError] = useState<string>(null);
     const ajax = useAjax();
     const history = useHistory();
+    const classes = useStyles();
 
     const loadData = async () => {
         setIsLoading(true);
@@ -31,19 +64,29 @@ export const UsersPage = () => {
     };
 
     useEffect(() => {
-        loadData();
+        if (mockData) {
+            setUsers(mockData.users);
+            setJiraAccounts(mockData.jiraAccounts || []);
+        } else {
+            loadData();
+        }
     }, []);
 
     const idGetter = (row: GridRowData) => (row as IStats).uid;
 
     const onChangeState = (uid: string, prevState: IUserState) => async () => {
         setIsLoading(true);
-        const res = await ajax.post<IAllUsersResponse>("/server/admin-users/set-user-state", {
+        const newState = prevState == "readonly" ? "active" : prevState == "active" ? "disabled" : "readonly";
+        const res = await ajax.post<boolean>("/server/admin-users/set-user-state", {
             uid,
             state: prevState == "readonly" ? "active" : prevState == "active" ? "disabled" : "readonly",
         } as IUserSetStateRequest);
-        if (res.isOk) {
-            setUsers(res.data.users);
+        if (!res.isOk) {
+            thisApp().alert("Nepodařilo se uložit režim aktivace");
+        } else {
+            const newUsers = [...users];
+            newUsers.find((u) => u.uid == uid).state = newState;
+            setUsers(newUsers);
         }
         setIsLoading(false);
     };
@@ -92,7 +135,12 @@ export const UsersPage = () => {
         [jiraAccountSelectOptions]
     );
 
-    const stateToColor = (state: IUserState): string => (state == "active" ? "green" : state == "readonly" ? "orange" : "red");
+    const onErrorClick = (lastError: any, userName: string) => () => {
+        setLastError(lastError);
+        setUserOfError(userName);
+    };
+
+    const stateToColor = (state: IUserState): string => (state == "active" ? green[600] : state == "readonly" ? orange[600] : red[600]);
     const stateToTitle = (state: IUserState): string =>
         state == "active" ? "Aktivní, synchronizace se provede" : state == "readonly" ? "Jen pročtení, simulace" : "Synchronizace se neprovede";
 
@@ -103,7 +151,7 @@ export const UsersPage = () => {
             flex: 1,
             align: "left",
             headerAlign: "center",
-            valueGetter: (params) => params.row.name || params.row.date || params.row.artifact,
+            valueGetter: (params) => params.value,
         },
         {
             field: "lastSynchronization",
@@ -114,13 +162,13 @@ export const UsersPage = () => {
         {
             field: "jiraAccountId",
             headerName: `JIRA účet`,
-            flex: 1,
+            flex: 0.8,
             renderCell: (p) => {
                 if (p.value) return (p.row as IUserPublicData).jiraName;
 
                 return (
                     <Tooltip title="Dvojklikem změň">
-                        <Typography color="secondary">nespárován</Typography>
+                        <Typography style={{ color: red[600] }}>nespárován</Typography>
                     </Tooltip>
                 );
             },
@@ -130,8 +178,8 @@ export const UsersPage = () => {
         },
         {
             field: "state",
-            headerName: `Stav`,
-            flex: 0.5,
+            headerName: `Aktivace`,
+            flex: 0.6,
             renderCell: (p) => (
                 <Tooltip title={stateToTitle(p.value as IUserState)}>
                     <IconButton onClick={onChangeState(p.row.uid, p.value as IUserState)} style={{ color: stateToColor(p.value as IUserState) }}>
@@ -139,6 +187,25 @@ export const UsersPage = () => {
                     </IconButton>
                 </Tooltip>
             ),
+        },
+        {
+            field: "lastError",
+            headerName: `Stav`,
+            flex: 0.5,
+            renderCell: (p) =>
+                p.value ? (
+                    <Tooltip title="Chyba během synchroizace! Klikni pro detail.">
+                        <IconButton onClick={onErrorClick(p.row.lastError, p.row.name)}>
+                            <WarningIcon className={classes.orangeIcon} />
+                        </IconButton>
+                    </Tooltip>
+                ) : p.row.lastSynchronization ? (
+                    <Tooltip title="Synchronizace proběhla bez chyby">
+                        <CheckIcon className={classes.greenIcon} />
+                    </Tooltip>
+                ) : (
+                    ""
+                ),
         },
     ];
 
@@ -150,7 +217,7 @@ export const UsersPage = () => {
     });
 
     const sortedUsers = [...users];
-    sortedUsers.sort((a, b) => a.name.localeCompare(b.name));
+    sortedUsers.sort((a, b) => (b.lastError || "").toString().localeCompare((a.lastError || "").toString()) || a.name.localeCompare(b.name));
     return (
         <Header header="Uživatelé">
             <Box height={3}>
@@ -192,6 +259,50 @@ export const UsersPage = () => {
                     </Button>
                 </Box>
             </Box>
+            {lastError && (
+                <Dialog open onClose={() => setLastError(null)} maxWidth="md">
+                    <DialogTitle id="alert-dialog-title">Poslední chyba synchronizace uživatele {userOfError}</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            <Typography variant="h6" color="secondary">
+                                {lastError.message}
+                            </Typography>
+                            {lastError.additionalData && (
+                                <Box my={2}>
+                                    <Card>
+                                        <Box m={2}>
+                                            <strong>Additional data</strong> <pre>{JSON.stringify(lastError.additionalData, null, 2)}</pre>
+                                        </Box>
+                                    </Card>
+                                </Box>
+                            )}
+                            {lastError.uuAppErrorMap && (
+                                <Box my={2}>
+                                    <Card>
+                                        <Box m={2}>
+                                            <strong>uuAppErrorMap</strong> <pre>{JSON.stringify(lastError.uuAppErrorMap, null, 2)}</pre>
+                                        </Box>
+                                    </Card>
+                                </Box>
+                            )}
+                            {lastError.stack && (
+                                <Box my={2}>
+                                    <Card>
+                                        <Box m={2}>
+                                            <strong>Stack</strong> <pre>{lastError.stack}</pre>
+                                        </Box>
+                                    </Card>
+                                </Box>
+                            )}
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setLastError(null)} color="secondary" autoFocus>
+                            Zavřít
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
         </Header>
     );
 };
