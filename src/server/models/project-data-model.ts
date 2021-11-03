@@ -1,11 +1,11 @@
+import { CachedFs } from "dropbox-fs";
 import { Inject } from "injector";
 import { join } from "path";
 import { IArtifactSettings } from "../../common/interfaces";
-import { DropboxCachedFs } from "../dropbox-fs/dropbox-cached-fs";
 
 @Inject.Singleton
 export class ProjectDataModel {
-    constructor(@Inject.Value("projectStorageDir") private storageDir: string, private dropboxCachedFs: DropboxCachedFs) {}
+    constructor(@Inject.Value("projectStorageDir") private storageDir: string, private dropboxCachedFs: CachedFs) {}
 
     public async getArtifactSettings(): Promise<IArtifactSettings[]> {
         const filePath = this.getFilePath();

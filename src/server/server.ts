@@ -1,6 +1,7 @@
 import express = require("express");
 import compression from "compression";
 import dotenv from "dotenv";
+import { CachedFs, DropboxFsClient } from "dropbox-fs";
 import { Response } from "express-serve-static-core";
 import fs from "fs";
 import http from "http";
@@ -8,7 +9,6 @@ import { Container } from "injector";
 import { IBaseResponse } from "../common/ajax-interfaces";
 import { IProjectConfigPublic, IUserData } from "../common/interfaces";
 import { WtmApi, WtmError } from "./apis/wtm-api";
-import { DropboxCachedFs } from "./dropbox-fs/dropbox-cached-fs";
 import { LoginAuthorizer } from "./helpers/login-authorizer";
 import { UuUserModel } from "./models/uu-user-model";
 import { TimesheetModelFactoryHandler } from "./models/uu/interfaces";
@@ -47,12 +47,13 @@ container.bindValue("tokenCache", {});
 container.bindValue("userStorageDir", "/users");
 container.bindValue("projectStorageDir", "/projects");
 
-const dropboxCachedFs = new DropboxCachedFs(
-    process.env.NITS_DROPBOX_TOKEN,
-    "/" + process.env.NITS_DROPBOX_FOLDER + "/userdata",
-    path.join(__dirname, "../../../userdata")
-);
-container.bindClassFactory(DropboxCachedFs, () => dropboxCachedFs);
+let dropboxFsClient: DropboxFsClient = null;
+if (process.env.NITS_DROPBOX_TOKEN) {
+    dropboxFsClient = new DropboxFsClient();
+    dropboxFsClient.connect(process.env.NITS_DROPBOX_TOKEN);
+}
+const cachedFs = new CachedFs(dropboxFsClient, "/" + process.env.NITS_DROPBOX_FOLDER + "/userdata", path.join(__dirname, "../../../userdata"));
+container.bindClassFactory(CachedFs, () => cachedFs);
 
 const uuUserModel = container.resolveClass(UuUserModel);
 const timesheetModelFactory: TimesheetModelFactoryHandler = (user: IUserData) => {

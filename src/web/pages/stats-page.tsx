@@ -156,7 +156,7 @@ export const StatsPage = () => {
                 }
                 return stats.jiraHours == stats.wtmHours;
             },
-            renderCell: (params) => <StatsStatus isOk={!!params.value} />,
+            renderCell: (params) => (params.row.artifact ? "" : <StatsStatus isOk={!!params.value} />),
         },
     ];
 

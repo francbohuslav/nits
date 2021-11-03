@@ -1,7 +1,7 @@
+import { CachedFs } from "dropbox-fs";
 import { Inject } from "injector";
 import { join } from "path";
 import { IUserData } from "../../common/interfaces";
-import { DropboxCachedFs } from "../dropbox-fs/dropbox-cached-fs";
 import { Crypt } from "../helpers/crypt";
 import { IProjectConfig } from "../project-config";
 
@@ -9,7 +9,7 @@ import { IProjectConfig } from "../project-config";
 export class UserDataModel {
     constructor(
         @Inject.Value("userStorageDir") private storageDir: string,
-        private dropboxFs: DropboxCachedFs,
+        private dropboxFs: CachedFs,
         private crypt: Crypt,
         @Inject.Value("projectConfig") private projectConfig: IProjectConfig
     ) {}
