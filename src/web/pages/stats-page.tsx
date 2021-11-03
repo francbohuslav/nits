@@ -12,7 +12,7 @@ import { StatsStatus } from "../components/stats-status";
 import { Router } from "../router";
 import React = require("react");
 
-const mockData: IStats[] = require("./stats-page-mock.json");
+const mockData: IStats[] = null; // require("./stats-page-mock.json");
 
 const useStyles = makeStyles({
     level1: {
