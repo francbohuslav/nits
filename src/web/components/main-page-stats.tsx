@@ -1,9 +1,9 @@
 import React = require("react");
+import { Box, LinearProgress, Typography } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import dateUtils from "../../common/date-utils";
-import { Box, LinearProgress, Typography } from "@material-ui/core";
-import { useAjax } from "../ajax";
 import { IUserStats } from "../../common/interfaces";
+import { useAjax } from "../ajax";
 
 export const MainPageStats = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +34,7 @@ export const MainPageStats = () => {
                     {stats?.lastSynchronization ? (
                         <>
                             Poslední synchronizace proběhla <strong>{dateUtils.formatDateTime(stats.lastSynchronization)}</strong>. <br />
-                            Za tento měsíc bylo synchronizováno <strong>{stats.wtmHours}</strong> hodin.
+                            Za tento měsíc bylo synchronizováno <strong>{dateUtils.formatHours(stats.wtmHours)}</strong> hodin.
                         </>
                     ) : (
                         "Zatím nesynchronizováno"

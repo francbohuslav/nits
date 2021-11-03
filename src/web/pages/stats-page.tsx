@@ -12,7 +12,7 @@ import { StatsStatus } from "../components/stats-status";
 import { Router } from "../router";
 import React = require("react");
 
-const mockData: IStats[] = null; //require("./stats-page-mock.json");
+const mockData: IStats[] = require("./stats-page-mock.json");
 
 const useStyles = makeStyles({
     level1: {
@@ -72,6 +72,9 @@ export const StatsPage = () => {
     const onMonthSelected = (monthShift: number) => {
         setSelectedMonth(monthShift == 0 ? actualMonth : monthShift == 1 ? previousMonth : beforePreviousMonth);
     };
+
+    // Less then 10 seconds is equal
+    const hoursEquals = (wtmHours: number, jiraHours: number) => Math.abs(jiraHours - wtmHours) * 60 * 60 < 10;
 
     const badUserCount = arrayUtils.sumAction(stats, (s) => (Object.values(s.days).some((d) => d.jiraHours != d.wtmHours) ? 1 : 0));
 
@@ -152,9 +155,9 @@ export const StatsPage = () => {
                 const stats = params.row as IStats;
                 if (stats.days) {
                     const days = Object.values(stats.days);
-                    return !days.some((d) => d.jiraHours != d.wtmHours);
+                    return !days.some((d) => !hoursEquals(d.wtmHours, d.jiraHours));
                 }
-                return stats.jiraHours == stats.wtmHours;
+                return hoursEquals(stats.wtmHours, stats.jiraHours);
             },
             renderCell: (params) => (params.row.artifact ? "" : <StatsStatus isOk={!!params.value} />),
         },
