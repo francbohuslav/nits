@@ -29,6 +29,10 @@ const useStyles = makeStyles({
     },
     level2: {
         paddingLeft: "2em",
+        position: "absolute",
+        maxWidth: "300px",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
     },
     level2Cell: {
         background: "#f6f6f6",
@@ -131,7 +135,7 @@ export const StatsPage = () => {
                         <div className={classes.level1}>{dateUtils.formatDate(params.value as string)}</div>
                     )
                 ) : (
-                    <div className={classes.level2}>{params.value}</div>
+                    <div className={classes.level2}>{params.value ? params.value.toString().replace("ues:", "") : ""}</div>
                 ),
         },
         {
