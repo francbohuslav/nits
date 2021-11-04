@@ -7,7 +7,7 @@ services:
             - "83:83"
         volumes:
             - .:/nits
-        command: /bin/sh -c "cd /nits; npm i; npm run build; npm run start"
+        command: /bin/sh -c "cd /nits; npm ci; npm run build; npm run start"
 
 networks:
     default:

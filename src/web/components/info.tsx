@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, DialogContentText, Typography, DialogActions, Button } from "@material-ui/core";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import React = require("react");
 
@@ -24,8 +24,8 @@ export const Info = (props: IInfoProps) => {
                         <img className={classes.img} src="/images/main-page-image.png" />
                     </Typography>
                     <Typography variant="body1" align="left" paragraph>
-                        Tato aplikace propojuje zajišťuje automatické propisy výkazů z JIRA do WTM. K propisu dochází každý den v noci, přičemž zpracovány jsou
-                        výkazy vždy 7 dní zpětně.
+                        Tato aplikace zajišťuje automatické propisy výkazů z JIRA do WTM. K propisu dochází každý den v noci, přičemž zpracovány jsou výkazy
+                        vždy 7 dní zpětně.
                     </Typography>
                     <Typography variant="body1" align="left" paragraph>
                         Existující položky ve WTM jsou mazány a přepsány novými údaji, nejsou však ovlivněny výkazy, které jsou ve WTM zadané mimo projekty JIRA
