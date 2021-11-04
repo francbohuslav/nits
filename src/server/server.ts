@@ -110,6 +110,7 @@ const methods: IServerMethod[] = [
             const ret: IProjectConfigPublic = {
                 jiraClientId: projectConfig.jira?.clientId,
                 serverAddress: projectConfig.serverAddress,
+                emailIsActive: !!(projectConfig.email?.user && projectConfig.email?.password),
             };
             return ret;
         },

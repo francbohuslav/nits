@@ -1,14 +1,16 @@
 import { Box, Button, LinearProgress, TextField } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { IUserPublicData } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
 import { Header } from "../components/header";
+import { DataContext, IDataContextValue } from "../data-context";
 import { Router } from "../router";
 import React = require("react");
 
 export const NotifySettingsPage = () => {
+    const { projectConfig } = useContext<IDataContextValue>(DataContext);
     const [email, setEmail] = useState<string>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isTesting, setIsTesting] = useState(false);
@@ -74,14 +76,18 @@ export const NotifySettingsPage = () => {
 
                     <Box display="flex">
                         <Box flexGrow={1}>
-                            {isTesting ? (
-                                <Box pt={2} width={210}>
-                                    <LinearProgress />
-                                </Box>
-                            ) : (
-                                <Button variant="contained" color="secondary" onClick={onTest}>
-                                    Poslat testovací zprávu
-                                </Button>
+                            {projectConfig?.emailIsActive && (
+                                <>
+                                    {isTesting ? (
+                                        <Box pt={2} width={210}>
+                                            <LinearProgress />
+                                        </Box>
+                                    ) : (
+                                        <Button variant="contained" color="secondary" onClick={onTest}>
+                                            Poslat testovací zprávu
+                                        </Button>
+                                    )}
+                                </>
                             )}
                         </Box>
                         <Box>

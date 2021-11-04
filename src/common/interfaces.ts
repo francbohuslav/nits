@@ -71,6 +71,8 @@ export interface IProjectConfigPublic {
     /** If true, no changes are made. All is readonly. Default is true */
     jiraClientId: string;
     serverAddress: string;
+    /** Email settings are set and can use emailing */
+    emailIsActive: boolean;
 }
 export type IUserState = "disabled" | "readonly" | "active";
 
