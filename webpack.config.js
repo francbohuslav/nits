@@ -62,6 +62,7 @@ module.exports = {
             patterns: [
                 { from: "src/web/images", to: "images" },
                 { from: "src/web/privacy-policy.html", to: "privacy-policy.html" },
+                { from: "src/web/contact.html", to: "contact.html" },
             ],
         }),
     ],
