@@ -36,7 +36,7 @@ export class JiraController {
             redirect_uri: this.projectConfig.serverAddress + "/server/jira/oauth",
         });
         const accessToken = response.data.access_token;
-        console.log("accessToken", accessToken);
+        console.log("accessToken", response.data);
 
         const jiraApi = new JiraApi(
             {
