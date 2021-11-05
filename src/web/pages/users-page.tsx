@@ -248,11 +248,7 @@ export const UsersPage = () => {
             )}
 
             <Box display="flex" mt={2}>
-                <Box flexGrow={1}>
-                    <Button variant="contained" color="secondary" href={Router.PageSynchronization} target="_blank">
-                        Spustit synchronizaci
-                    </Button>
-                </Box>
+                <Box flexGrow={1}></Box>
                 <Box>
                     <Button variant="contained" onClick={() => history.push(Router.PageMain)}>
                         Zpět

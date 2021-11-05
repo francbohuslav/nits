@@ -1,4 +1,4 @@
-import { AppBar, Box, Container, makeStyles, Toolbar, Tooltip, Typography } from "@material-ui/core";
+import { AppBar, Box, Button, Container, makeStyles, Toolbar, Tooltip, Typography } from "@material-ui/core";
 import TimerIcon from "@material-ui/icons/Timer";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
@@ -41,6 +41,13 @@ export const MainLayout = (props: IMainLayoutProps) => {
                             </Tooltip>
                         </Link>
                     </Box>
+                    {userData?.isAdmin && (
+                        <Box mr={3}>
+                            <Button variant="contained" color="secondary" href={Router.PageSynchronization} target="_blank">
+                                Spustit synchronizaci
+                            </Button>
+                        </Box>
+                    )}
                     <Typography variant="h6" align="right">
                         {userData?.name}
                         {userData?.isAdmin ? " (admin)" : ""}
