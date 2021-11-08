@@ -27,9 +27,11 @@ export class Worklog {
     }
 
     public toString(): string {
-        return `JIRA Worklog ${this.author.displayName} ${this._issueKey || this.issueId} ${dateUtils.formatDateTime(this.started, true)} ${
-            this.commentAsText
-        }`;
+        const time = this.timeSpentSeconds / 3600;
+        return `JIRA Worklog ${this.author.displayName} ${this._issueKey || this.issueId} ${dateUtils.formatDateTime(
+            this.started,
+            true
+        )} (${dateUtils.formatHours(time)}) ${this.commentAsText}`;
     }
 }
 

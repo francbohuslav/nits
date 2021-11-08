@@ -1,18 +1,14 @@
 import { Inject } from "injector";
-import arrayUtils from "../../common/array-utils";
-import { assert } from "../../common/core";
 import dateUtils from "../../common/date-utils";
-import { IArtifactSettings } from "../../common/interfaces";
 import { WtmError } from "../apis/wtm-api";
 import { ISyncReport, ISyncReportUser, TimesheetMapping, TimesheetMappingsPerDay } from "../models/interfaces";
-import { IIssue, IIssueCustomField, Worklog } from "../models/jira/interfaces";
-import { JiraModel } from "../models/jira/jira-model";
+import { Worklog } from "../models/jira/interfaces";
+import { IWtmTsConfigPerIssueKey, JiraModel } from "../models/jira/jira-model";
+import { ProjectDataModel } from "../models/project-data-model";
 import { SystemDataModel } from "../models/system-data-model";
 import { UserDataModel } from "../models/user-data-model";
 import { nitsTimesheetFilter, Timesheet, TimesheetModelFactoryHandler } from "../models/uu/interfaces";
-import { IProjectConfig } from "../project-config";
 import { NotifyController } from "./notify-controller";
-import { ProjectController } from "./project-controller";
 
 @Inject.Singleton
 export class SyncController {
@@ -20,9 +16,8 @@ export class SyncController {
         private userDataModel: UserDataModel,
         private systemDataModel: SystemDataModel,
         private jiraModel: JiraModel,
-        private projectController: ProjectController,
+        private projectDataModel: ProjectDataModel,
         private notifyController: NotifyController,
-        @Inject.Value("projectConfig") private projectConfig: IProjectConfig,
         @Inject.Value("timesheetModelFactory") private timesheetModelFactory: TimesheetModelFactoryHandler
     ) {}
 
@@ -42,11 +37,18 @@ export class SyncController {
         // Get all changed worklogs
         let allWorklogList = await this.jiraModel.getLastWorklogs(startDate, endDate);
 
-        // Filter that worklogs be project settings. Only worklogs with artifact is relevant
+        // Filter that worklogs by project settings. Only worklogs with artifact is relevant
         const wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey = {};
-        const issuesById = await this.getAllNeededIssues(allWorklogList);
+        const issuesById = await this.jiraModel.getAllNeededIssues(allWorklogList);
         allWorklogList.forEach((w) => (w.issueKey = issuesById[w.issueId].key));
-        allWorklogList = await this.filterWorklogsAndAssignWtmConfig(allWorklogList, issuesById, wtmTsConfigPerIssueKey, report);
+        const artifactSettingsList = await this.projectDataModel.getArtifactSettings();
+        allWorklogList = await this.jiraModel.filterWorklogsAndAssignWtmConfig(
+            allWorklogList,
+            issuesById,
+            wtmTsConfigPerIssueKey,
+            artifactSettingsList,
+            report
+        );
 
         // Split worklogs by user
         const worklogListPerAccountId: { [accountId: string]: Worklog[] } = {};
@@ -116,83 +118,6 @@ export class SyncController {
             report.log.push(err.message + "\n" + err.stack);
         }
         return report;
-    }
-
-    protected async filterWorklogsAndAssignWtmConfig(
-        worklogList: Worklog[],
-        issuesById: { [id: string]: IIssue },
-        wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey,
-        report: ISyncReport
-    ): Promise<Worklog[]> {
-        const artifactSettingsList = await this.projectController.getArtifactSettings();
-
-        const validProjectCodes = artifactSettingsList.map((p) => p.jiraProjectKey);
-
-        const validWorklogs: Worklog[] = [];
-        for (const workglog of worklogList) {
-            const issue = issuesById[workglog.issueId];
-            const parentIssue = issue.fields.parent ? issuesById[issue.fields.parent.id] : null;
-            assert(issue, `Issue ${workglog.issueKey} of worklog ${workglog.toString()} not found`);
-
-            const projectKey = issue.fields.project.key;
-            let nitsField = issue.fields[this.projectConfig.jira.nitsCustomField] as IIssueCustomField;
-            nitsField = nitsField || (parentIssue ? (parentIssue.fields[this.projectConfig.jira.nitsCustomField] as IIssueCustomField) : null);
-            const nitsFieldId = nitsField ? nitsField.id : null;
-
-            let artifactSettings: IArtifactSettings = null;
-
-            if (!validProjectCodes.includes(projectKey)) {
-                report.log.push(`Worklog ${workglog.toString()} skipped. Project ${projectKey} is not configured.`);
-                continue;
-            }
-
-            // Exact fit of project and NITS field
-            artifactSettings = artifactSettingsList.find((p) => p.jiraProjectKey == projectKey && p.jiraNitsField && p.jiraNitsField == nitsFieldId);
-            if (artifactSettings) {
-                report.log.push(`Worklog ${workglog.toString()} passed. Artifact ${artifactSettings.wtmArtifact} will be used.`);
-            }
-            // Issue with project without specified NITS field
-            if (!artifactSettings) {
-                artifactSettings = artifactSettingsList.find((p) => p.jiraProjectKey == projectKey && !p.jiraNitsField && !nitsFieldId);
-                if (artifactSettings) {
-                    report.log.push(`Worklog ${workglog.toString()} passed. Artifact ${artifactSettings.wtmArtifact} will be used.`);
-                }
-            }
-            // Issue with project but with unknown NITS field
-            if (!artifactSettings) {
-                artifactSettings = artifactSettingsList.find((p) => p.jiraProjectKey == projectKey && !p.jiraNitsField && nitsFieldId);
-                if (artifactSettings) {
-                    report.log.push(
-                        `Worklog ${workglog.toString()} passed. Artifact ${
-                            artifactSettings.wtmArtifact
-                        } will be used. WARNING: issue or parent has unused NITS custom field ${JSON.stringify(nitsField)}.`
-                    );
-                }
-            }
-            if (artifactSettings) {
-                validWorklogs.push(workglog);
-                wtmTsConfigPerIssueKey[issue.key] = artifactSettings;
-            } else {
-                report.log.push(`Worklog ${workglog.toString()} skipped. Neither issue ${issue.key} nor parent has no valid configuration.`);
-            }
-        }
-        return validWorklogs;
-    }
-
-    /**
-     * Returns all used issues and parents in worklogs
-     * @param worklogList
-     */
-    private async getAllNeededIssues(worklogList: Worklog[]): Promise<{ [id: string]: IIssue }> {
-        const issues = worklogList.length ? await this.jiraModel.getIssuesById(worklogList.map((w) => w.issueId)) : [];
-        const issuesById = arrayUtils.toDictionary<IIssue, IIssue>(issues, (i) => i.id);
-        const parents = issues.length ? await this.jiraModel.getIssuesById(issues.filter((i) => i.fields.parent?.id).map((i) => i.fields.parent.id)) : [];
-        parents.forEach((p) => {
-            if (!issuesById[p.id]) {
-                issuesById[p.id] = p;
-            }
-        });
-        return issuesById;
     }
 
     protected separateTimesheets(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; timesheetsToRemain: Timesheet[] } {
@@ -318,8 +243,6 @@ export class SyncController {
         return { interval, isPauseApplied };
     }
 }
-
-export type IWtmTsConfigPerIssueKey = { [issueId: string]: IArtifactSettings };
 
 export interface IInterval {
     from: Date;

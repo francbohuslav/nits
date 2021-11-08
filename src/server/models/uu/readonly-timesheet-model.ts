@@ -2,9 +2,9 @@ import arrayUtils from "../../../common/array-utils";
 import { assert } from "../../../common/core";
 import dateUtils from "../../../common/date-utils";
 import { WtmApi, WtmError } from "../../apis/wtm-api";
-import { IWtmTsConfigPerIssueKey } from "../../controllers/sync-controller";
 import { ISyncReportUser, TimesheetMapping, TimesheetMappingsPerDay } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
+import { IWtmTsConfigPerIssueKey } from "../jira/jira-model";
 import { UuUserModel } from "../uu-user-model";
 import { ITimesheetModel, ITimesheetPerUser, Timesheet } from "./interfaces";
 

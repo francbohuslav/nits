@@ -1,191 +1,9 @@
-import { IArtifactSettings } from "../src/common/interfaces";
-import { IInterval, IWtmTsConfigPerIssueKey, SyncController } from "../src/server/controllers/sync-controller";
-import { ISyncReport, TimesheetMapping, TimesheetMappingsPerDay } from "../src/server/models/interfaces";
-import { IIssue, Worklog } from "../src/server/models/jira/interfaces";
+import { IInterval, SyncController } from "../src/server/controllers/sync-controller";
+import { TimesheetMapping, TimesheetMappingsPerDay } from "../src/server/models/interfaces";
 import { Timesheet } from "../src/server/models/uu/interfaces";
 
-test("filterWorklogsAndAssignWtmConfig", async () => {
-    const NITS_FIELD_VALUE_1 = "1";
-    const NITS_FIELD_VALUE_2 = "2";
-    const NITS_FIELD_UNKNOWN_VALUE = "3";
-    const projectController = {
-        async getArtifactSettings(): Promise<IArtifactSettings[]> {
-            return [
-                {
-                    jiraProjectKey: "CET",
-                    jiraNitsField: "",
-                    wtmArtifact: "CET-WITHOUT-FIELD",
-                },
-                {
-                    jiraProjectKey: "CET",
-                    jiraNitsField: NITS_FIELD_VALUE_1,
-                    wtmArtifact: "CET-WITH-NITS-1",
-                },
-                {
-                    jiraProjectKey: "CET",
-                    jiraNitsField: NITS_FIELD_VALUE_2,
-                    wtmArtifact: "CET-WITH-NITS-2",
-                },
-                {
-                    jiraProjectKey: "SUP",
-                    jiraNitsField: NITS_FIELD_VALUE_1,
-                    wtmArtifact: "CET-WITH-NITS-3",
-                },
-            ];
-        },
-    } as any;
-
-    const issuesById: { [id: string]: IIssue } = {
-        "1": {
-            id: "1",
-            fields: {
-                project: {
-                    id: "100",
-                    key: "CET",
-                    name: "CET",
-                },
-            },
-            key: "CET-1",
-        },
-        "2": {
-            id: "2",
-            fields: {
-                project: {
-                    id: "100",
-                    key: "CET",
-                    name: "CET",
-                },
-                nitsCustomFiled: {
-                    id: NITS_FIELD_VALUE_1,
-                    value: "NITS_FIELD_VALUE_1",
-                },
-            },
-            key: "CET-2",
-        },
-        "3": {
-            id: "3",
-            fields: {
-                project: {
-                    id: "100",
-                    key: "CET",
-                    name: "CET",
-                },
-                nitsCustomFiled: {
-                    id: NITS_FIELD_VALUE_2,
-                    value: "NITS_FIELD_VALUE_2",
-                },
-            },
-            key: "CET-3",
-        },
-        "4": {
-            id: "4",
-            fields: {
-                project: {
-                    id: "100",
-                    key: "CET",
-                    name: "CET",
-                },
-                nitsCustomFiled: {
-                    id: NITS_FIELD_UNKNOWN_VALUE,
-                    value: "NITS_FIELD_UNKNOWN_VALUE",
-                },
-            },
-            key: "CET-4",
-        },
-        // will not be used
-        "5": {
-            id: "5",
-            fields: {
-                project: {
-                    id: "200",
-                    key: "OUT",
-                    name: "OUT",
-                },
-            },
-            key: "OUT-4",
-        },
-        // configuration not fit
-        "6": {
-            id: "6",
-            fields: {
-                project: {
-                    id: "300",
-                    key: "SUP",
-                    name: "SUP",
-                },
-            },
-            key: "SUP-6",
-        },
-    };
-
-    const syncController = new TestingSyncController(
-        null,
-        null,
-        null,
-        projectController,
-        null,
-        {
-            cryptoSalt: "test",
-            serverAddress: "",
-            email: {
-                password: "",
-                sender: "",
-                user: "",
-            },
-            jira: {
-                clientId: "",
-                clientSecret: "",
-                cloudId: "",
-                nitsCustomField: "nitsCustomFiled",
-            },
-            userDataEncrypted: false,
-        },
-        null
-    );
-    const inputWorklogs: Partial<Worklog>[] = [
-        {
-            id: "10",
-            issueId: "1",
-        },
-        {
-            id: "20",
-            issueId: "2",
-        },
-        {
-            id: "30",
-            issueId: "3",
-        },
-        {
-            id: "40",
-            issueId: "4",
-        },
-        {
-            id: "50",
-            issueId: "5",
-        },
-        {
-            id: "60",
-            issueId: "6",
-        },
-    ];
-    const wtmTsConfigPerIssueId: IWtmTsConfigPerIssueKey = {};
-    const report: ISyncReport = { log: [], users: [] };
-    const workLog = await syncController.publishedFilterWorklogsAndAssignWtmConfig(inputWorklogs as Worklog[], issuesById, wtmTsConfigPerIssueId, report);
-    expect(workLog).toHaveLength(4);
-    expect(wtmTsConfigPerIssueId).toBeTruthy();
-    expect(wtmTsConfigPerIssueId["CET-1"].wtmArtifact).toBe("CET-WITHOUT-FIELD");
-    expect(wtmTsConfigPerIssueId["CET-2"].wtmArtifact).toBe("CET-WITH-NITS-1");
-    expect(wtmTsConfigPerIssueId["CET-3"].wtmArtifact).toBe("CET-WITH-NITS-2");
-    expect(wtmTsConfigPerIssueId["CET-4"].wtmArtifact).toBe("CET-WITHOUT-FIELD");
-    expect(wtmTsConfigPerIssueId["5"]).toBeUndefined();
-    expect(wtmTsConfigPerIssueId["6"]).toBeUndefined();
-    expect(report.log[3]).toContain("WARNING");
-    expect(report.log[4]).toContain("skipped. Project OUT is not configured.");
-    expect(report.log[5]).toContain("nor parent has no valid configuration");
-});
-
 test("separateTimesheets", async () => {
-    const syncController = new TestingSyncController(null, null, null, null, null, null, null);
+    const syncController = new TestingSyncController(null, null, null, null, null, null);
     const result = syncController.separateTimesheets2([
         {
             data: undefined,
@@ -216,7 +34,7 @@ test("separateTimesheets", async () => {
 
 describe("computeNewTimesheets", () => {
     test("split_to_days", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const result = syncController.computeNewTimesheets2(
             {
                 "2021-10-11": [
@@ -295,7 +113,7 @@ describe("getNextFreeTimeSegment", () => {
     let searchFromTime: Date;
 
     beforeEach(() => {
-        syncController = new TestingSyncController(null, null, null, null, null, null, null);
+        syncController = new TestingSyncController(null, null, null, null, null, null);
         searchFromTime = new Date("2021-10-12T06:00:00Z");
     });
 
@@ -405,12 +223,12 @@ describe("getNextFreeTimeSegment", () => {
 
 describe("computeNewTimesheetsInDay", () => {
     test("empty", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         expect(syncController.computeNewTimesheetsInDay2([], []).length).toBe(0);
     });
 
     test("no_remaining_timesheets", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const tsmBase = {
             date: "2021-10-12",
             description: "desc",
@@ -462,7 +280,7 @@ describe("computeNewTimesheetsInDay", () => {
     });
 
     test("time_shift_because_of_too_much", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const tsmBase = {
             date: "2021-10-12",
             description: "desc",
@@ -502,7 +320,7 @@ describe("computeNewTimesheetsInDay", () => {
     });
 
     test("no_space_for_timesheets", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const tsmBase = {
             date: "2021-10-12",
             description: "desc",
@@ -524,7 +342,7 @@ describe("computeNewTimesheetsInDay", () => {
     });
 
     test("full_test_with_splitted", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const tsmBase = {
             date: "2021-10-12",
             description: "desc",
@@ -574,14 +392,14 @@ describe("computeNewTimesheetsInDay", () => {
 
 describe("computeNewTimesheetInSegment", () => {
     test("empty", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const newTimesheets: Timesheet[] = [];
         syncController.computeNewTimesheetInSegment2({ from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T06:00:00Z") }, newTimesheets, []);
         expect(newTimesheets.length).toBe(0);
     });
 
     test("timesheet_shorter_then_segment", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const newTimesheets: Timesheet[] = [];
         const timesheetMappings: TimesheetMapping[] = [
             {
@@ -615,7 +433,7 @@ describe("computeNewTimesheetInSegment", () => {
     });
 
     test("timesheet_longer_then_segment", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const newTimesheets: Timesheet[] = [];
         const timesheetMappings: TimesheetMapping[] = [
             {
@@ -640,7 +458,7 @@ describe("computeNewTimesheetInSegment", () => {
     });
 
     test("timesheets_exact_as_segment", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
         const newTimesheets: Timesheet[] = [];
         const timesheetMappings: TimesheetMapping[] = [
             {
@@ -684,15 +502,6 @@ describe("computeNewTimesheetInSegment", () => {
 });
 
 class TestingSyncController extends SyncController {
-    public async publishedFilterWorklogsAndAssignWtmConfig(
-        worklogList: Worklog[],
-        issuesById: { [id: string]: IIssue },
-        wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey,
-        report: ISyncReport
-    ): Promise<Worklog[]> {
-        return this.filterWorklogsAndAssignWtmConfig(worklogList, issuesById, wtmTsConfigPerIssueKey, report);
-    }
-
     public separateTimesheets2(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; timesheetsToRemain: Timesheet[] } {
         return this.separateTimesheets(exitingTimesheets);
     }

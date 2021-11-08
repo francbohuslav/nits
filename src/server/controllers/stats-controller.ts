@@ -2,8 +2,10 @@ import { Inject } from "injector";
 import arrayUtils from "../../common/array-utils";
 import dateUtils from "../../common/date-utils";
 import { IStats, IStatsDays, IUserData, IUserStats } from "../../common/interfaces";
+import { ISyncReport } from "../models/interfaces";
 import { Worklog } from "../models/jira/interfaces";
-import { JiraModel } from "../models/jira/jira-model";
+import { IWtmTsConfigPerIssueKey, JiraModel } from "../models/jira/jira-model";
+import { ProjectDataModel } from "../models/project-data-model";
 import { UserDataModel } from "../models/user-data-model";
 import { ITimesheetModel, nitsTimesheetFilter, Timesheet, TimesheetModelFactoryHandler } from "../models/uu/interfaces";
 
@@ -12,6 +14,7 @@ export class StatsController {
     constructor(
         private userDataModel: UserDataModel,
         private jiraModel: JiraModel,
+        private projectDataModel: ProjectDataModel,
         @Inject.Value("timesheetModelFactory") private timesheetModelFactory: TimesheetModelFactoryHandler
     ) {}
 
@@ -87,7 +90,9 @@ export class StatsController {
         toExcept: Date
     ): Promise<{ worklogsPerUser: IWorklogsPerUser; worklogsPerUserAndDay: IWorklogsPerUserAndDay }> {
         const validUserIds = userDataList.map((u) => u.jiraAccountId);
-        const worklogList = await this.jiraModel.getLastWorklogs(since, toExcept);
+        let worklogList = await this.jiraModel.getLastWorklogs(since, toExcept);
+        worklogList = await this.filterJiraWorklogs(worklogList);
+
         const worklogsPerUser = arrayUtils.toGroups(
             worklogList.filter((w) => validUserIds.includes(w.author.accountId)),
             (w) => w.author.accountId
@@ -97,6 +102,16 @@ export class StatsController {
             ([accountId, wlogs]) => (worklogsPerUserAndDay[accountId] = arrayUtils.toGroups(wlogs, (w) => dateUtils.toIsoFormat(w.startedDate)))
         );
         return { worklogsPerUserAndDay, worklogsPerUser };
+    }
+
+    private async filterJiraWorklogs(allWorklogList: Worklog[]): Promise<Worklog[]> {
+        // Filter that worklogs by project settings. Only worklogs with artifact is relevant
+        const report: ISyncReport = { users: [], log: [] };
+        const wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey = {};
+        const issuesById = await this.jiraModel.getAllNeededIssues(allWorklogList);
+        allWorklogList.forEach((w) => (w.issueKey = issuesById[w.issueId].key));
+        const artifactSettingsList = await this.projectDataModel.getArtifactSettings();
+        return await this.jiraModel.filterWorklogsAndAssignWtmConfig(allWorklogList, issuesById, wtmTsConfigPerIssueKey, artifactSettingsList, report);
     }
 
     private async getWtmTimesheets(

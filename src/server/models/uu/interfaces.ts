@@ -1,8 +1,8 @@
 import dateUtils from "../../../common/date-utils";
 import { IUserData } from "../../../common/interfaces";
-import { IWtmTsConfigPerIssueKey } from "../../controllers/sync-controller";
 import { ISyncReportUser, TimesheetMappingsPerDay } from "../interfaces";
 import { Worklog } from "../jira/interfaces";
+import { IWtmTsConfigPerIssueKey } from "../jira/jira-model";
 
 export type TimesheetModelFactoryHandler = (userData: IUserData) => ITimesheetModel;
 
@@ -32,7 +32,11 @@ export class Timesheet {
     }
 
     public toString(): string {
-        return `UU Timesheet: ${dateUtils.formatDateTime(this.datetimeFrom, true)} - ${dateUtils.formatDateTime(this.datetimeTo, true)} - ${this.description}`;
+        const time = dateUtils.secondsBetween(this.datetimeFrom, this.datetimeTo) / 3600;
+        return `UU Timesheet: ${dateUtils.formatDateTime(this.datetimeFrom, true)} - ${dateUtils.formatDateTime(
+            this.datetimeTo,
+            true
+        )} = ${dateUtils.formatHours(time)} | ${this.description}`;
     }
 }
 

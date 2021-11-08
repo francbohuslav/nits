@@ -1,8 +1,12 @@
 import { Inject } from "injector";
+import arrayUtils from "../../../common/array-utils";
+import { assert } from "../../../common/core";
 import dateUtils from "../../../common/date-utils";
+import { IArtifactSettings } from "../../../common/interfaces";
 import { JiraApi } from "../../apis/jira-api";
 import { IProjectConfig } from "../../project-config";
-import { IAccount, IIssue, Worklog } from "./interfaces";
+import { ISyncReport } from "../interfaces";
+import { IAccount, IIssue, IIssueCustomField, Worklog } from "./interfaces";
 
 @Inject.Singleton
 export class JiraModel {
@@ -29,6 +33,82 @@ export class JiraModel {
     public async getIssuesById(ids: string[]): Promise<IIssue[]> {
         const uniqIds = ids.filter((id, index) => ids.indexOf(id) == index);
         return await this.jiraApi.searchIssues("id in (" + uniqIds.join(",") + ")", ["project", "parent", this.projectConfig.jira.nitsCustomField]);
+    }
+
+    public async filterWorklogsAndAssignWtmConfig(
+        worklogList: Worklog[],
+        issuesById: { [id: string]: IIssue },
+        wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey,
+        artifactSettingsList: IArtifactSettings[],
+        report: ISyncReport
+    ): Promise<Worklog[]> {
+        const validProjectCodes = artifactSettingsList.map((p) => p.jiraProjectKey);
+
+        const validWorklogs: Worklog[] = [];
+        for (const workglog of worklogList) {
+            const issue = issuesById[workglog.issueId];
+            const parentIssue = issue.fields.parent ? issuesById[issue.fields.parent.id] : null;
+            assert(issue, `Issue ${workglog.issueKey} of worklog ${workglog.toString()} not found`);
+
+            const projectKey = issue.fields.project.key;
+            let nitsField = issue.fields[this.projectConfig.jira.nitsCustomField] as IIssueCustomField;
+            nitsField = nitsField || (parentIssue ? (parentIssue.fields[this.projectConfig.jira.nitsCustomField] as IIssueCustomField) : null);
+            const nitsFieldId = nitsField ? nitsField.id : null;
+
+            let artifactSettings: IArtifactSettings = null;
+
+            if (!validProjectCodes.includes(projectKey)) {
+                report.log.push(`Worklog ${workglog.toString()} skipped. Project ${projectKey} is not configured.`);
+                continue;
+            }
+
+            // Exact fit of project and NITS field
+            artifactSettings = artifactSettingsList.find((p) => p.jiraProjectKey == projectKey && p.jiraNitsField && p.jiraNitsField == nitsFieldId);
+            if (artifactSettings) {
+                report.log.push(`Worklog ${workglog.toString()} passed. Artifact ${artifactSettings.wtmArtifact} will be used.`);
+            }
+            // Issue with project without specified NITS field
+            if (!artifactSettings) {
+                artifactSettings = artifactSettingsList.find((p) => p.jiraProjectKey == projectKey && !p.jiraNitsField && !nitsFieldId);
+                if (artifactSettings) {
+                    report.log.push(`Worklog ${workglog.toString()} passed. Artifact ${artifactSettings.wtmArtifact} will be used.`);
+                }
+            }
+            // Issue with project but with unknown NITS field
+            if (!artifactSettings) {
+                artifactSettings = artifactSettingsList.find((p) => p.jiraProjectKey == projectKey && !p.jiraNitsField && nitsFieldId);
+                if (artifactSettings) {
+                    report.log.push(
+                        `Worklog ${workglog.toString()} passed. Artifact ${
+                            artifactSettings.wtmArtifact
+                        } will be used. WARNING: issue or parent has unused NITS custom field ${JSON.stringify(nitsField)}.`
+                    );
+                }
+            }
+            if (artifactSettings) {
+                validWorklogs.push(workglog);
+                wtmTsConfigPerIssueKey[issue.key] = artifactSettings;
+            } else {
+                report.log.push(`Worklog ${workglog.toString()} skipped. Neither issue ${issue.key} nor parent has no valid configuration.`);
+            }
+        }
+        return validWorklogs;
+    }
+
+    /**
+     * Returns all used issues and parents in worklogs
+     * @param worklogList
+     */
+    public async getAllNeededIssues(worklogList: Worklog[]): Promise<{ [id: string]: IIssue }> {
+        const issues = worklogList.length ? await this.getIssuesById(worklogList.map((w) => w.issueId)) : [];
+        const issuesById = arrayUtils.toDictionary<IIssue, IIssue>(issues, (i) => i.id);
+        const parents = issues.length ? await this.getIssuesById(issues.filter((i) => i.fields.parent?.id).map((i) => i.fields.parent.id)) : [];
+        parents.forEach((p) => {
+            if (!issuesById[p.id]) {
+                issuesById[p.id] = p;
+            }
+        });
+        return issuesById;
     }
 
     private convertCommentToText(worklog: Worklog): string {
@@ -68,3 +148,5 @@ export class JiraModel {
         return lines.join("\n");
     }
 }
+
+export type IWtmTsConfigPerIssueKey = { [issueId: string]: IArtifactSettings };
