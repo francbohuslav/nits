@@ -7,10 +7,17 @@ import { UserController } from "./user-controller";
 export class NotifyController {
     constructor(private userController: UserController, @Inject.Value("projectConfig") private projectConfig: IProjectConfig) {}
 
-    public async testEmail(email: string): Promise<void> {
+    public async sendTestEmail(email: string): Promise<void> {
         await this.sendEmail(email, "NITS: testovací zpráva", "Toto je testovací zpráva z NITS. Zdá se, že vše funguje.");
     }
-
+    public async sendMonthUserEmail(email: string): Promise<void> {
+        const today = new Date();
+        await this.sendEmail(
+            email,
+            `NITS: výkazy za ${today.getMonth() + 1}/${today.getFullYear()}`,
+            "Toto je testovací zpráva z NITS. Zdá se, že vše funguje."
+        );
+    }
     public async syncError(): Promise<void> {
         const admins = await this.userController.getAdmins();
         for (const adminUid of admins) {
@@ -32,7 +39,9 @@ export class NotifyController {
         return new Promise((resolve) => {
             console.log(`Sending to ${email}`);
             const transporter = nodemailer.createTransport({
-                service: "gmail",
+                host: this.projectConfig.email.host,
+                port: this.projectConfig.email.port,
+                secure: this.projectConfig.email.secure,
                 auth: {
                     user: this.projectConfig.email.user,
                     pass: this.projectConfig.email.password,

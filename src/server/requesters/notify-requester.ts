@@ -15,7 +15,7 @@ export class NotifyRequester extends BaseRequester {
         await this.userController.setNotificationEmail(uid, req.body.email);
     }
 
-    public async testEmail(req: Request): Promise<void> {
-        await this.notifyController.testEmail(req.body.email as string);
+    public async sendTestEmail(req: Request): Promise<void> {
+        await this.notifyController.sendTestEmail(req.body.email as string);
     }
 }

@@ -12,6 +12,8 @@ import { NotifyController } from "./notify-controller";
 
 @Inject.Singleton
 export class SyncController {
+    private nextPossibleStartTime: Date;
+
     constructor(
         private userDataModel: UserDataModel,
         private systemDataModel: SystemDataModel,
@@ -23,6 +25,11 @@ export class SyncController {
 
     public async sync(): Promise<ISyncReport> {
         const report: ISyncReport = { users: [], log: [] };
+        if (this.nextPossibleStartTime && dateUtils.isLowerThen(new Date(), this.nextPossibleStartTime)) {
+            report.log.push(`Too soon. Try it again after ${dateUtils.formatDateTime(this.nextPossibleStartTime)}`);
+            return report;
+        }
+        this.setNextPossibleStartTime();
         let isAtLeastOneError = false;
         const syncDaysCount = (await this.systemDataModel.getSystemConfig()).syncDaysCount;
 
@@ -109,6 +116,7 @@ export class SyncController {
                 };
                 this.userDataModel.setUserData(userData.uid, userData);
             }
+            this.setNextPossibleStartTime();
         }
         try {
             if (isAtLeastOneError) {
@@ -241,6 +249,10 @@ export class SyncController {
             }
         } while (dateUtils.areEquals(interval.from, interval.to));
         return { interval, isPauseApplied };
+    }
+
+    private setNextPossibleStartTime() {
+        this.nextPossibleStartTime = dateUtils.increase(new Date(), "minutes", 5);
     }
 }
 

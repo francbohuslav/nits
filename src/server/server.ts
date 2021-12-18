@@ -9,6 +9,7 @@ import { Container } from "injector";
 import { IBaseResponse } from "../common/ajax-interfaces";
 import { IProjectConfigPublic, IUserData } from "../common/interfaces";
 import { WtmApi, WtmError } from "./apis/wtm-api";
+import { CronController } from "./controllers/cron-controller";
 import { LoginAuthorizer } from "./helpers/login-authorizer";
 import { UuUserModel } from "./models/uu-user-model";
 import { TimesheetModelFactoryHandler } from "./models/uu/interfaces";
@@ -76,6 +77,9 @@ const syncRequester = container.resolveClass(SyncRequester);
 const projectReqester = container.resolveClass(ProjectRequester);
 const notifyRequester = container.resolveClass(NotifyRequester);
 const statsRequester = container.resolveClass(StatsRequester);
+const crontController = container.resolveClass(CronController);
+
+crontController.run();
 
 const app = express();
 app.use(compression());
@@ -123,12 +127,12 @@ const methods: IServerMethod[] = [
     m("get", "/server/get-user-session", userRequester.getUserSession.bind(userRequester), loginAuthorize),
     m("post", "/server/logout-jira", userRequester.logoutJira.bind(userRequester), loginAuthorize),
     m("get", "/server/jira/oauth", jiraRequester.oauth.bind(jiraRequester)),
-    m("get", "/server/sync", syncRequester.sync.bind(syncRequester), undefined, { formatOutput: true }),
     m("post", "/server/notify/set", notifyRequester.setNotificationEmail.bind(notifyRequester), loginAuthorize),
-    m("post", "/server/notify/test", notifyRequester.testEmail.bind(notifyRequester), loginAuthorize),
+    m("post", "/server/notify/test", notifyRequester.sendTestEmail.bind(notifyRequester), loginAuthorize),
     m("get", "/server/user-stats/get", statsRequester.getUserStats.bind(statsRequester), loginAuthorize),
 
     // admin commands
+    m("get", "/server/sync", syncRequester.sync.bind(syncRequester), adminAuthorize, { formatOutput: true }),
     m("get", "/server/project-settings/get-artifacts", projectReqester.getArtifactSettings.bind(projectReqester), adminAuthorize),
     m("post", "/server/project-settings/set-artifacts", projectReqester.setArtifactSettings.bind(projectReqester), adminAuthorize),
     m("get", "/server/project-settings/get-config", projectReqester.getSystemConfig.bind(projectReqester), adminAuthorize),

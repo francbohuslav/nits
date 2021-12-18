@@ -79,6 +79,8 @@ export type IUserState = "disabled" | "readonly" | "active";
 export interface ISystemConfig {
     adminUids: string[];
     syncDaysCount: number;
+    syncHour: number;
+    notifyHour: number;
 }
 export interface IJiraAccount {
     name: string;

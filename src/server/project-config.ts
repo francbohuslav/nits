@@ -10,6 +10,9 @@ export interface IProjectConfig {
         cloudId: string;
     };
     email: {
+        host: string;
+        port: number;
+        secure: boolean;
         user: string;
         password: string;
         sender: string;
@@ -33,6 +36,9 @@ export class ProjectConfigurer {
                     cloudId: process.env.NITS_JIRA_CLOUD_ID,
                 },
                 email: {
+                    host: process.env.NITS_EMAIL_HOST,
+                    port: parseInt(process.env.NITS_EMAIL_PORT),
+                    secure: !!process.env.NITS_EMAIL_SECURE,
                     user: process.env.NITS_EMAIL_USER,
                     password: process.env.NITS_EMAIL_PASS,
                     sender: process.env.NITS_EMAIL_SENDER,

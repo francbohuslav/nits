@@ -12,6 +12,7 @@ export class SystemDataModel {
         const defaultSystemConfig: ISystemConfig = {
             adminUids: ["12-8835-1", "1017-1", "7062-822-1"],
             syncDaysCount: 1,
+            syncHour: 5,
         };
         if (!(await this.dropboxCachedFs.fileExists(filePath))) {
             return defaultSystemConfig;

@@ -71,6 +71,8 @@ export const ProjectSettingsPage = () => {
 
     const onAdminUids = (e: ChangeEvent<HTMLInputElement>) => setAdminUidsAsStr(e.target.value);
     const onSyncDaysCount = (e: ChangeEvent<HTMLInputElement>) => setSystemConfig({ ...systemConfig, syncDaysCount: parseInt(e.target.value) });
+    const onSyncHour = (e: ChangeEvent<HTMLInputElement>) => setSystemConfig({ ...systemConfig, syncHour: parseInt(e.target.value) });
+    const onNotifyHour = (e: ChangeEvent<HTMLInputElement>) => setSystemConfig({ ...systemConfig, notifyHour: parseInt(e.target.value) });
 
     const onSystemConfigSubmit = async () => {
         setIsLoading(true);
@@ -183,7 +185,7 @@ export const ProjectSettingsPage = () => {
                                         </Typography>
                                         <form noValidate onSubmit={onSystemConfigSubmit}>
                                             <Grid container spacing={2}>
-                                                <Grid item xs={12} sm={6}>
+                                                <Grid item xs={12} sm={6} md={3}>
                                                     <TextField
                                                         id="adminUids"
                                                         label="UID administrátorů"
@@ -194,15 +196,40 @@ export const ProjectSettingsPage = () => {
                                                         onChange={onAdminUids}
                                                     />
                                                 </Grid>
-                                                <Grid item xs={12} sm={6}>
+                                                <Grid item xs={12} sm={6} md={3}>
                                                     <TextField
                                                         id="syncDaysCount"
-                                                        label="Počet dnů k synchronizaci"
+                                                        label="Sync dní"
                                                         value={systemConfig?.syncDaysCount || 1}
+                                                        helperText="počet dnů k synchronizaci"
                                                         fullWidth
                                                         required
                                                         type="number"
                                                         onChange={onSyncDaysCount}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={12} sm={6} md={3}>
+                                                    <TextField
+                                                        id="syncHour"
+                                                        label="Sync hodina"
+                                                        value={systemConfig?.syncHour || 5}
+                                                        helperText="hodina, ve které dojde k synchronizaci"
+                                                        fullWidth
+                                                        required
+                                                        type="number"
+                                                        onChange={onSyncHour}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={12} sm={6} md={3}>
+                                                    <TextField
+                                                        id="notifyHour"
+                                                        label="Hodina notifikace"
+                                                        value={systemConfig?.notifyHour || 6}
+                                                        helperText="hodina, ve které dojde na konci měsíce odeslání e-mailu uživatelům"
+                                                        fullWidth
+                                                        required
+                                                        type="number"
+                                                        onChange={onNotifyHour}
                                                     />
                                                 </Grid>
                                             </Grid>
