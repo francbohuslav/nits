@@ -1,11 +1,27 @@
-import { Box, Button, Card, CardContent, Grid, IconButton, LinearProgress, TextField, Tooltip, Typography } from "@material-ui/core";
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    FormControl,
+    FormHelperText,
+    Grid,
+    IconButton,
+    InputLabel,
+    LinearProgress,
+    MenuItem,
+    Select,
+    TextField,
+    Tooltip,
+    Typography,
+} from "@material-ui/core";
 import { DataGrid, GridCellEditCommitParams, GridColumns } from "@material-ui/data-grid";
 import AddIcon from "@material-ui/icons/AddCircleRounded";
 import CloseIcon from "@material-ui/icons/Close";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { IArtifactSettingsResponse } from "../../common/ajax-interfaces";
-import { IArtifactSettings, ISystemConfig } from "../../common/interfaces";
+import { IAllUsersResponse, IArtifactSettingsResponse } from "../../common/ajax-interfaces";
+import { IArtifactSettings, ISystemConfig, IUserPublicData } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
 import { Header } from "../components/header";
@@ -15,6 +31,7 @@ import React = require("react");
 export const ProjectSettingsPage = () => {
     const [artifactSettings, setArtifactSettings] = useState<IArtifactSettings[]>(null);
     const [nitsFieldValues, setNitsFieldValues] = useState<{ [id: string]: string }>({});
+    const [users, setUsers] = useState<IUserPublicData[]>([]);
     const [projects, setProjects] = useState<{ [id: string]: string }>({});
     const [systemConfig, setSystemConfig] = useState<ISystemConfig>(null);
     const [adminUidsAsStr, setAdminUidsAsStr] = useState<string>("");
@@ -39,6 +56,7 @@ export const ProjectSettingsPage = () => {
         setIsLoading(true);
         const res = await ajax.get<IArtifactSettingsResponse>("/server/project-settings/get-artifacts");
         const res2 = await ajax.get<ISystemConfig>("/server/project-settings/get-config");
+        const res3 = await ajax.get<IAllUsersResponse>("/server/admin-users/get");
         if (res.isOk) {
             setArtifactSettings(res.data.records);
             setNitsFieldValues(res.data.nitsFiledValues);
@@ -47,6 +65,9 @@ export const ProjectSettingsPage = () => {
         if (res2.isOk) {
             setSystemConfig(res2.data);
             setAdminUidsAsStr(res2.data.adminUids.join(", "));
+        }
+        if (res3.isOk) {
+            setUsers(res3.data.users);
         }
         setIsLoading(false);
     };
@@ -73,6 +94,7 @@ export const ProjectSettingsPage = () => {
     const onSyncDaysCount = (e: ChangeEvent<HTMLInputElement>) => setSystemConfig({ ...systemConfig, syncDaysCount: parseInt(e.target.value) });
     const onSyncHour = (e: ChangeEvent<HTMLInputElement>) => setSystemConfig({ ...systemConfig, syncHour: parseInt(e.target.value) });
     const onNotifyHour = (e: ChangeEvent<HTMLInputElement>) => setSystemConfig({ ...systemConfig, notifyHour: parseInt(e.target.value) });
+    const onStatsUserUid = (e: any) => setSystemConfig({ ...systemConfig, statsUserUid: e.target.value });
 
     const onSystemConfigSubmit = async () => {
         setIsLoading(true);
@@ -180,23 +202,12 @@ export const ProjectSettingsPage = () => {
                             <Box mb={3}>
                                 <Card>
                                     <CardContent>
-                                        <Typography variant="h6" paragraph>
-                                            Obecná nastavení
-                                        </Typography>
                                         <form noValidate onSubmit={onSystemConfigSubmit}>
+                                            <Typography variant="h6" paragraph>
+                                                Synchronizace
+                                            </Typography>
                                             <Grid container spacing={2}>
-                                                <Grid item xs={12} sm={6} md={3}>
-                                                    <TextField
-                                                        id="adminUids"
-                                                        label="UID administrátorů"
-                                                        helperText="oddělené čárkou"
-                                                        value={adminUidsAsStr}
-                                                        fullWidth
-                                                        required
-                                                        onChange={onAdminUids}
-                                                    />
-                                                </Grid>
-                                                <Grid item xs={12} sm={6} md={3}>
+                                                <Grid item xs={12} sm={6}>
                                                     <TextField
                                                         id="syncDaysCount"
                                                         label="Sync dní"
@@ -208,11 +219,11 @@ export const ProjectSettingsPage = () => {
                                                         onChange={onSyncDaysCount}
                                                     />
                                                 </Grid>
-                                                <Grid item xs={12} sm={6} md={3}>
+                                                <Grid item xs={12} sm={6}>
                                                     <TextField
                                                         id="syncHour"
                                                         label="Sync hodina"
-                                                        value={systemConfig?.syncHour || 5}
+                                                        value={systemConfig?.syncHour || 23}
                                                         helperText="hodina, ve které dojde k synchronizaci"
                                                         fullWidth
                                                         required
@@ -220,7 +231,12 @@ export const ProjectSettingsPage = () => {
                                                         onChange={onSyncHour}
                                                     />
                                                 </Grid>
-                                                <Grid item xs={12} sm={6} md={3}>
+                                            </Grid>
+                                            <Box mt={4}>
+                                                <Typography variant="h6">Notifikace</Typography>
+                                            </Box>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={12} sm={6}>
                                                     <TextField
                                                         id="notifyHour"
                                                         label="Hodina notifikace"
@@ -230,6 +246,42 @@ export const ProjectSettingsPage = () => {
                                                         required
                                                         type="number"
                                                         onChange={onNotifyHour}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={12} sm={6}>
+                                                    <FormControl fullWidth required>
+                                                        <InputLabel id="statsUserUid-label">Uživatel statistik</InputLabel>
+                                                        <Select
+                                                            labelId="statsUserUid-label"
+                                                            id="statsUserUid"
+                                                            value={systemConfig?.statsUserUid || 6}
+                                                            onChange={onStatsUserUid}
+                                                        >
+                                                            {users.map((u) => (
+                                                                <MenuItem key={u.uid} value={u.uid}>
+                                                                    {u.name}
+                                                                </MenuItem>
+                                                            ))}
+                                                        </Select>
+                                                        <FormHelperText>uživatel, pod kterým se stáhnou statistiky pro měsíční notifikaci</FormHelperText>
+                                                    </FormControl>
+                                                </Grid>
+                                            </Grid>
+                                            <Box mt={4}>
+                                                <Typography variant="h6" paragraph>
+                                                    Obecná nastavení
+                                                </Typography>
+                                            </Box>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={12} sm={6}>
+                                                    <TextField
+                                                        id="adminUids"
+                                                        label="UID administrátorů"
+                                                        helperText="oddělené čárkou"
+                                                        value={adminUidsAsStr}
+                                                        fullWidth
+                                                        required
+                                                        onChange={onAdminUids}
                                                     />
                                                 </Grid>
                                             </Grid>

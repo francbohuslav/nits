@@ -133,6 +133,7 @@ const methods: IServerMethod[] = [
 
     // admin commands
     m("get", "/server/sync", syncRequester.sync.bind(syncRequester), adminAuthorize, { formatOutput: true }),
+    m("get", "/server/month-notification", notifyRequester.monthNotification.bind(notifyRequester), adminAuthorize, { formatOutput: true }),
     m("get", "/server/project-settings/get-artifacts", projectReqester.getArtifactSettings.bind(projectReqester), adminAuthorize),
     m("post", "/server/project-settings/set-artifacts", projectReqester.setArtifactSettings.bind(projectReqester), adminAuthorize),
     m("get", "/server/project-settings/get-config", projectReqester.getSystemConfig.bind(projectReqester), adminAuthorize),

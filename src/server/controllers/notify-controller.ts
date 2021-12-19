@@ -1,23 +1,50 @@
 import { Inject } from "injector";
 import nodemailer from "nodemailer";
+import dateUtils from "../../common/date-utils";
+import { ISystemConfig } from "../../common/interfaces";
+import { SystemDataModel } from "../models/system-data-model";
+import { UserDataModel } from "../models/user-data-model";
 import { IProjectConfig } from "../project-config";
+import { StatsController } from "./stats-controller";
 import { UserController } from "./user-controller";
 
 @Inject.Singleton
 export class NotifyController {
-    constructor(private userController: UserController, @Inject.Value("projectConfig") private projectConfig: IProjectConfig) {}
+    constructor(
+        private userController: UserController,
+        private systemDataModel: SystemDataModel,
+        private statsController: StatsController,
+        private userDataModel: UserDataModel,
+        @Inject.Value("projectConfig") private projectConfig: IProjectConfig
+    ) {}
 
     public async sendTestEmail(email: string): Promise<void> {
-        await this.sendEmail(email, "NITS: testovací zpráva", "Toto je testovací zpráva z NITS. Zdá se, že vše funguje.");
+        await this.sendEmail(email, "testovací zpráva", "Toto je testovací zpráva z NITS. Zdá se, že vše funguje.");
     }
-    public async sendMonthUserEmail(email: string): Promise<void> {
-        const today = new Date();
-        await this.sendEmail(
-            email,
-            `NITS: výkazy za ${today.getMonth() + 1}/${today.getFullYear()}`,
-            "Toto je testovací zpráva z NITS. Zdá se, že vše funguje."
-        );
+
+    public async monthNotification(): Promise<string[]> {
+        const systemConfig = await this.systemDataModel.getSystemConfig();
+        if (!systemConfig.statsUserUid) {
+            return ["User for stats is not set. Notifications are skipped."];
+        }
+        const users = await this.userDataModel.getAllUserData();
+        const actualMonth = dateUtils.getStartOfMonth();
+        const report = [];
+        const stats = await this.statsController.getAdminStats(systemConfig.statsUserUid, dateUtils.toIsoFormat(actualMonth));
+        for (const stat of stats) {
+            const user = users.find((u) => u.uid == stat.uid);
+            if (!user) {
+                report.push(`User ${stat.uid} ${stat.name} can not be found in valid users. Skipped.`);
+            } else if (!user.notificationEmail) {
+                report.push(`User ${stat.uid} ${stat.name} has not filled notification e-mail address.`);
+            } else {
+                report.push(`Sending to ${stat.uid} ${stat.name}.`);
+                await this.sendMonthUserEmail(user.notificationEmail, systemConfig, stat.wtmHours);
+            }
+        }
+        return report;
     }
+
     public async syncError(): Promise<void> {
         const admins = await this.userController.getAdmins();
         for (const adminUid of admins) {
@@ -25,20 +52,43 @@ export class NotifyController {
             if (userData.notificationEmail) {
                 await this.sendEmail(
                     userData.notificationEmail,
-                    "NITS: chyba synchronizace",
+                    "chyba synchronizace",
                     "Došlo k chybě synchronizace. Více info na stránce " + this.projectConfig.serverAddress + "/page/users/."
                 );
             }
         }
     }
 
+    private async sendMonthUserEmail(email: string, systemConfig: ISystemConfig, wtmHours: number): Promise<void> {
+        const today = new Date();
+        await this.sendEmail(
+            email,
+            `výkazy za ${today.getMonth() + 1}/${today.getFullYear()}`,
+            "Ahoj,\n" +
+                "\n" +
+                "je poslední den v měsíci a chceme Ti připomenout, že je dnes potřeba mít nejpozději do 22:00 vykázané všechny odpracované hodiny za tento měsíc. \n" +
+                "\n" +
+                "Pro info - ke včerejšímu dni k " +
+                systemConfig.syncHour +
+                ":00 bylo do WTM přeneseno " +
+                dateUtils.formatHours(wtmHours) +
+                " Tvých vykázaných hodin.\n" +
+                "\n" +
+                "Děkujeme Ti za spolupráci,\n" +
+                "\n" +
+                "NITS tým"
+        );
+    }
+
     private async sendEmail(email: string, subject: string, text: string): Promise<void> {
         if (!this.projectConfig.email.user || !this.projectConfig.email.password) {
             throw new Error("E-mailing is not active. Credentials must be set.");
         }
+        subject = `NITS - ${subject}`;
         return new Promise((resolve) => {
-            console.log(`Sending to ${email}`);
+            console.log(`Sending ${subject} to ${email}`);
             const transporter = nodemailer.createTransport({
+                // service: "gmail",
                 host: this.projectConfig.email.host,
                 port: this.projectConfig.email.port,
                 secure: this.projectConfig.email.secure,

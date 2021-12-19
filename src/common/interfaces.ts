@@ -81,6 +81,7 @@ export interface ISystemConfig {
     syncDaysCount: number;
     syncHour: number;
     notifyHour: number;
+    statsUserUid: string;
 }
 export interface IJiraAccount {
     name: string;

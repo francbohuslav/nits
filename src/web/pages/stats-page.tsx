@@ -5,14 +5,14 @@ import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import arrayUtils from "../../common/array-utils";
 import dateUtils from "../../common/date-utils";
-import { IStats, IStatsArt, IStatsDay } from "../../common/interfaces";
+import { IStats, IStatsArt, IStatsDay, ISystemConfig } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import { Header } from "../components/header";
 import { StatsStatus } from "../components/stats-status";
 import { Router } from "../router";
 import React = require("react");
 
-const mockData: IStats[] = null; // require("./stats-page-mock.json");
+const mockData: IStats[] = null;
 
 const useStyles = makeStyles({
     level1: {
@@ -46,6 +46,7 @@ export const StatsPage = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [stats, setStats] = useState<IStats[]>([]);
+    const [systemConfig, setSystemConfig] = useState<ISystemConfig>(null);
     const [selectedUser, setSelectedUser] = useState<IStats>(null);
     const [selectedDate, setSelectedDate] = useState<string>(null);
     const [selectedMonth, setSelectedMonth] = useState<Date>(actualMonth);
@@ -60,6 +61,10 @@ export const StatsPage = () => {
         const res = await ajax.get<IStats[]>("/server/admin-stats/get?month=" + dateUtils.toIsoFormat(selectedMonth));
         if (res.isOk) {
             setStats(res.data);
+        }
+        const res2 = await ajax.get<ISystemConfig>("/server/project-settings/get-config");
+        if (res2.isOk) {
+            setSystemConfig(res2.data);
         }
         setIsLoading(false);
     };
@@ -201,10 +206,18 @@ export const StatsPage = () => {
     // Default sort
     stats.sort((a, b) => a.name.localeCompare(b.name));
 
-    const userSyncWarning = stats.some((r) => r.jiraHours != r.wtmHours);
+    const userSyncWarning = stats.some((r) => !hoursEquals(r.jiraHours, r.wtmHours));
     const selectedMonthTabIndex = dateUtils.areEquals(selectedMonth, actualMonth) ? 0 : dateUtils.areEquals(selectedMonth, previousMonth) ? 1 : 2;
     return (
         <Header header="Statistiky">
+            <Typography paragraph>
+                {systemConfig && !systemConfig.statsUserUid && (
+                    <MuiAlert variant="filled" severity="error">
+                        Není nastaven uživatel pro statistiky a proto měsíční notifikační e-mail nebude odeslán!{" "}
+                        <Link href={Router.PageArtifactSettings}>Nastavit</Link>.
+                    </MuiAlert>
+                )}
+            </Typography>
             {isLoading ? (
                 <>
                     <Typography paragraph>Dat bývá hodně, zabere to necelou minutku.</Typography>
