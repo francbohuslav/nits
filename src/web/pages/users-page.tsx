@@ -177,6 +177,12 @@ export const UsersPage = () => {
             valueOptions: jiraAccountSelectOptions,
         },
         {
+            field: "notifikace",
+            headerName: `Notifikace`,
+            flex: 0.6,
+            renderCell: (p) => "E",
+        },
+        {
             field: "state",
             headerName: `Aktivace`,
             flex: 0.6,

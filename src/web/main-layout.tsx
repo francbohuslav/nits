@@ -1,5 +1,4 @@
 import { AppBar, Box, Button, Container, makeStyles, Toolbar, Tooltip, Typography } from "@material-ui/core";
-import TimerIcon from "@material-ui/icons/Timer";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { DataContext, IDataContextValue } from "./data-context";
@@ -35,8 +34,7 @@ export const MainLayout = (props: IMainLayoutProps) => {
                         <Link to={Router.PageMain} className={classes.mainPageLink}>
                             <Tooltip title="Přejít na domovskou stránku" placement="bottom-start">
                                 <Typography variant="h5" className={classes.leftPart}>
-                                    <TimerIcon fontSize="large" />
-                                    <div>&nbsp; NITS</div>
+                                    <img src="images/logo-title.png" height="50" />
                                 </Typography>
                             </Tooltip>
                         </Link>

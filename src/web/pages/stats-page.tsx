@@ -1,5 +1,8 @@
 import { Box, Button, LinearProgress, Link, makeStyles, Paper, Tab, Tabs, Tooltip, Typography } from "@material-ui/core";
+import green from "@material-ui/core/colors/green";
 import { DataGrid, GridColumns, GridRowData } from "@material-ui/data-grid";
+import CheckIcon from "@material-ui/icons/Check";
+import EmailIcon from "@material-ui/icons/Email";
 import MuiAlert from "@material-ui/lab/Alert";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -12,7 +15,7 @@ import { StatsStatus } from "../components/stats-status";
 import { Router } from "../router";
 import React = require("react");
 
-const mockData: IStats[] = null;
+const mockData: IStats[] = require("./stats-page-mock.json");
 
 const useStyles = makeStyles({
     level1: {
@@ -36,6 +39,10 @@ const useStyles = makeStyles({
     },
     level2Cell: {
         background: "#f6f6f6",
+    },
+    greenIcon: {
+        marginTop: "6px",
+        color: green[600],
     },
 });
 
@@ -91,7 +98,7 @@ export const StatsPage = () => {
         {
             field: "name",
             headerName: `Jméno (${stats?.length}x)`,
-            flex: 1.5,
+            flex: 1.2,
             align: "left",
             headerAlign: "center",
             valueGetter: (params) => params.row.name || params.row.date || params.row.artifact,
@@ -154,12 +161,23 @@ export const StatsPage = () => {
             renderCell: (params) => dateUtils.formatHours(params.value as number),
         },
         {
+            field: "notification",
+            headerName: `Notification`,
+            renderCell: (params) => <CheckIcon className={classes.greenIcon} />,
+            renderHeader: (params) => (
+                <Tooltip title="Notifikace">
+                    <EmailIcon />
+                </Tooltip>
+            ),
+            flex: 0.5,
+        },
+        {
             field: "status",
             headerName: `Stav (${badUserCount}/${stats.length - badUserCount})`,
             type: "boolean",
             align: "center",
             headerAlign: "center",
-            flex: 1,
+            flex: 0.8,
             valueGetter: (params) => {
                 const stats = params.row as IStats;
                 if (stats.days) {
