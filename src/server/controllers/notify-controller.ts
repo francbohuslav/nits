@@ -115,10 +115,10 @@ export class NotifyController {
         return new Promise((resolve, reject) => {
             console.log(`Sending ${subject} to ${email}`);
             const transporter = nodemailer.createTransport({
-                service: "gmail",
-                // host: this.projectConfig.email.host,
-                // port: this.projectConfig.email.port,
-                // secure: this.projectConfig.email.secure,
+                // service: "gmail",
+                host: this.projectConfig.email.host,
+                port: this.projectConfig.email.port,
+                secure: this.projectConfig.email.secure,
                 auth: {
                     user: this.projectConfig.email.user,
                     pass: this.projectConfig.email.password,
