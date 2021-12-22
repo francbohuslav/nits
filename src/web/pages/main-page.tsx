@@ -9,7 +9,7 @@ import { makeStyles } from "@material-ui/styles";
 import { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useAjax } from "../ajax";
-import { GreenCheckIcon, RedCrossIcon } from "../components/icons";
+import { CheckIcon, CrossIcon } from "../components/icons";
 import { Info } from "../components/info";
 import { MainPageStats } from "../components/main-page-stats";
 import { DataContext, IDataContextValue } from "../data-context";
@@ -78,9 +78,9 @@ export const MainPage = () => {
                     </Grid>
                     <Grid item xs={3} sm={4}>
                         {isJiraOk ? (
-                            <GreenCheckIcon tooltip="JIRA účet je nastaven a ověřen" mt={6} />
+                            <CheckIcon tooltip="JIRA účet je nastaven a ověřen" mt={6} />
                         ) : (
-                            <RedCrossIcon tooltip="JIRA účet neobsahuje správné přihlašovací údaje" mt={6} />
+                            <CrossIcon tooltip="JIRA účet neobsahuje správné přihlašovací údaje" mt={6} />
                         )}
                     </Grid>
                 </Grid>
@@ -95,9 +95,9 @@ export const MainPage = () => {
                     </Grid>
                     <Grid item xs={3} sm={4}>
                         {userData?.notificationEmail ? (
-                            <GreenCheckIcon tooltip="Notifikační e-mail je nastaven" mt={6} />
+                            <CheckIcon tooltip="Notifikační e-mail je nastaven" mt={6} />
                         ) : (
-                            <RedCrossIcon tooltip="Notifikační e-mail není nastaven" mt={6} />
+                            <CrossIcon tooltip="Notifikační e-mail není nastaven" mt={6} />
                         )}
                     </Grid>
                 </Grid>

@@ -119,6 +119,9 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
             password: "",
             sender: "",
             user: "",
+            host: "",
+            port: 0,
+            secure: false,
         },
         jira: {
             clientId: "",

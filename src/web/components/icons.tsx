@@ -1,21 +1,21 @@
 import { Tooltip } from "@material-ui/core";
 import * as colors from "@material-ui/core/colors";
 import BlockIcon from "@material-ui/icons/Block";
-import CheckIcon from "@material-ui/icons/Check";
+import CheckIconM from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 import ErrorIcon from "@material-ui/icons/Error";
 import QueryBuilderIcon from "@material-ui/icons/QueryBuilder";
 import React = require("react");
 
-export const GreenCheckIcon = ({ tooltip, mt = 0, color = "green" }: { tooltip: string; mt?: number; color?: string }) => {
+export const CheckIcon = ({ tooltip, mt = 0, color = "green" }: { tooltip: string; mt?: number; color?: string }) => {
     return (
         <Tooltip title={tooltip}>
-            <CheckIcon style={{ color: (colors as any)[color][500], marginTop: mt + "px" }} />
+            <CheckIconM style={{ color: (colors as any)[color][500], marginTop: mt + "px" }} />
         </Tooltip>
     );
 };
 
-export const RedCrossIcon = ({ tooltip, mt = 0, color = "red" }: { tooltip: string; mt?: number; color?: string }) => {
+export const CrossIcon = ({ tooltip, mt = 0, color = "red" }: { tooltip: string; mt?: number; color?: string }) => {
     return (
         <Tooltip title={tooltip}>
             <CloseIcon style={{ color: (colors as any)[color][500], marginTop: mt + "px" }} />

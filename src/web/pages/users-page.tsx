@@ -29,7 +29,7 @@ import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
 import { Header } from "../components/header";
 import { HeaderEnvelope } from "../components/header-envelope";
-import { GreenCheckIcon, RedCrossIcon } from "../components/icons";
+import { CheckIcon, CrossIcon } from "../components/icons";
 import { Router } from "../router";
 import React = require("react");
 
@@ -181,7 +181,7 @@ export const UsersPage = () => {
             flex: 0.6,
             valueGetter: (params) => !!(params.row as IUserPublicData).notificationEmail,
             renderCell: (params) =>
-                params.value ? <GreenCheckIcon tooltip="Notifikační e-mail je nastaven" /> : <RedCrossIcon tooltip="Notifikační e-mail není nastaven" />,
+                params.value ? <CheckIcon tooltip="Notifikační e-mail je nastaven" /> : <CrossIcon tooltip="Notifikační e-mail není nastaven" />,
             renderHeader: (_params) => <HeaderEnvelope tooltip="Notifikační e-mail" />,
         },
         {
@@ -208,7 +208,7 @@ export const UsersPage = () => {
                         </IconButton>
                     </Tooltip>
                 ) : p.row.lastSynchronization ? (
-                    <GreenCheckIcon tooltip="Synchronizace proběhla bez chyby" />
+                    <CheckIcon tooltip="Synchronizace proběhla bez chyby" />
                 ) : (
                     ""
                 ),

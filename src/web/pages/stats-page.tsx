@@ -9,12 +9,12 @@ import { IStats, IStatsArt, IStatsDay, ISystemConfig } from "../../common/interf
 import { useAjax } from "../ajax";
 import { Header } from "../components/header";
 import { HeaderEnvelope } from "../components/header-envelope";
-import { FailedIcon, GreenCheckIcon, NotAvailableIcon, PlannedIcon } from "../components/icons";
+import { CheckIcon, CrossIcon, FailedIcon, PlannedIcon } from "../components/icons";
 import { StatsStatus } from "../components/stats-status";
 import { Router } from "../router";
 import React = require("react");
 
-const mockData: IStats[] = null; //require("./stats-page-mock.json");
+const mockData: IStats[] = null; // require("./stats-page-mock.json");
 
 const useStyles = makeStyles({
     level1: {
@@ -185,7 +185,7 @@ export const StatsPage = () => {
                 const notifyStat = stats.notitificationStatuses && stats.notitificationStatuses[dateUtils.toIsoFormat(selectedMonth)];
                 switch (state) {
                     case NotificationState.EmailNotSet:
-                        return <NotAvailableIcon tooltip="Uživatel neměl pro tento měsíc nastaven e-mail" />;
+                        return <CrossIcon tooltip="Uživatel neměl pro tento měsíc nastaven e-mail" color="grey" />;
                     case NotificationState.Failed:
                         return (
                             <FailedIcon
@@ -208,7 +208,7 @@ export const StatsPage = () => {
                             />
                         );
                     case NotificationState.Sent:
-                        return <GreenCheckIcon tooltip={`Odesláno v ${dateUtils.formatDateTime(notifyStat.time)}`} color="grey" />;
+                        return <CheckIcon tooltip={`Odesláno v ${dateUtils.formatDateTime(notifyStat.time)}`} color="grey" />;
                     default:
                         return <PlannedIcon tooltip="K odeslání zatím nedošlo" />;
                 }
