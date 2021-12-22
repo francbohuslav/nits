@@ -74,6 +74,7 @@ export class UserController {
             isAdmin: admins.includes(userData.uid),
             state: userData.state,
             lastError: userData.lastError,
+            notitificationStatuses: userData.notitificationStatuses,
         };
     }
 }

@@ -1,8 +1,5 @@
 import { Box, Button, LinearProgress, Link, makeStyles, Paper, Tab, Tabs, Tooltip, Typography } from "@material-ui/core";
-import green from "@material-ui/core/colors/green";
 import { DataGrid, GridColumns, GridRowData } from "@material-ui/data-grid";
-import CheckIcon from "@material-ui/icons/Check";
-import EmailIcon from "@material-ui/icons/Email";
 import MuiAlert from "@material-ui/lab/Alert";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -11,11 +8,13 @@ import dateUtils from "../../common/date-utils";
 import { IStats, IStatsArt, IStatsDay, ISystemConfig } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import { Header } from "../components/header";
+import { HeaderEnvelope } from "../components/header-envelope";
+import { FailedIcon, GreenCheckIcon, NotAvailableIcon, PlannedIcon } from "../components/icons";
 import { StatsStatus } from "../components/stats-status";
 import { Router } from "../router";
 import React = require("react");
 
-const mockData: IStats[] = require("./stats-page-mock.json");
+const mockData: IStats[] = null; //require("./stats-page-mock.json");
 
 const useStyles = makeStyles({
     level1: {
@@ -40,11 +39,14 @@ const useStyles = makeStyles({
     level2Cell: {
         background: "#f6f6f6",
     },
-    greenIcon: {
-        marginTop: "6px",
-        color: green[600],
-    },
 });
+
+enum NotificationState {
+    Planned,
+    Sent,
+    Failed,
+    EmailNotSet,
+}
 
 export const StatsPage = () => {
     const actualMonth = dateUtils.getStartOfMonth();
@@ -163,12 +165,55 @@ export const StatsPage = () => {
         {
             field: "notification",
             headerName: `Notification`,
-            renderCell: (params) => <CheckIcon className={classes.greenIcon} />,
-            renderHeader: (params) => (
-                <Tooltip title="Notifikace">
-                    <EmailIcon />
-                </Tooltip>
-            ),
+            valueGetter: (params) => {
+                const stats = params.row as IStats;
+                const notifyStat = stats.notitificationStatuses && stats.notitificationStatuses[dateUtils.toIsoFormat(selectedMonth)];
+                if (!notifyStat) {
+                    return NotificationState.Planned;
+                }
+                if (!notifyStat.emailIsSet) {
+                    return NotificationState.EmailNotSet;
+                }
+                if (notifyStat.error) {
+                    return NotificationState.Failed;
+                }
+                return NotificationState.Sent;
+            },
+            renderCell: (params) => {
+                const state = params.value as NotificationState;
+                const stats = params.row as IStats;
+                const notifyStat = stats.notitificationStatuses && stats.notitificationStatuses[dateUtils.toIsoFormat(selectedMonth)];
+                switch (state) {
+                    case NotificationState.EmailNotSet:
+                        return <NotAvailableIcon tooltip="Uživatel neměl pro tento měsíc nastaven e-mail" />;
+                    case NotificationState.Failed:
+                        return (
+                            <FailedIcon
+                                tooltip={
+                                    <>
+                                        <div>Chyba: {notifyStat.error}</div>
+                                        <div>Čas: {dateUtils.formatDateTime(notifyStat.time)}</div>
+                                        {/* <div>
+                                            Stacktrace:
+                                            <br />
+                                            {notifyStat.stack.split(/\n/).map((l, i) => (
+                                                <span key={i}>
+                                                    {l}
+                                                    <br />
+                                                </span>
+                                            ))}
+                                        </div> */}
+                                    </>
+                                }
+                            />
+                        );
+                    case NotificationState.Sent:
+                        return <GreenCheckIcon tooltip={`Odesláno v ${dateUtils.formatDateTime(notifyStat.time)}`} color="grey" />;
+                    default:
+                        return <PlannedIcon tooltip="K odeslání zatím nedošlo" />;
+                }
+            },
+            renderHeader: (_params) => <HeaderEnvelope tooltip="Notifikace" />,
             flex: 0.5,
         },
         {

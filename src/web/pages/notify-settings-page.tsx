@@ -1,5 +1,5 @@
 import { Box, Button, LinearProgress, TextField } from "@material-ui/core";
-import { useContext, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { IUserPublicData } from "../../common/interfaces";
 import { useAjax } from "../ajax";
@@ -11,7 +11,7 @@ import React = require("react");
 
 export const NotifySettingsPage = () => {
     const { projectConfig } = useContext<IDataContextValue>(DataContext);
-    const [email, setEmail] = useState<string>(null);
+    const [email, setEmail] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
     const [isTesting, setIsTesting] = useState(false);
     const ajax = useAjax();
@@ -37,6 +37,10 @@ export const NotifySettingsPage = () => {
             thisApp().toast("Data nebyla uložena", "error");
         }
     };
+    const onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setEmail(value);
+    };
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -58,6 +62,8 @@ export const NotifySettingsPage = () => {
         loadData();
     }, []);
 
+    const isValidEmail = email.length === 0 || email.match(/^.+@.+\..+/);
+
     return (
         <Header header="Nastavení notifikace">
             {isLoading ? (
@@ -69,9 +75,11 @@ export const NotifySettingsPage = () => {
                         label="E-mail"
                         value={email}
                         type="email"
+                        error={!isValidEmail}
+                        helperText={isValidEmail ? "" : "Zadej platný e-mail"}
                         fullWidth
                         margin="dense"
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={onChangeEmail}
                     />
 
                     <Box display="flex">
@@ -91,7 +99,7 @@ export const NotifySettingsPage = () => {
                             )}
                         </Box>
                         <Box>
-                            <Button variant="contained" color="primary" type="submit">
+                            <Button variant="contained" color="primary" type="submit" disabled={!isValidEmail}>
                                 Uložit
                             </Button>{" "}
                             <Button variant="contained" onClick={() => history.push(Router.PageMain)}>

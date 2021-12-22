@@ -8,7 +8,8 @@ export class Router<TQueryParams> {
     public static PageArtifactSettings = "/page/project-settings/";
     public static PageStats = "/page/stats/";
     public static PageUsers = "/page/users/";
-    public static PageSynchronization = "/server/sync/";
+    public static PageSynchronization = "/server/sync";
+    public static PageMonthNotification = "/server/month-notification";
     public static PageLogout = "/server/logout/";
 
     constructor(public route: string, public history: any, public location: any) {}

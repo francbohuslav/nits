@@ -7,6 +7,7 @@ interface IUserDataBase {
     lastSynchronization: string;
     state: IUserState;
     lastError: ILastError;
+    notitificationStatuses: INotificationStatuses;
 }
 
 export interface IUserPublicData extends IUserDataBase {
@@ -44,10 +45,18 @@ export interface IStats {
     wtmHours: number;
     days: IStatsDays;
     lastSynchronization: string;
+    notitificationStatuses: INotificationStatuses;
 }
-
 export type IStatsDays = { [date: string]: IStatsDay };
+export type INotificationStatuses = { [startOfMonth: string]: INotificationStatus };
 
+export interface INotificationStatus {
+    /** Set even for error */
+    time: Date;
+    error: string;
+    stack: string;
+    emailIsSet: boolean;
+}
 export interface IStatsDay {
     date: string;
     jiraHours: number;

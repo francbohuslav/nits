@@ -29,18 +29,45 @@ export class NotifyController {
         }
         const users = await this.userDataModel.getAllUserData();
         const actualMonth = dateUtils.getStartOfMonth();
+        const actualMonthStr = dateUtils.toIsoFormat(actualMonth);
         const report = [];
         const stats = await this.statsController.getAdminStats(systemConfig.statsUserUid, dateUtils.toIsoFormat(actualMonth));
         for (const stat of stats) {
             const user = users.find((u) => u.uid == stat.uid);
             if (!user) {
                 report.push(`User ${stat.uid} ${stat.name} can not be found in valid users. Skipped.`);
-            } else if (!user.notificationEmail) {
+                continue;
+            }
+            const userData = await this.userDataModel.getUserData(stat.uid);
+            userData.notitificationStatuses = userData.notitificationStatuses || {};
+            const notifyStat = userData.notitificationStatuses;
+            let ms = notifyStat[actualMonthStr];
+            if (ms && ms.time && !ms.error && ms.emailIsSet) {
+                report.push(`User ${stat.uid} ${stat.name} has been sent in some previous run. Skipped.`);
+                continue;
+            }
+            notifyStat[actualMonthStr] = {
+                time: new Date(),
+                emailIsSet: false,
+                error: null,
+                stack: null,
+            };
+            ms = notifyStat[actualMonthStr];
+            if (!user.notificationEmail) {
                 report.push(`User ${stat.uid} ${stat.name} has not filled notification e-mail address.`);
             } else {
+                ms.emailIsSet = true;
                 report.push(`Sending to ${stat.uid} ${stat.name}.`);
-                await this.sendMonthUserEmail(user.notificationEmail, systemConfig, stat.wtmHours);
+                try {
+                    await this.sendMonthUserEmail(user.notificationEmail, systemConfig, stat.wtmHours);
+                } catch (ex) {
+                    const error = ex as Error;
+                    ms.error = error.message;
+                    ms.stack = error.stack;
+                }
             }
+            await this.userDataModel.setUserData(userData.uid, userData);
+            console.log(ms);
         }
         return report;
     }
@@ -85,7 +112,7 @@ export class NotifyController {
             throw new Error("E-mailing is not active. Credentials must be set.");
         }
         subject = `NITS - ${subject}`;
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             console.log(`Sending ${subject} to ${email}`);
             const transporter = nodemailer.createTransport({
                 service: "gmail",
@@ -105,7 +132,13 @@ export class NotifyController {
             };
 
             transporter.sendMail(mailOptions, function (error: any, info: any) {
-                resolve(error || info.response);
+                if (error) {
+                    console.log("error", error);
+                    reject(error);
+                } else {
+                    console.log("info", info);
+                    resolve(info);
+                }
             });
         });
     }

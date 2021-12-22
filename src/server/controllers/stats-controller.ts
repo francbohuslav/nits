@@ -66,6 +66,7 @@ export class StatsController {
                 wtmHours,
                 days,
                 lastSynchronization: userData.lastSynchronization,
+                notitificationStatuses: userData.notitificationStatuses,
             };
             stats.push(stat);
         }

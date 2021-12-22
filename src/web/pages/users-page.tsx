@@ -16,7 +16,6 @@ import green from "@material-ui/core/colors/green";
 import orange from "@material-ui/core/colors/orange";
 import red from "@material-ui/core/colors/red";
 import { DataGrid, GridCellEditCommitParams, GridColumns, GridRowData } from "@material-ui/data-grid";
-import CheckIcon from "@material-ui/icons/Check";
 import CircleIcon from "@material-ui/icons/FiberManualRecord";
 import WarningIcon from "@material-ui/icons/Warning";
 import MuiAlert from "@material-ui/lab/Alert";
@@ -29,15 +28,14 @@ import { IJiraAccount, ILastError, IStats, IUserPublicData, IUserState } from ".
 import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
 import { Header } from "../components/header";
+import { HeaderEnvelope } from "../components/header-envelope";
+import { GreenCheckIcon, RedCrossIcon } from "../components/icons";
 import { Router } from "../router";
 import React = require("react");
 
-const mockData: IAllUsersResponse = null; //require("./users-page-mock.json");
+const mockData: IAllUsersResponse = null; // require("./users-page-mock.json");
 
 const useStyles = makeStyles({
-    greenIcon: {
-        color: green[600],
-    },
     orangeIcon: {
         color: orange[600],
     },
@@ -179,8 +177,12 @@ export const UsersPage = () => {
         {
             field: "notifikace",
             headerName: `Notifikace`,
+            type: "boolean",
             flex: 0.6,
-            renderCell: (p) => "E",
+            valueGetter: (params) => !!(params.row as IUserPublicData).notificationEmail,
+            renderCell: (params) =>
+                params.value ? <GreenCheckIcon tooltip="Notifikační e-mail je nastaven" /> : <RedCrossIcon tooltip="Notifikační e-mail není nastaven" />,
+            renderHeader: (_params) => <HeaderEnvelope tooltip="Notifikační e-mail" />,
         },
         {
             field: "state",
@@ -206,9 +208,7 @@ export const UsersPage = () => {
                         </IconButton>
                     </Tooltip>
                 ) : p.row.lastSynchronization ? (
-                    <Tooltip title="Synchronizace proběhla bez chyby">
-                        <CheckIcon className={classes.greenIcon} />
-                    </Tooltip>
+                    <GreenCheckIcon tooltip="Synchronizace proběhla bez chyby" />
                 ) : (
                     ""
                 ),

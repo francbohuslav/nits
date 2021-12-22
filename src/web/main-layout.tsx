@@ -1,4 +1,6 @@
 import { AppBar, Box, Button, Container, makeStyles, Toolbar, Tooltip, Typography } from "@material-ui/core";
+import EmaiIcon from "@material-ui/icons/Email";
+import SyncIcon from "@material-ui/icons/Sync";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { DataContext, IDataContextValue } from "./data-context";
@@ -40,11 +42,20 @@ export const MainLayout = (props: IMainLayoutProps) => {
                         </Link>
                     </Box>
                     {userData?.isAdmin && (
-                        <Box mr={3}>
-                            <Button variant="contained" color="secondary" href={Router.PageSynchronization} target="_blank">
-                                Spustit synchronizaci
-                            </Button>
-                        </Box>
+                        <>
+                            <Box mr={3}>
+                                <Tooltip title="Pošle měsíční e-mail uživatelům, kteří ho ještě nedostali">
+                                    <Button startIcon={<EmaiIcon />} variant="contained" color="secondary" href={Router.PageMonthNotification} target="_blank">
+                                        Spustit měsíční notifikaci
+                                    </Button>
+                                </Tooltip>
+                            </Box>
+                            <Box mr={3}>
+                                <Button startIcon={<SyncIcon />} variant="contained" color="secondary" href={Router.PageSynchronization} target="_blank">
+                                    Spustit synchronizaci
+                                </Button>
+                            </Box>
+                        </>
                     )}
                     <Typography variant="h6" align="right">
                         {userData?.name}

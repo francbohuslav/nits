@@ -26,6 +26,7 @@ export class UserDataModel {
             lastSynchronization: "",
             state: "disabled",
             lastError: null,
+            notitificationStatuses: {},
         };
         const filePath = this.getUserFilePath(uid);
         if (!(await this.dropboxFs.fileExists(filePath))) {

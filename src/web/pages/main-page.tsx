@@ -1,9 +1,5 @@
-import { Box, Button, Grid, Tooltip, Typography } from "@material-ui/core";
-import green from "@material-ui/core/colors/green";
-import red from "@material-ui/core/colors/red";
+import { Box, Button, Grid, Typography } from "@material-ui/core";
 import StatsIcon from "@material-ui/icons/BarChart";
-import CheckIcon from "@material-ui/icons/Check";
-import CloseIcon from "@material-ui/icons/Close";
 import EmailIcon from "@material-ui/icons/Email";
 import ExitIcon from "@material-ui/icons/ExitToApp";
 import InfoIcon from "@material-ui/icons/Info";
@@ -13,6 +9,7 @@ import { makeStyles } from "@material-ui/styles";
 import { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useAjax } from "../ajax";
+import { GreenCheckIcon, RedCrossIcon } from "../components/icons";
 import { Info } from "../components/info";
 import { MainPageStats } from "../components/main-page-stats";
 import { DataContext, IDataContextValue } from "../data-context";
@@ -22,15 +19,6 @@ import React = require("react");
 const useStyles = makeStyles({
     button: {
         justifyContent: "left",
-    },
-
-    greenIcon: {
-        marginTop: "6px",
-        color: green[600],
-    },
-    redIcon: {
-        marginTop: "6px",
-        color: red[500],
     },
     infoOpen: {
         maxHeight: "500px !important",
@@ -42,7 +30,6 @@ const useStyles = makeStyles({
         cursor: "pointer",
     },
     logo: {
-        // margin: "2em 0",
         maxWidth: "100%",
         height: "140px",
     },
@@ -91,13 +78,9 @@ export const MainPage = () => {
                     </Grid>
                     <Grid item xs={3} sm={4}>
                         {isJiraOk ? (
-                            <Tooltip title="JIRA účet je nastaven a ověřen">
-                                <CheckIcon className={classes.greenIcon} />
-                            </Tooltip>
+                            <GreenCheckIcon tooltip="JIRA účet je nastaven a ověřen" mt={6} />
                         ) : (
-                            <Tooltip title="JIRA účet neobsahuje správné přihlašovací údaje">
-                                <CloseIcon className={classes.redIcon} />
-                            </Tooltip>
+                            <RedCrossIcon tooltip="JIRA účet neobsahuje správné přihlašovací údaje" mt={6} />
                         )}
                     </Grid>
                 </Grid>
@@ -112,13 +95,9 @@ export const MainPage = () => {
                     </Grid>
                     <Grid item xs={3} sm={4}>
                         {userData?.notificationEmail ? (
-                            <Tooltip title="Notifikační e-mail je nastaven">
-                                <CheckIcon className={classes.greenIcon} />
-                            </Tooltip>
+                            <GreenCheckIcon tooltip="Notifikační e-mail je nastaven" mt={6} />
                         ) : (
-                            <Tooltip title="Notifikační e-mail není nastaven">
-                                <CloseIcon className={classes.redIcon} />
-                            </Tooltip>
+                            <RedCrossIcon tooltip="Notifikační e-mail není nastaven" mt={6} />
                         )}
                     </Grid>
                 </Grid>
