@@ -77,9 +77,9 @@ const syncRequester = container.resolveClass(SyncRequester);
 const projectReqester = container.resolveClass(ProjectRequester);
 const notifyRequester = container.resolveClass(NotifyRequester);
 const statsRequester = container.resolveClass(StatsRequester);
-const crontController = container.resolveClass(CronController);
+const cronController = container.resolveClass(CronController);
 
-crontController.run();
+cronController.run();
 
 const app = express();
 app.use(compression());

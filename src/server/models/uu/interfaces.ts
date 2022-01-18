@@ -31,6 +31,16 @@ export class Timesheet {
         return dateUtils.secondsBetween(this.datetimeFrom, this.datetimeTo) / 3600;
     }
 
+    public isSameAs(other: Timesheet) {
+        return (
+            this.datetimeFrom == other.datetimeFrom &&
+            this.datetimeTo == other.datetimeTo &&
+            this.subject == other.subject &&
+            this.description == other.description &&
+            JSON.stringify(this.data) == JSON.stringify(other.data)
+        );
+    }
+
     public toString(): string {
         const time = dateUtils.secondsBetween(this.datetimeFrom, this.datetimeTo) / 3600;
         return `UU Timesheet: ${dateUtils.formatDateTime(this.datetimeFrom, true)} - ${dateUtils.formatDateTime(

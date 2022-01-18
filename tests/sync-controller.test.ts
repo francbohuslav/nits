@@ -1,6 +1,6 @@
 import { IInterval, SyncController } from "../src/server/controllers/sync-controller";
 import { TimesheetMapping, TimesheetMappingsPerDay } from "../src/server/models/interfaces";
-import { Timesheet } from "../src/server/models/uu/interfaces";
+import { ITimesheetData, Timesheet } from "../src/server/models/uu/interfaces";
 
 test("separateTimesheets", async () => {
     const syncController = new TestingSyncController(null, null, null, null, null, null);
@@ -27,13 +27,13 @@ test("separateTimesheets", async () => {
     expect(result.timesheetsToDelete).toHaveLength(2);
     expect(result.timesheetsToDelete[0].data.nits).toBeNull();
     expect(result.timesheetsToDelete[1].data.nits).toBeTruthy();
-    expect(result.timesheetsToRemain).toHaveLength(2);
-    expect(result.timesheetsToRemain[0].data).toBeUndefined();
-    expect(result.timesheetsToRemain[1].data.nits).toBeUndefined();
+    expect(result.notNitsTimesheets).toHaveLength(2);
+    expect(result.notNitsTimesheets[0].data).toBeUndefined();
+    expect(result.notNitsTimesheets[1].data.nits).toBeUndefined();
 });
 
 describe("computeNewTimesheets", () => {
-    test("split_to_days", () => {
+    test("Split to days", () => {
         const syncController = new TestingSyncController(null, null, null, null, null, null);
         const result = syncController.computeNewTimesheets2(
             {
@@ -501,36 +501,79 @@ describe("computeNewTimesheetInSegment", () => {
     });
 });
 
+describe("excludeNotChangedTimesheets", () => {
+    test("Empty array", () => {
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
+        const newTimesheets: Timesheet[] = [];
+        const timesheetsToDelete: Timesheet[] = [];
+
+        const excludedTimesheets = syncController.excludeNotChangedTimesheets2(newTimesheets, timesheetsToDelete);
+        expect(newTimesheets.length).toBe(0);
+        expect(timesheetsToDelete.length).toBe(0);
+        expect(excludedTimesheets.length).toBe(0);
+    });
+
+    test("Some values", () => {
+        const syncController = new TestingSyncController(null, null, null, null, null, null);
+        const newTimesheets: Timesheet[] = [
+            createTimesheet("2022-01-18T00:00:00Z", "2022-01-18T01:00:00Z", "desc", "subject", null),
+            createTimesheet("2022-01-18T01:00:00Z", "2022-01-18T02:00:00Z", "desc2", "subject2", { nits: { issueKey: "issuekey", worklogIds: ["123415"] } }),
+            createTimesheet("2022-01-18T02:00:00Z", "2022-01-18T03:00:00Z", "desc3", "subject", null),
+        ];
+        const timesheetsToDelete: Timesheet[] = [
+            createTimesheet("2022-01-18T00:00:00Z", "2022-01-18T01:00:00Z", "desc", "subject", null),
+            createTimesheet("2022-01-18T01:00:00Z", "2022-01-18T02:00:00Z", "desc2", "subject2", { nits: { issueKey: "issuekey", worklogIds: ["123415"] } }),
+            createTimesheet("2022-01-18T03:00:00Z", "2022-01-18T04:00:00Z", "desc4", "subject", null),
+        ];
+
+        const excludedTimesheets = syncController.excludeNotChangedTimesheets2(newTimesheets, timesheetsToDelete);
+        expect(newTimesheets.length).toBe(1);
+        expect(newTimesheets[0].description).toBe("desc3");
+        expect(timesheetsToDelete.length).toBe(1);
+        expect(timesheetsToDelete[0].description).toBe("desc4");
+        expect(excludedTimesheets.length).toBe(2);
+        expect(excludedTimesheets[0].description).toBe("desc");
+        expect(excludedTimesheets[1].description).toBe("desc2");
+    });
+});
+
 class TestingSyncController extends SyncController {
-    public separateTimesheets2(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; timesheetsToRemain: Timesheet[] } {
+    public separateTimesheets2(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; notNitsTimesheets: Timesheet[] } {
         return this.separateTimesheets(exitingTimesheets);
     }
 
-    public computeNewTimesheets2(timesheetMappingsPerDay: TimesheetMappingsPerDay, timesheetsToRemain: Timesheet[]): Timesheet[] {
-        return this.computeNewTimesheets(timesheetMappingsPerDay, timesheetsToRemain);
+    public computeNewTimesheets2(timesheetMappingsPerDay: TimesheetMappingsPerDay, notNitsTimesheets: Timesheet[]): Timesheet[] {
+        return this.computeNewTimesheets(timesheetMappingsPerDay, notNitsTimesheets);
     }
 
     public getNextFreeTimeSegment2(
         searchFromTime: Date,
-        timesheetsToRemain: Timesheet[],
+        notNitsTimesheets: Timesheet[],
         isPauseApplied: boolean,
         alreadyProcessedHours: number
     ): { interval: IInterval; isPauseApplied: boolean } {
-        return this.getNextFreeTimeSegment(searchFromTime, timesheetsToRemain, isPauseApplied, alreadyProcessedHours);
+        return this.getNextFreeTimeSegment(searchFromTime, notNitsTimesheets, isPauseApplied, alreadyProcessedHours);
     }
 
     public computeNewTimesheetInSegment2(interval: IInterval, newTimesheets: Timesheet[], timesheetMapping: TimesheetMapping[]) {
         return this.computeNewTimesheetInSegment(interval, newTimesheets, timesheetMapping);
     }
 
-    public computeNewTimesheetsInDay2(timesheetMapping: TimesheetMapping[], timesheetsToRemain: Timesheet[]): Timesheet[] {
-        return this.computeNewTimesheetsInDay(timesheetMapping, timesheetsToRemain);
+    public computeNewTimesheetsInDay2(timesheetMapping: TimesheetMapping[], notNitsTimesheets: Timesheet[]): Timesheet[] {
+        return this.computeNewTimesheetsInDay(timesheetMapping, notNitsTimesheets);
+    }
+
+    public excludeNotChangedTimesheets2(newTimesheets: Timesheet[], timesheetsToDelete: Timesheet[]): Timesheet[] {
+        return this.excludeNotChangedTimesheets(newTimesheets, timesheetsToDelete);
     }
 }
 
-function createTimesheet(d1: string, d2: string): Timesheet {
+function createTimesheet(d1: string, d2: string, description?: string, subject?: string, data?: ITimesheetData): Timesheet {
     const t = new Timesheet();
     t.datetimeFrom = d1;
     t.datetimeTo = d2;
+    t.description = description;
+    t.subject = subject;
+    t.data = data;
     return t;
 }

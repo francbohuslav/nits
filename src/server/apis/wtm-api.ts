@@ -22,18 +22,15 @@ export class WtmApi {
             }
             return this.convertToTimesheets(response.timesheetItemList);
         } catch (ex) {
-            if (ex instanceof WtmError) {
-                if (
-                    ex.response?.uuAppErrorMap &&
-                    Object.values(ex.response?.uuAppErrorMap).length == 1 &&
-                    !ex.response?.uuAppErrorMap["uu-specialistwtm-main/listWorkerTimesheetItemsByMonth/timesheetItemsNotFound"]
-                ) {
-                    throw ex;
-                }
+            if (
+                ex instanceof WtmError &&
+                ex.response?.uuAppErrorMap &&
+                Object.values(ex.response?.uuAppErrorMap).length == 1 &&
+                ex.response?.uuAppErrorMap["uu-specialistwtm-main/listWorkerTimesheetItemsByMonth/timesheetItemsNotFound"]
+            ) {
                 return [];
-            } else {
-                throw ex;
             }
+            throw ex;
         }
     }
 
@@ -120,11 +117,12 @@ export class WtmApi {
             const error = err as AxiosError<IBaseResponse>;
             if (error.isAxiosError) {
                 const response: IErrorResponse = {
-                    ...error.response.data,
+                    data: error.response.data,
+                    uuAppErrorMap: error.response.data?.uuAppErrorMap,
                     status: error.response.status,
                     statusText: error.response.statusText,
                 };
-                throw new WtmError(err.message, response);
+                throw new WtmError(err.message, response, typeof error.response.data == "string" ? error.response.data : undefined);
             }
             if (err instanceof WtmError) {
                 throw err;
@@ -145,6 +143,7 @@ interface IBaseResponse {
 }
 
 interface IErrorResponse extends IBaseResponse {
+    data: object;
     status: number;
     statusText: string;
 }

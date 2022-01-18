@@ -85,11 +85,14 @@ export class SyncController {
                     reportUser.log.push(commentErrors);
                 }
                 const exitingTimesheets = await timesheetModel.getMyLastTimesheets(dateUtils.toIsoFormat(startDate));
-                const { timesheetsToDelete, timesheetsToRemain } = this.separateTimesheets(exitingTimesheets);
-                const newTimesheets = this.computeNewTimesheets(timesheetMappingsPerDay, timesheetsToRemain);
-                // reportUser.log.push({ timesheetMappingsPerDay });
+                const { timesheetsToDelete, notNitsTimesheets } = this.separateTimesheets(exitingTimesheets);
+                const newTimesheets = this.computeNewTimesheets(timesheetMappingsPerDay, notNitsTimesheets);
+                const notChangedTimesheets = this.excludeNotChangedTimesheets(newTimesheets, timesheetsToDelete);
+
                 reportUser.log.push({ timesheetsToDelete: timesheetsToDelete.map((t) => t.toString()) });
-                reportUser.log.push({ timesheetsToRemain: timesheetsToRemain.map((t) => t.toString()) });
+                reportUser.log.push({ notNitsTimesheets: notNitsTimesheets.map((t) => t.toString()) });
+                reportUser.log.push({ notChangedTimesheets: notChangedTimesheets.map((t) => t.toString()) });
+
                 await timesheetModel.removeTimesheets(timesheetsToDelete, reportUser);
                 await timesheetModel.saveTimesheets(newTimesheets, reportUser);
                 userData.lastSynchronization = new Date().toISOString();
@@ -128,39 +131,39 @@ export class SyncController {
         return report;
     }
 
-    protected separateTimesheets(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; timesheetsToRemain: Timesheet[] } {
+    protected separateTimesheets(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; notNitsTimesheets: Timesheet[] } {
         const timesheetsToDelete: Timesheet[] = [];
-        const timesheetsToRemain: Timesheet[] = [];
+        const notNitsTimesheets: Timesheet[] = [];
         for (const timesheet of exitingTimesheets) {
             if (nitsTimesheetFilter(timesheet)) {
                 timesheetsToDelete.push(timesheet);
             } else {
-                timesheetsToRemain.push(timesheet);
+                notNitsTimesheets.push(timesheet);
             }
         }
         return {
-            timesheetsToRemain,
+            notNitsTimesheets,
             timesheetsToDelete,
         };
     }
 
-    protected computeNewTimesheets(timesheetMappingsPerDay: TimesheetMappingsPerDay, timesheetsToRemain: Timesheet[]): Timesheet[] {
+    protected computeNewTimesheets(timesheetMappingsPerDay: TimesheetMappingsPerDay, notNitsTimesheets: Timesheet[]): Timesheet[] {
         let newTimesheets: Timesheet[] = [];
         Object.entries(timesheetMappingsPerDay).forEach(([day, tsm]) => {
-            const timesheetsToRemainOfDay = timesheetsToRemain.filter((t) => dateUtils.toIsoFormat(t.datetimeFrom) == day);
+            const timesheetsToRemainOfDay = notNitsTimesheets.filter((t) => dateUtils.toIsoFormat(t.datetimeFrom) == day);
             newTimesheets = newTimesheets.concat(this.computeNewTimesheetsInDay(tsm, timesheetsToRemainOfDay));
         });
         return newTimesheets;
     }
 
-    protected computeNewTimesheetsInDay(timesheetMapping: TimesheetMapping[], timesheetsToRemain: Timesheet[]): Timesheet[] {
+    protected computeNewTimesheetsInDay(timesheetMapping: TimesheetMapping[], notNitsTimesheets: Timesheet[]): Timesheet[] {
         if (timesheetMapping.length == 0) {
             return [];
         }
         let startHour = 8;
         while (startHour > -1) {
             let searchFromTime = dateUtils.increase(dateUtils.getStartOfDay(timesheetMapping[0].date), "hours", startHour);
-            const startOfDay = timesheetsToRemain
+            const startOfDay = notNitsTimesheets
                 .map((t) => t.datetimeFrom)
                 .reduce((p, c) => (dateUtils.isLowerThen(p, c) ? dateUtils.toDate(p) : dateUtils.toDate(c)), searchFromTime);
             const newTimesheets: Timesheet[] = [];
@@ -168,7 +171,7 @@ export class SyncController {
             let segment: { interval: IInterval; isPauseApplied: boolean } = null;
             do {
                 const alreadyProcessedHours = dateUtils.secondsBetween(startOfDay, searchFromTime) / 3600;
-                segment = this.getNextFreeTimeSegment(searchFromTime, timesheetsToRemain, segment?.isPauseApplied, alreadyProcessedHours);
+                segment = this.getNextFreeTimeSegment(searchFromTime, notNitsTimesheets, segment?.isPauseApplied, alreadyProcessedHours);
                 if (segment) {
                     const endTime = this.computeNewTimesheetInSegment(segment.interval, newTimesheets, timesheetMappingToProcess);
                     if (timesheetMappingToProcess.length == 0) {
@@ -198,7 +201,7 @@ export class SyncController {
         ts.datetimeFrom = startTime.toISOString();
         startTime = dateUtils.increase(startTime, "seconds", timeToSpent);
         ts.datetimeTo = startTime.toISOString();
-        ts.subject = tsm.wtmArtifact;
+        ts.subject = tsm.wtmArtifact.match(/^ues:/) ? tsm.wtmArtifact : `ues:${tsm.wtmArtifact}`;
         ts.data = {
             nits: {
                 issueKey: tsm.jiraIssueKey,
@@ -217,14 +220,14 @@ export class SyncController {
 
     protected getNextFreeTimeSegment(
         searchFromTime: Date,
-        timesheetsToRemain: Timesheet[],
+        notNitsTimesheets: Timesheet[],
         isPauseApplied: boolean,
         alreadyProcessedHours: number
     ): { interval: IInterval; isPauseApplied: boolean } {
         const day = dateUtils.toIsoFormat(searchFromTime);
         let interval: IInterval = null;
         do {
-            const timesheetsAfterTime = timesheetsToRemain.filter((t) => !dateUtils.isLowerOrEqualsThen(t.datetimeTo, searchFromTime));
+            const timesheetsAfterTime = notNitsTimesheets.filter((t) => !dateUtils.isLowerOrEqualsThen(t.datetimeTo, searchFromTime));
             while (timesheetsAfterTime.length > 0 && dateUtils.isLowerOrEqualsThen(timesheetsAfterTime[0].datetimeFrom, searchFromTime)) {
                 alreadyProcessedHours += dateUtils.secondsBetween(searchFromTime, timesheetsAfterTime[0].datetimeTo) / 3600;
                 searchFromTime = dateUtils.toDate(timesheetsAfterTime[0].datetimeTo);
@@ -253,6 +256,30 @@ export class SyncController {
 
     private setNextPossibleStartTime() {
         this.nextPossibleStartTime = dateUtils.increase(new Date(), "minutes", 5);
+    }
+
+    protected excludeNotChangedTimesheets(newTimesheets: Timesheet[], timesheetsToDelete: Timesheet[]): Timesheet[] {
+        const newTimesheetsCopy = [...newTimesheets];
+        const timesheetsToDeleteCopy = [...timesheetsToDelete];
+        const excludedTimesheets: Timesheet[] = [];
+        newTimesheetsCopy.forEach((newTimeSheet) => {
+            timesheetsToDeleteCopy.forEach((timesheetToDelete) => {
+                if (newTimeSheet.isSameAs(timesheetToDelete)) {
+                    excludedTimesheets.push(newTimeSheet);
+                    this.removeTimesheetFromList(newTimeSheet, newTimesheets);
+                    this.removeTimesheetFromList(timesheetToDelete, timesheetsToDelete);
+                }
+            });
+        });
+        return excludedTimesheets;
+    }
+
+    private removeTimesheetFromList(timesheet: Timesheet, timesheets: Timesheet[]): void {
+        const index = timesheets.findIndex((t) => t == timesheet);
+        if (index == -1) {
+            throw new Error(`Timesheet ${timesheet} does not exists in list [${timesheets?.join(", ")}]`);
+        }
+        timesheets.splice(index, 1);
     }
 }
 

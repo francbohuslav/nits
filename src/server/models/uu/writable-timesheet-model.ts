@@ -20,7 +20,7 @@ export class WritableTimesheetModel extends ReadOnlyTimesheetModel {
                 datetimeFrom: ts.datetimeFrom,
                 datetimeTo: ts.datetimeTo,
                 description: ts.description,
-                subject: ts.subject.match(/^ues:/) ? ts.subject : `ues:${ts.subject}`,
+                subject: ts.subject,
                 data: ts.data,
             });
             report.log[report.log.length - 1] += " created, ID: " + id;

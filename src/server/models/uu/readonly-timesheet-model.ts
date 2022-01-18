@@ -100,7 +100,6 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
         report: ISyncReportUser
     ): TimesheetMappingsPerDay {
         worklogList.forEach((w) => report.log.push(w.toString()));
-        //TODO: BF: otestovat utc, zda se nahodou casy v 11vecer a v 1 ranu vykazou spravne
         const worklogsPerDay = arrayUtils.toGroups(worklogList, (w) => dateUtils.toIsoFormat(w.startedDate));
         const worklogsPerDayAndIssue: { [day: string]: { [issueId: string]: Worklog[] } } = {};
         Object.entries(worklogsPerDay).forEach(([day, wlogs]) => (worklogsPerDayAndIssue[day] = arrayUtils.toGroups(wlogs, (w) => w.issueKey)));
