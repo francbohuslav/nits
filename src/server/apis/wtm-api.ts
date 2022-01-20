@@ -3,7 +3,7 @@ import { assert } from "../../common/core";
 import { IMonthlyEvaluation, Timesheet } from "../models/uu/interfaces";
 
 export class WtmApi {
-    private wtmUrl = "https://uuos9.plus4u.net/uu-specialistwtmg01-main/99923616732453117-8031926f783d4aaba733af73c1974840";
+    private wtmUrl = "https://uuapp.plus4u.net/uu-specialistwtm-maing01/99923616732453117-8031926f783d4aaba733af73c1974840";
 
     public async listWorkerTimesheetItemsByMonth(idToken: string, year: number, month: number): Promise<Timesheet[]> {
         assert(year);
