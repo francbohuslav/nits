@@ -1,598 +1,178 @@
 [
     {
         "uid": "12-8835-1",
-        "name": "Franc Bohuslav",
-        "jiraHours": 9.083333333333334,
-        "wtmHours": 9.083333333333334,
-        "notitificationStatuses": {
-            "2021-12-01": {
-                "time": "2021-12-31 10:00:00",
-                "emailIsSet": false
-            }
-        },
+        "name": "Bohuslav Franc",
+        "jiraHours": 125,
+        "wtmHours": 0,
         "days": {
-            "2021-09-16": {
-                "date": "2021-09-16",
-                "jiraHours": 0,
-                "wtmHours": 1,
-                "artifacts": {}
-            },
-            "2021-09-17": {
-                "date": "2021-09-17",
-                "jiraHours": 2,
-                "wtmHours": 1,
-                "artifacts": {}
-            },
-            "2021-09-24": {
-                "date": "2021-09-24",
-                "jiraHours": 2.0833333333333335,
-                "wtmHours": 2.0833333333333335,
-                "artifacts": {}
-            },
-            "2021-10-04": {
-                "date": "2021-10-04",
-                "jiraHours": 1.5,
-                "wtmHours": 1.5,
-                "artifacts": {}
-            },
-            "2021-10-08": {
-                "date": "2021-10-08",
-                "jiraHours": 2.5,
-                "wtmHours": 2.5,
-                "artifacts": {}
-            },
-            "2021-10-14": {
-                "date": "2021-10-14",
-                "jiraHours": 1,
-                "wtmHours": 1,
-                "artifacts": {}
-            },
-            "2019-07-29": {
-                "date": "2019-07-29",
-                "jiraHours": 0,
+            "2022-02-01": {
+                "date": "2022-02-01",
+                "jiraHours": 5.5,
                 "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/19": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/19ssSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-                        "wtmHours": 0.75
-                    }
-                }
+                "artifacts": {},
+                "workLogs": [
+                    "created: 8.2.2022 23:12, edited: 8.2., spent: 3h, text: JIRA, MT load, platby, maily/slack/skype, Plus4U",
+                    "created: 8.2.2022 23:11, edited: 8.2., spent: 2h, text: Týmovka PM, kapacitní plánování",
+                    "created: 8.2.2022 23:11, edited: 8.2., spent: 30m, text: Architektura RTS"
+                ]
             },
-            "2019-07-30": {
-                "date": "2019-07-30",
-                "jiraHours": 0,
+            "2022-02-02": {
+                "date": "2022-02-02",
+                "jiraHours": 9,
                 "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/19": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/19",
-                        "wtmHours": 0.5
-                    }
-                }
+                "artifacts": {},
+                "workLogs": [
+                    "created: 8.2.2022 23:21, edited: 9.2., spent: 4h 15m, text: Plánování c CET, pohovor (ANL - MSol), JIRA, MT, platby, maiily/slack/skype, Plus4U",
+                    "created: 8.2.2022 23:14, edited: 8.2., spent: 2h 45m, text: 1:1 JChar, týmovka TL, 1:1 HChmie, 1:1 JBár",
+                    "created: 8.2.2022 23:13, edited: 8.2., spent: 2h, text: SP84 lidé, interní status TelcoOSS"
+                ]
             },
-            "2019-07-31": {
-                "date": "2019-07-31",
-                "jiraHours": 0,
+            "2022-02-03": {
+                "date": "2022-02-03",
+                "jiraHours": 7,
                 "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 1.25
-                    }
-                }
+                "artifacts": {},
+                "workLogs": [
+                    "created: 9.2.2022 23:36, edited: 9.2., spent: 6h, text: Příprava roadmapy & schůzka s MVič, JIRA, konsolidace MT, QS/nabídky, platby, bonusy, maily/skype/slack, Plus4U,",
+                    "created: 9.2.2022 23:35, edited: 9.2., spent: 1h, text: 1:1 TVaz, 1:1 RUrb"
+                ]
             },
-            "2019-08-01": {
-                "date": "2019-08-01",
-                "jiraHours": 0,
+            "2022-02-04": {
+                "date": "2022-02-04",
+                "jiraHours": 8,
                 "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
+                "artifacts": {},
+                "workLogs": [
+                    "created: 10.2.2022 16:57, edited: 10.2., spent: 3h 30m, text: JIRA, MT, objednávky, AP/platby,, bonusy 2022 - koncept, maily/slack/skype, Plus4U,",
+                    "created: 10.2.2022 16:51, edited: 10.2., spent: 2h, text: KKra - 1:1, synchro",
+                    "created: 10.2.2022 16:51, edited: 10.2., spent: 1h 30m, text: Porada PST",
+                    "created: 10.2.2022 16:55, edited: 10.2., spent: 1h, text: NI RFP ppt - status"
+                ]
             },
-            "2019-08-05": {
-                "date": "2019-08-05",
-                "jiraHours": 0,
+            "2022-02-07": {
+                "date": "2022-02-07",
+                "jiraHours": 7,
                 "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
+                "artifacts": {},
+                "workLogs": [
+                    "created: 14.2.2022 21:51, edited: 14.2., spent: 7h, text: JIRA, MT load/konsolidace, QS/nabídky, plán plateb, Portolio, NITS, příprava prezentací, Confl., maily/slack/skype, Plus4U"
+                ]
             },
-            "2019-08-06": {
-                "date": "2019-08-06",
-                "jiraHours": 0,
+            "2022-02-08": {
+                "date": "2022-02-08",
+                "jiraHours": 8,
                 "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 1.25
-                    }
-                }
+                "artifacts": {},
+                "workLogs": [
+                    "created: 14.2.2022 22:01, edited: 14.2., spent: 4h 15m, text: Pohovor MSol (ANL), JIRA, MT, platby, schéma bon. 2022, maily/slack/skype, Plus4U",
+                    "created: 14.2.2022 22:00, edited: 14.2., spent: 3h 15m, text: Týmovka PM, kapacitní plánování, kick-off Písek - příprava s KKra",
+                    "created: 14.2.2022 21:58, edited: 14.2., spent: 30m, text: Architektura RTS"
+                ]
             },
-            "2019-08-12": {
-                "date": "2019-08-12",
-                "jiraHours": 0,
+            "2022-02-10": {
+                "date": "2022-02-10",
+                "jiraHours": 17,
                 "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
+                "artifacts": {},
+                "workLogs": [
+                    "created: 17.2.2022 20:54, edited: 17.2., spent: 3h, text: Školení",
+                    "created: 17.2.2022 23:27, edited: 17.2., spent: 4h, text: JIRA, MT, SP84 report, platby, objednávky, maily/slack/skype, Plus4U",
+                    "created: 17.2.2022 23:13, edited: 17.2., spent: 1h, text: Pohovor TMíl",
+                    "created: 17.2.2022 0:23, edited: 17.2., spent: 2h 30m, text: 9.2. - koncept bonusů 2022 s KPre, SP84 - lidé, interní status TelcoOSS",
+                    "created: 17.2.2022 0:24, edited: 17.2., spent: 2h, text: 9.2. - Týmovka TL, 1:1 KKra",
+                    "created: 17.2.2022 0:25, edited: 17.2., spent: 4h 30m, text: 9.2. - Plánování a revize RE kandidátů s CET, JIRA, MT, platby, víkendový support RE30, maily/slack/skype, Plus4U"
+                ]
             },
-            "2019-08-15": {
-                "date": "2019-08-15",
-                "jiraHours": 0,
+            "2022-02-11": {
+                "date": "2022-02-11",
+                "jiraHours": 8,
                 "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
+                "artifacts": {},
+                "workLogs": [
+                    "created: 18.2.2022 23:22, edited: 18.2., spent: 5h 30m, text: Víkendový support s CET, JIRA, MT konsolidace, revize plateb, QS/nabídky, AJ screen., maily/slack/skype, Plus4U",
+                    "created: 18.2.2022 23:21, edited: 18.2., spent: 1h 30m, text: Porada PST",
+                    "created: 11.2.2022 23:01, edited: 11.2., spent: 1h, text: Přístupy, komunikace"
+                ]
             },
-            "2019-08-14": {
-                "date": "2019-08-14",
-                "jiraHours": 0,
+            "2022-02-13": {
+                "date": "2022-02-13",
+                "jiraHours": 3,
                 "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.25
-                    }
-                }
+                "artifacts": {},
+                "workLogs": ["created: 18.2.2022 23:24, edited: 18.2., spent: 3h, text: Úprava Portfolia a Deníčků pro vyhodnocování WP, vyhodnocování RE"]
+            },
+            "2022-02-14": {
+                "date": "2022-02-14",
+                "jiraHours": 8,
+                "wtmHours": 0,
+                "artifacts": {},
+                "workLogs": [
+                    "created: 15.2.2022 9:26, edited: 20.2., spent: 6h, text: Bon. 2021 - komunikace, NITS troublesh., víkendová podpora - dořešení s CET & interní odměny, report WP s CET, S/C synchro, JIRA, MT, CF, maily/slack/skype, Plus4U",
+                    "created: 20.2.2022 22:46, edited: 20.2., spent: 1h, text: Celotýmovka, 1:1 KSam",
+                    "created: 20.2.2022 22:47, edited: 20.2., spent: 1h, text: NI RFP - stav"
+                ]
+            },
+            "2022-02-15": {
+                "date": "2022-02-15",
+                "jiraHours": 8,
+                "wtmHours": 0,
+                "artifacts": {},
+                "workLogs": [
+                    "created: 15.2.2022 9:24, edited: 15.2., spent: 45m, text: Architektura RTS",
+                    "created: 22.2.2022 18:27, edited: 22.2., spent: 5h 45m, text: Ppt na PST Kick-off, ppt na Status akvizice za 2021, NITS, úprava Portfolia pro vyhodnocování RE, JIRA, MT load, platby, maily/slack/skype, Plus4U",
+                    "created: 18.2.2022 23:30, edited: 18.2., spent: 1h, text: Kapacitní plánování",
+                    "created: 18.2.2022 23:29, edited: 18.2., spent: 30m, text: O2 - synchro s JBár"
+                ]
+            },
+            "2022-02-16": {
+                "date": "2022-02-16",
+                "jiraHours": 8,
+                "wtmHours": 0,
+                "artifacts": {},
+                "workLogs": [
+                    "created: 22.2.2022 18:38, edited: 22.2., spent: 2h, text: Plánování s CET, maily",
+                    "created: 22.2.2022 18:29, edited: 22.2., spent: 3h 30m, text: SP84 lidé, interní status TelcoOSS, akvizice - kontrolní výbor (2021), PST Kick-off",
+                    "created: 22.2.2022 18:32, edited: 22.2., spent: 1h 30m, text: 1:1 JChar, týmovka TL",
+                    "created: 18.2.2022 23:19, edited: 18.2., spent: 1h, text: Schůzka k návrhu postupu řešení"
+                ]
+            },
+            "2022-02-17": {
+                "date": "2022-02-17",
+                "jiraHours": 10.5,
+                "wtmHours": 0,
+                "artifacts": {},
+                "workLogs": [
+                    "created: 23.2.2022 0:56, edited: 23.2., spent: 4h, text: KKra - synchro, týmovka PM, 1:1 JBár, 1:1 TVaz, 1:1 HChmie, 1:1 RUrb",
+                    "created: 23.2.2022 8:14, edited: 23.2., spent: 4h, text: Roadmapa s MVič, JIRA, MT, platby, akceptace, ppt SP84 Kick-off, maiyl/slack/skype, Plus4U",
+                    "created: 18.2.2022 23:18, edited: 23.2., spent: 2h 30m, text: Návrh plánu/harmonogramu ,synchro s JBár, shrnutí"
+                ]
+            },
+            "2022-02-18": {
+                "date": "2022-02-18",
+                "jiraHours": 10,
+                "wtmHours": 0,
+                "artifacts": {},
+                "workLogs": [
+                    "created: 23.2.2022 8:15, edited: 23.2., spent: 2h, text: JTaj - pohovor/call, 1:1 KKra",
+                    "created: 23.2.2022 8:16, edited: 23.2., spent: 1h 30m, text: Porada PST",
+                    "created: 23.2.2022 8:18, edited: 23.2., spent: 6h, text: Neo4j schůzka s CET, SP84 weekly rep., dev. kapacity pro MBoj, WP report pro PPas, objednávky/akceptace, JIRA, MT, platby, maily/slack/skype, Plus4U",
+                    "created: 18.2.2022 23:19, edited: 18.2., spent: 30m, text: Shrnující mail O2, synchro s KPeš"
+                ]
+            },
+            "2022-02-19": {
+                "date": "2022-02-19",
+                "jiraHours": 3,
+                "wtmHours": 0,
+                "artifacts": {},
+                "workLogs": ["created: 23.2.2022 22:47, edited: 23.2., spent: 3h, text: Vyhodnocení releasů za 2021 (RE25-29), prezentace na SP84 Kick-off"]
+            },
+            "2022-02-20": {
+                "date": "2022-02-20",
+                "jiraHours": 5,
+                "wtmHours": 0,
+                "artifacts": {},
+                "workLogs": ["created: 23.2.2022 22:52, edited: 23.2., spent: 5h, text: Prezentace na SP84 Kick-off"]
             }
-        },
-        "lastSynchronization": "2021-10-15T13:46:42.853Z"
-    },
-    {
-        "uid": "12-8835-2",
-        "name": "Franc Bohuslav",
-        "jiraHours": 9.083333333333334,
-        "wtmHours": 9.083333333333334,
-        "notitificationStatuses": {
-            "2021-12-01": {
-                "time": "2021-12-31 10:00:00",
-                "emailIsSet": true
-            }
-        },
-        "days": {
-            "2021-09-16": {
-                "date": "2021-09-16",
-                "jiraHours": 0,
-                "wtmHours": 1,
-                "artifacts": {}
-            },
-            "2021-09-17": {
-                "date": "2021-09-17",
-                "jiraHours": 2,
-                "wtmHours": 1,
-                "artifacts": {}
-            },
-            "2021-09-24": {
-                "date": "2021-09-24",
-                "jiraHours": 2.0833333333333335,
-                "wtmHours": 2.0833333333333335,
-                "artifacts": {}
-            },
-            "2021-10-04": {
-                "date": "2021-10-04",
-                "jiraHours": 1.5,
-                "wtmHours": 1.5,
-                "artifacts": {}
-            },
-            "2021-10-08": {
-                "date": "2021-10-08",
-                "jiraHours": 2.5,
-                "wtmHours": 2.5,
-                "artifacts": {}
-            },
-            "2021-10-14": {
-                "date": "2021-10-14",
-                "jiraHours": 1,
-                "wtmHours": 1,
-                "artifacts": {}
-            },
-            "2019-07-29": {
-                "date": "2019-07-29",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/19": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/19ssSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-07-30": {
-                "date": "2019-07-30",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/19": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/19",
-                        "wtmHours": 0.5
-                    }
-                }
-            },
-            "2019-07-31": {
-                "date": "2019-07-31",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 1.25
-                    }
-                }
-            },
-            "2019-08-01": {
-                "date": "2019-08-01",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-08-05": {
-                "date": "2019-08-05",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-08-06": {
-                "date": "2019-08-06",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 1.25
-                    }
-                }
-            },
-            "2019-08-12": {
-                "date": "2019-08-12",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-08-15": {
-                "date": "2019-08-15",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-08-14": {
-                "date": "2019-08-14",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.25
-                    }
-                }
-            }
-        },
-        "lastSynchronization": "2021-10-15T13:46:42.853Z"
-    },
-    {
-        "uid": "12-8835-3",
-        "name": "Franc Bohuslav",
-        "jiraHours": 9.083333333333334,
-        "wtmHours": 9.083333333333334,
-        "notitificationStatuses": {
-            "2021-12-01": {
-                "time": "2021-12-31 10:00:00",
-                "error": "Server connection error",
-                "stack": "some-file.js:213\nanother-file.js:12",
-                "emailIsSet": true
-            }
-        },
-        "days": {
-            "2021-09-16": {
-                "date": "2021-09-16",
-                "jiraHours": 0,
-                "wtmHours": 1,
-                "artifacts": {}
-            },
-            "2021-09-17": {
-                "date": "2021-09-17",
-                "jiraHours": 2,
-                "wtmHours": 1,
-                "artifacts": {}
-            },
-            "2021-09-24": {
-                "date": "2021-09-24",
-                "jiraHours": 2.0833333333333335,
-                "wtmHours": 2.0833333333333335,
-                "artifacts": {}
-            },
-            "2021-10-04": {
-                "date": "2021-10-04",
-                "jiraHours": 1.5,
-                "wtmHours": 1.5,
-                "artifacts": {}
-            },
-            "2021-10-08": {
-                "date": "2021-10-08",
-                "jiraHours": 2.5,
-                "wtmHours": 2.5,
-                "artifacts": {}
-            },
-            "2021-10-14": {
-                "date": "2021-10-14",
-                "jiraHours": 1,
-                "wtmHours": 1,
-                "artifacts": {}
-            },
-            "2019-07-29": {
-                "date": "2019-07-29",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/19": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/19ssSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-07-30": {
-                "date": "2019-07-30",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/19": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/19",
-                        "wtmHours": 0.5
-                    }
-                }
-            },
-            "2019-07-31": {
-                "date": "2019-07-31",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 1.25
-                    }
-                }
-            },
-            "2019-08-01": {
-                "date": "2019-08-01",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-08-05": {
-                "date": "2019-08-05",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-08-06": {
-                "date": "2019-08-06",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 1.25
-                    }
-                }
-            },
-            "2019-08-12": {
-                "date": "2019-08-12",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-08-15": {
-                "date": "2019-08-15",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-08-14": {
-                "date": "2019-08-14",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.25
-                    }
-                }
-            }
-        },
-        "lastSynchronization": "2021-10-15T13:46:42.853Z"
-    },
-    {
-        "uid": "12-8835-4",
-        "name": "Franta vonasek",
-        "jiraHours": 10.083333333333334,
-        "wtmHours": 10.083333333333334,
-        "days": {
-            "2021-09-16": {
-                "date": "2021-09-16",
-                "jiraHours": 1,
-                "wtmHours": 1,
-                "artifacts": {}
-            },
-            "2021-09-17": {
-                "date": "2021-09-17",
-                "jiraHours": 2,
-                "wtmHours": 2,
-                "artifacts": {}
-            },
-            "2021-09-24": {
-                "date": "2021-09-24",
-                "jiraHours": 2.0833333333333335,
-                "wtmHours": 2.0833333333333335,
-                "artifacts": {}
-            },
-            "2021-10-04": {
-                "date": "2021-10-04",
-                "jiraHours": 1.5,
-                "wtmHours": 1.5,
-                "artifacts": {}
-            },
-            "2021-10-08": {
-                "date": "2021-10-08",
-                "jiraHours": 2.5,
-                "wtmHours": 2.5,
-                "artifacts": {}
-            },
-            "2021-10-14": {
-                "date": "2021-10-14",
-                "jiraHours": 1,
-                "wtmHours": 1,
-                "artifacts": {}
-            },
-            "2019-07-29": {
-                "date": "2019-07-29",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/19": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/19",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-07-30": {
-                "date": "2019-07-30",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/19": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/19",
-                        "wtmHours": 0.5
-                    }
-                }
-            },
-            "2019-07-31": {
-                "date": "2019-07-31",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 1.25
-                    }
-                }
-            },
-            "2019-08-01": {
-                "date": "2019-08-01",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-08-05": {
-                "date": "2019-08-05",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-08-06": {
-                "date": "2019-08-06",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 1.25
-                    }
-                }
-            },
-            "2019-08-12": {
-                "date": "2019-08-12",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-08-15": {
-                "date": "2019-08-15",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.75
-                    }
-                }
-            },
-            "2019-08-14": {
-                "date": "2019-08-14",
-                "jiraHours": 0,
-                "wtmHours": 0,
-                "artifacts": {
-                    "ues:UNI-BT:SWF.D1.DAMAS-62/08/20": {
-                        "artifact": "ues:UNI-BT:SWF.D1.DAMAS-62/08/20",
-                        "wtmHours": 0.25
-                    }
-                }
-            }
-        },
-        "lastSynchronization": "2021-10-15T13:46:42.853Z"
+        }
     }
 ]

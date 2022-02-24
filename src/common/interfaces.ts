@@ -58,6 +58,7 @@ export interface INotificationStatus {
     emailIsSet: boolean;
 }
 export interface IStatsDay {
+    workLogs: string[];
     date: string;
     jiraHours: number;
     wtmHours: number;
