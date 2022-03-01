@@ -47,6 +47,7 @@ container.bindValue("jiraApiOptions", {
 container.bindValue("tokenCache", {});
 container.bindValue("userStorageDir", "/users");
 container.bindValue("projectStorageDir", "/projects");
+container.bindValue("syncStorageDir", "/syncs");
 
 let dropboxFsClient: DropboxFsClient = null;
 if (process.env.NITS_DROPBOX_TOKEN) {
@@ -133,6 +134,8 @@ const methods: IServerMethod[] = [
 
     // admin commands
     m("get", "/server/sync", syncRequester.sync.bind(syncRequester), adminAuthorize, { formatOutput: true }),
+    m("get", "/server/list-syncs", syncRequester.getReportFilesList.bind(syncRequester), adminAuthorize, { formatOutput: true }),
+    m("get", "/server/get-sync", syncRequester.getReportFile.bind(syncRequester), adminAuthorize, { formatOutput: true }),
     m("get", "/server/month-notification", notifyRequester.monthNotification.bind(notifyRequester), adminAuthorize, { formatOutput: true }),
     m("get", "/server/project-settings/get-artifacts", projectReqester.getArtifactSettings.bind(projectReqester), adminAuthorize),
     m("post", "/server/project-settings/set-artifacts", projectReqester.setArtifactSettings.bind(projectReqester), adminAuthorize),

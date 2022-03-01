@@ -2,6 +2,7 @@
 /dist
 /debug.log
 /userdata/users/*.data
+/userdata/syncs/*.json
 /.env
 /userdata/projects/project-settings.data
 /coverage

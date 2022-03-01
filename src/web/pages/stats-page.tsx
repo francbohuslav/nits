@@ -1,4 +1,4 @@
-import { Box, Button, LinearProgress, Link, makeStyles, Paper, Tab, Tabs, Tooltip, Typography } from "@material-ui/core";
+import { Box, Button, LinearProgress, Link, List, ListItem, ListItemText, makeStyles, Paper, Tab, Tabs, Tooltip, Typography } from "@material-ui/core";
 import { DataGrid, GridColumns, GridRowData } from "@material-ui/data-grid";
 import MuiAlert from "@material-ui/lab/Alert";
 import { useEffect, useState } from "react";
@@ -39,6 +39,9 @@ const useStyles = makeStyles({
     level2Cell: {
         background: "#f6f6f6",
     },
+    tab: {
+        minWidth: "120px",
+    },
 });
 
 enum NotificationState {
@@ -59,6 +62,8 @@ export const StatsPage = () => {
     const [selectedUser, setSelectedUser] = useState<IStats>(null);
     const [selectedDate, setSelectedDate] = useState<string>(null);
     const [selectedMonth, setSelectedMonth] = useState<Date>(actualMonth);
+    const [tabReports, setTabReports] = useState(false);
+    const [reportsList, setReportsList] = useState<string[]>([]);
     const ajax = useAjax();
     const history = useHistory();
     const classes = useStyles();
@@ -75,6 +80,10 @@ export const StatsPage = () => {
         if (res2.isOk) {
             setSystemConfig(res2.data);
         }
+        const res3 = await ajax.get<string[]>("/server/list-syncs");
+        if (res3.isOk) {
+            setReportsList(res3.data);
+        }
         setIsLoading(false);
     };
 
@@ -87,8 +96,13 @@ export const StatsPage = () => {
     }, [selectedMonth]);
 
     const idGetter = (row: GridRowData) => (row as IStats).uid || (row as IStatsDay).date || (row as IStatsArt).artifact;
-    const onMonthSelected = (monthShift: number) => {
-        setSelectedMonth(monthShift == 0 ? actualMonth : monthShift == 1 ? previousMonth : beforePreviousMonth);
+    const onMonthSelected = (tabIndex: number) => {
+        if (tabIndex < 3) {
+            setSelectedMonth(tabIndex == 0 ? actualMonth : tabIndex == 1 ? previousMonth : beforePreviousMonth);
+            setTabReports(false);
+        } else {
+            setTabReports(true);
+        }
     };
 
     // Less then 10 seconds is equal
@@ -297,22 +311,40 @@ export const StatsPage = () => {
                     </Typography>
 
                     <Paper square>
-                        <Tabs value={selectedMonthTabIndex} indicatorColor="primary" textColor="primary" centered onChange={(e, v) => onMonthSelected(v)}>
-                            <Tab label={actualMonth.toLocaleString(undefined, { month: "long" })} />
-                            <Tab label={previousMonth.toLocaleString(undefined, { month: "long" })} />
-                            <Tab label={beforePreviousMonth.toLocaleString(undefined, { month: "long" })} />
+                        <Tabs
+                            value={tabReports ? 3 : selectedMonthTabIndex}
+                            indicatorColor="primary"
+                            textColor="primary"
+                            variant="fullWidth"
+                            centered
+                            onChange={(e, v) => onMonthSelected(v)}
+                        >
+                            <Tab className={classes.tab} label={actualMonth.toLocaleString(undefined, { month: "long" })} />
+                            <Tab className={classes.tab} label={previousMonth.toLocaleString(undefined, { month: "long" })} />
+                            <Tab className={classes.tab} label={beforePreviousMonth.toLocaleString(undefined, { month: "long" })} />
+                            <Tab className={classes.tab} label="Protokoly" />
                         </Tabs>
                     </Paper>
-                    <DataGrid
-                        getRowId={idGetter}
-                        columns={columns}
-                        rows={rows}
-                        density="compact"
-                        autoHeight
-                        disableColumnMenu
-                        hideFooterPagination
-                        hideFooter
-                    />
+                    {!tabReports ? (
+                        <DataGrid
+                            getRowId={idGetter}
+                            columns={columns}
+                            rows={rows}
+                            density="compact"
+                            autoHeight
+                            disableColumnMenu
+                            hideFooterPagination
+                            hideFooter
+                        />
+                    ) : (
+                        <List component="nav">
+                            {reportsList.map((file) => (
+                                <ListItem button component="a" key={file} href={"/server/get-sync/?file=" + encodeURIComponent(file)} target="_blank">
+                                    <ListItemText primary={file} />
+                                </ListItem>
+                            ))}
+                        </List>
+                    )}
                 </>
             )}
             <Box display="flex" mt={2}>

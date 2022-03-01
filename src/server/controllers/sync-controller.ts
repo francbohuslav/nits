@@ -1,4 +1,7 @@
+import { CachedFs } from "dropbox-fs";
 import { Inject } from "injector";
+import { join } from "path";
+import { assert } from "../../common/core";
 import dateUtils from "../../common/date-utils";
 import { WtmError } from "../apis/wtm-api";
 import { ISyncReport, ISyncReportUser, TimesheetMapping, TimesheetMappingsPerDay } from "../models/interfaces";
@@ -20,7 +23,9 @@ export class SyncController {
         private jiraModel: JiraModel,
         private projectDataModel: ProjectDataModel,
         private notifyController: NotifyController,
-        @Inject.Value("timesheetModelFactory") private timesheetModelFactory: TimesheetModelFactoryHandler
+        private dropboxCachedFs: CachedFs,
+        @Inject.Value("timesheetModelFactory") private timesheetModelFactory: TimesheetModelFactoryHandler,
+        @Inject.Value("syncStorageDir") private storageDir: string
     ) {}
 
     public async sync(): Promise<ISyncReport> {
@@ -128,7 +133,29 @@ export class SyncController {
         } catch (err) {
             report.log.push(err.message + "\n" + err.stack);
         }
+        await this.saveReportToFile(report);
         return report;
+    }
+
+    private async saveReportToFile(report: ISyncReport): Promise<void> {
+        const file = `sync-${new Date().toISOString().replace(/[^a-z0-9]/gi, "-")}.json`;
+        await this.dropboxCachedFs.writeFile(join(this.storageDir, file), JSON.stringify(report, null, 2));
+    }
+
+    public async getReportFilesList(): Promise<string[]> {
+        const files = await this.dropboxCachedFs.readdir(this.storageDir);
+        files.sort((a, b) => -a.localeCompare(b));
+        for (let i = 40; i < files.length; i++) {
+            // const file = files[i];
+            //TODO: BF: delete file
+        }
+        return files.slice(0, 40);
+    }
+
+    public async getReportFile(file: string): Promise<ISyncReport> {
+        assert(file.match(/^[a-z0-9.-]+$/i));
+        const content = await this.dropboxCachedFs.readFile(join(this.storageDir, file));
+        return JSON.parse(content);
     }
 
     protected separateTimesheets(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; notNitsTimesheets: Timesheet[] } {
