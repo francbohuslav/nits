@@ -42,6 +42,11 @@ const useStyles = makeStyles({
     tab: {
         minWidth: "120px",
     },
+    worklogTooltip: {
+        "& .MuiTooltip-tooltip": {
+            maxWidth: "800px",
+        },
+    },
 });
 
 enum NotificationState {
@@ -169,7 +174,29 @@ export const StatsPage = () => {
         {
             field: "jiraHours",
             headerName: `JIRA (${dateUtils.formatHours(arrayUtils.sumAction(stats, (s) => s.jiraHours))})`,
-            renderCell: (params) => (params.value == undefined ? "" : dateUtils.formatHours(params.value as number)),
+            renderCell: (params) =>
+                params.value == undefined ? (
+                    ""
+                ) : (params.row as IStatsDay).workLogs ? (
+                    <Tooltip
+                        PopperProps={{
+                            className: classes.worklogTooltip,
+                        }}
+                        title={
+                            (params.row as IStatsDay).workLogs ? (
+                                <div>
+                                    {(params.row as IStatsDay).workLogs.map((w, i) => (
+                                        <div key={i}>{w}</div>
+                                    ))}
+                                </div>
+                            ) : undefined
+                        }
+                    >
+                        <div>{dateUtils.formatHours(params.value as number)}</div>
+                    </Tooltip>
+                ) : (
+                    dateUtils.formatHours(params.value as number)
+                ),
         },
         {
             field: "wtmHours",

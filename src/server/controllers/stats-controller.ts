@@ -41,14 +41,20 @@ export class StatsController {
             if (worklogsPerUserAndDay[userData.jiraAccountId]) {
                 jiraHours = arrayUtils.sumAction(worklogsPerUser[userData.jiraAccountId], (w) => w.timeSpentSeconds) / 3600;
                 Object.entries(worklogsPerUserAndDay[userData.jiraAccountId]).forEach(([date, workLogs]) => {
-                    const dayStats = (days[date] = days[date] || { date, jiraHours: 0, wtmHours: 0, artifacts: {} });
+                    const dayStats = (days[date] = days[date] || { date, jiraHours: 0, wtmHours: 0, artifacts: {}, workLogs: [] });
                     dayStats.jiraHours = arrayUtils.sumAction(workLogs, (w) => w.timeSpentSeconds) / 3600;
+                    dayStats.workLogs = workLogs.map(
+                        (w) =>
+                            `created: ${dateUtils.formatDateTime(w.created)}, edited: ${dateUtils.formatDate(w.updated)}, spent: ${w.timeSpent}, text: ${
+                                w.commentAsText
+                            }`
+                    );
                 });
             }
             if (timesheetsPerUserAndDay[userData.uid]) {
                 wtmHours = arrayUtils.sumAction(timesheetsPerUser[userData.uid], (t) => t.getSpentHours());
                 Object.entries(timesheetsPerUserAndDay[userData.uid]).forEach(([date, timesheets]) => {
-                    const dayStats = (days[date] = days[date] || { date, jiraHours: 0, wtmHours: 0, artifacts: {} });
+                    const dayStats = (days[date] = days[date] || { date, jiraHours: 0, wtmHours: 0, artifacts: {}, workLogs: [] });
                     dayStats.wtmHours = arrayUtils.sumAction(timesheets, (t) => t.getSpentHours());
                     const timesheetsPerArtifacts = arrayUtils.toGroups(timesheets, (t) => t.subject);
                     Object.entries(timesheetsPerArtifacts).forEach(([art, timesheets]) => {
