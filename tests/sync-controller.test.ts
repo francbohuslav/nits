@@ -81,28 +81,28 @@ describe("computeNewTimesheets", () => {
             expect.objectContaining({
                 datetimeFrom: "2021-10-11T07:30:00.000Z",
                 datetimeTo: "2021-10-11T08:30:00.000Z",
-                subject: "UNI-BT:USYT.NI_20/NITS",
+                subject: "ues:UNI-BT:USYT.NI_20/NITS",
             })
         );
         expect(result[1]).toEqual(
             expect.objectContaining({
                 datetimeFrom: "2021-10-11T08:30:00.000Z",
                 datetimeTo: "2021-10-11T09:00:00.000Z",
-                subject: "UNI-BT:USYT.NI_20/NITS2",
+                subject: "ues:UNI-BT:USYT.NI_20/NITS2",
             })
         );
         expect(result[2]).toEqual(
             expect.objectContaining({
                 datetimeFrom: "2021-10-12T06:00:00.000Z",
                 datetimeTo: "2021-10-12T07:00:00.000Z",
-                subject: "UNI-BT:USYT.NI_20/NITS",
+                subject: "ues:UNI-BT:USYT.NI_20/NITS",
             })
         );
         expect(result[3]).toEqual(
             expect.objectContaining({
                 datetimeFrom: "2021-10-12T07:30:00.000Z",
                 datetimeTo: "2021-10-12T08:00:00.000Z",
-                subject: "UNI-BT:USYT.NI_20/NITS2",
+                subject: "ues:UNI-BT:USYT.NI_20/NITS2",
             })
         );
     });
@@ -260,21 +260,21 @@ describe("computeNewTimesheetsInDay", () => {
             expect.objectContaining({
                 datetimeFrom: "2021-10-12T06:00:00.000Z",
                 datetimeTo: "2021-10-12T07:00:00.000Z",
-                subject: "UNI-BT:1",
+                subject: "ues:UNI-BT:1",
             } as Timesheet)
         );
         expect(newTimesheets[1]).toEqual(
             expect.objectContaining({
                 datetimeFrom: "2021-10-12T07:00:00.000Z",
                 datetimeTo: "2021-10-12T07:30:00.000Z",
-                subject: "UNI-BT:2",
+                subject: "ues:UNI-BT:2",
             } as Timesheet)
         );
         expect(newTimesheets[2]).toEqual(
             expect.objectContaining({
                 datetimeFrom: "2021-10-12T07:30:00.000Z",
                 datetimeTo: "2021-10-12T07:45:00.000Z",
-                subject: "UNI-BT:3",
+                subject: "ues:UNI-BT:3",
             } as Timesheet)
         );
     });
@@ -307,14 +307,14 @@ describe("computeNewTimesheetsInDay", () => {
             expect.objectContaining({
                 datetimeFrom: "2021-10-12T04:00:00.000Z",
                 datetimeTo: "2021-10-12T05:00:00.000Z",
-                subject: "UNI-BT:1",
+                subject: "ues:UNI-BT:1",
             } as Timesheet)
         );
         expect(newTimesheets[1]).toEqual(
             expect.objectContaining({
                 datetimeFrom: "2021-10-12T05:00:00.000Z",
                 datetimeTo: "2021-10-12T22:00:00.000Z",
-                subject: "UNI-BT:2",
+                subject: "ues:UNI-BT:2",
             } as Timesheet)
         );
     });
@@ -370,21 +370,21 @@ describe("computeNewTimesheetsInDay", () => {
             expect.objectContaining({
                 datetimeFrom: "2021-10-12T02:30:00.000Z",
                 datetimeTo: "2021-10-12T05:45:00.000Z",
-                subject: "UNI-BT:1",
+                subject: "ues:UNI-BT:1",
             } as Timesheet)
         );
         expect(newTimesheets[1]).toEqual(
             expect.objectContaining({
                 datetimeFrom: "2021-10-12T07:15:00.000Z",
                 datetimeTo: "2021-10-12T08:00:00.000Z",
-                subject: "UNI-BT:1",
+                subject: "ues:UNI-BT:1",
             } as Timesheet)
         );
         expect(newTimesheets[2]).toEqual(
             expect.objectContaining({
                 datetimeFrom: "2021-10-12T08:00:00.000Z",
                 datetimeTo: "2021-10-12T12:00:00.000Z",
-                subject: "UNI-BT:2",
+                subject: "ues:UNI-BT:2",
             } as Timesheet)
         );
     });
@@ -421,7 +421,7 @@ describe("computeNewTimesheetInSegment", () => {
             datetimeFrom: "2021-10-12T06:00:00.000Z",
             datetimeTo: "2021-10-12T07:00:00.000Z",
             description: "desc",
-            subject: "UNI-BT:1",
+            subject: "ues:UNI-BT:1",
             data: {
                 nits: {
                     issueKey: "C-1",
@@ -489,7 +489,7 @@ describe("computeNewTimesheetInSegment", () => {
             datetimeFrom: "2021-10-12T06:00:00.000Z",
             datetimeTo: "2021-10-12T07:00:00.000Z",
             description: "desc",
-            subject: "UNI-BT:1",
+            subject: "ues:UNI-BT:1",
             data: {
                 nits: {
                     issueKey: "C-1",
