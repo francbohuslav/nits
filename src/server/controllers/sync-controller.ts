@@ -146,8 +146,8 @@ export class SyncController {
         const files = await this.dropboxCachedFs.readdir(this.storageDir);
         files.sort((a, b) => -a.localeCompare(b));
         for (let i = 40; i < files.length; i++) {
-            // const file = files[i];
-            //TODO: BF: delete file
+            const file = files[i];
+            this.dropboxCachedFs.unlinkFile(join(this.storageDir, file));
         }
         return files.slice(0, 40);
     }
