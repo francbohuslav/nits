@@ -179,7 +179,7 @@ app.get("/page/*", async (req, res) => {
 
 app.use(express.static(__dirname + "/../../../dist/web"));
 const port = process.env.PORT || 83;
-
+console.log("TimeZone", Intl.DateTimeFormat().resolvedOptions().timeZone);
 const httpServer = http.createServer(app);
 
 httpServer.listen(port, () => {

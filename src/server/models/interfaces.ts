@@ -1,6 +1,8 @@
 import { Worklog } from "./jira/interfaces";
 
 export interface ISyncReport {
+    startedAt: Date;
+    timeZone: string;
     log: string[];
     users: ISyncReportUser[];
 }

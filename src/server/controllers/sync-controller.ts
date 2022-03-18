@@ -29,7 +29,12 @@ export class SyncController {
     ) {}
 
     public async sync(): Promise<ISyncReport> {
-        const report: ISyncReport = { users: [], log: [] };
+        const report: ISyncReport = {
+            startedAt: new Date(),
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            users: [],
+            log: [],
+        };
         if (this.nextPossibleStartTime && dateUtils.isLowerThen(new Date(), this.nextPossibleStartTime)) {
             report.log.push(`Too soon. Try it again after ${dateUtils.formatDateTime(this.nextPossibleStartTime)}`);
             return report;

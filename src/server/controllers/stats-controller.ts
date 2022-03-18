@@ -113,7 +113,7 @@ export class StatsController {
 
     private async filterJiraWorklogs(allWorklogList: Worklog[]): Promise<Worklog[]> {
         // Filter that worklogs by project settings. Only worklogs with artifact is relevant
-        const report: ISyncReport = { users: [], log: [] };
+        const report: ISyncReport = { startedAt: new Date(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, users: [], log: [] };
         const wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey = {};
         const issuesById = await this.jiraModel.getAllNeededIssues(allWorklogList);
         allWorklogList.forEach((w) => (w.issueKey = issuesById[w.issueId].key));
