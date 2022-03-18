@@ -10,12 +10,18 @@ export class JiraRequester extends BaseRequester {
         super();
     }
 
-    public async oauth(req: Request, res: Response): Promise<void> {
+    public async oauth(req: Request, res: Response): Promise<any> {
         try {
             await this.jiraController.processOAth(req.query as any as IJiraProcessRequest);
-            res.redirect("/");
+            if (!res.headersSent) {
+                res.redirect("/");
+            }
         } catch (er) {
-            res.redirect(`/?error=1&message=${encodeURIComponent(er.message)}&stack=${er.stack}`);
+            if (!res.headersSent) {
+                res.redirect(`/?error=1&message=${encodeURIComponent(er.message)}&stack=${er.stack}`);
+            } else {
+                return { message: er.message, stack: er.stack };
+            }
         }
     }
 }

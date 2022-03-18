@@ -153,7 +153,12 @@ const processRequest = (method: IServerAction, options: IServerMethodOptions) =>
         const result: IBaseResponse<unknown> = {
             data: dataResult,
         };
-        res.send(isDevelopment || options.formatOutput ? JSON.stringify(result, null, 2) : JSON.stringify(result));
+        const outputData = isDevelopment || options.formatOutput ? JSON.stringify(result, null, 2) : JSON.stringify(result);
+        if (res.headersSent) {
+            res.end(outputData);
+        } else {
+            res.send(outputData);
+        }
     } catch (ex) {
         sendError(res, ex);
     }
