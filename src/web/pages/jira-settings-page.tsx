@@ -52,7 +52,7 @@ export const JiraSettingsPage = () => {
     const url = sessionHash
         ? `https://auth.atlassian.com/authorize?audience=api.atlassian.com&client_id=${encodeURIComponent(
               clientId
-          )}&scope=read%3Ajira-user&redirect_uri=${encodeURIComponent(server)}%2Fserver%2Fjira%2Foauth&state=${encodeURIComponent(
+          )}&scope=read%3Auser%3Ajira&redirect_uri=${encodeURIComponent(server)}%2Fserver%2Fjira%2Foauth&state=${encodeURIComponent(
               sessionHash
           )}&response_type=code&prompt=consent`
         : "#";
