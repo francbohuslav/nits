@@ -1,11 +1,13 @@
-import express = require("express");
 import compression from "compression";
 import dotenv from "dotenv";
 import { CachedFs, DropboxFsClient } from "dropbox-fs";
+import express from "express";
 import { Response } from "express-serve-static-core";
+import session from "express-session";
 import fs from "fs";
 import http from "http";
 import { Container } from "injector";
+import path from "path";
 import { IBaseResponse } from "../common/ajax-interfaces";
 import { IProjectConfigPublic, IUserData } from "../common/interfaces";
 import { WtmApi, WtmError } from "./apis/wtm-api";
@@ -22,9 +24,7 @@ import { ProjectRequester } from "./requesters/project-requester";
 import { StatsRequester } from "./requesters/stats-requester";
 import { SyncRequester } from "./requesters/sync-requester";
 import { UserRequester } from "./requesters/user-requester";
-import session = require("express-session");
 const json = require("body-parser").json;
-import path = require("path");
 dotenv.config();
 
 const isDevelopment = !!process.env.NITS_DEVEL_ACCOUNT;
@@ -38,7 +38,7 @@ const projectConfig = new ProjectConfigurer().getProjectConfig();
 container.bindValue("projectConfig", projectConfig);
 container.bindValue("jiraApiOptions", {
     protocol: "https",
-    host: "intelis.atlassian.net",
+    host: process.env.NITS_JIRA_SERVER || "intelis.atlassian.net",
     apiVersion: "3",
     strictSSL: true,
     username: process.env.NITS_JIRA_USERNAME,

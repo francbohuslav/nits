@@ -18,7 +18,7 @@ import {
 import { DataGrid, GridCellEditCommitParams, GridColumns } from "@material-ui/data-grid";
 import AddIcon from "@material-ui/icons/AddCircleRounded";
 import CloseIcon from "@material-ui/icons/Close";
-import { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { IAllUsersResponse, IArtifactSettingsResponse } from "../../common/ajax-interfaces";
 import { IArtifactSettings, ISystemConfig, IUserPublicData } from "../../common/interfaces";
@@ -26,7 +26,6 @@ import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
 import { Header } from "../components/header";
 import { Router } from "../router";
-import React = require("react");
 
 export const ProjectSettingsPage = () => {
     const [artifactSettings, setArtifactSettings] = useState<IArtifactSettings[]>(null);
