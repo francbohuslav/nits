@@ -7,6 +7,7 @@ export interface IProjectConfig {
         nitsCustomField: string;
         clientId: string;
         clientSecret: string;
+        // https://intelis.atlassian.net/_edge/tenant_info
         cloudId: string;
     };
     email: {
@@ -33,6 +34,7 @@ export class ProjectConfigurer {
                     nitsCustomField: process.env.NITS_JIRA_CUSTOM_FIELD,
                     clientId: process.env.NITS_JIRA_CLIENT_ID,
                     clientSecret: process.env.NITS_JIRA_SECRET,
+                    // https://intelis.atlassian.net/_edge/tenant_info
                     cloudId: process.env.NITS_JIRA_CLOUD_ID,
                 },
                 email: {
