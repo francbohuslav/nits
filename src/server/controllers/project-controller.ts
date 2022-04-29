@@ -8,8 +8,9 @@ import { SystemDataModel } from "../models/system-data-model";
 
 @Inject.Singleton
 export class ProjectController {
-    private getNitsFiledValuesLastTime: number = 0;
-    private getNitsFiledValuesCache: { [key: string]: string };
+    private getNitsFieldValuesLastTime: number = 0;
+    private getNitsFieldValuesCache: { [key: string]: string };
+
     constructor(private projectDataModel: ProjectDataModel, private jiraApi: JiraApi, private systemDataModel: SystemDataModel) {}
 
     public getArtifactSettings(): Promise<IArtifactSettings[]> {
@@ -31,11 +32,11 @@ export class ProjectController {
 
     public async getNitsFieldValues(): Promise<{ [key: string]: string }> {
         const now = dateUtils.toTimestamp();
-        if (this.getNitsFiledValuesLastTime < now) {
-            this.getNitsFiledValuesCache = await this.jiraApi.getNitsFiledValues();
-            this.getNitsFiledValuesLastTime = now + 5 * 60;
+        if (this.getNitsFieldValuesLastTime < now) {
+            this.getNitsFieldValuesCache = await this.jiraApi.getNitsFieldValues();
+            this.getNitsFieldValuesLastTime = now + 5 * 60;
         }
-        return this.getNitsFiledValuesCache;
+        return this.getNitsFieldValuesCache;
     }
 
     public getSystemConfig(): Promise<ISystemConfig> {

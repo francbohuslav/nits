@@ -58,7 +58,7 @@ export const ProjectSettingsPage = () => {
         const res3 = await ajax.get<IAllUsersResponse>("/server/admin-users/get");
         if (res.isOk) {
             setArtifactSettings(res.data.records);
-            setNitsFieldValues(res.data.nitsFiledValues);
+            setNitsFieldValues(res.data.nitsFieldValues);
             setProjects(res.data.projects);
         }
         if (res2.isOk) {

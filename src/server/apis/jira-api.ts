@@ -67,7 +67,7 @@ export class JiraApi {
         return response;
     }
 
-    public async getNitsFiledValues(): Promise<{ [key: string]: string }> {
+    public async getNitsFieldValues(): Promise<{ [key: string]: string }> {
         const response = await this.client.getIssueCreateMetadata({
             expand: "projects.issuetypes.fields",
         });

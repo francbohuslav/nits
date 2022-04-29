@@ -121,7 +121,6 @@ const methods: IServerMethod[] = [
         },
         loginAuthorize
     ),
-
     m("post", "/server/login", userRequester.login.bind(userRequester)),
     m("post", "/server/logout", userRequester.logout.bind(userRequester)),
     m("get", "/server/get-user-public-data", userRequester.getUserPublicData.bind(userRequester), loginAuthorize),

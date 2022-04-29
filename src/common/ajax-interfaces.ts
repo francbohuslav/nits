@@ -18,7 +18,7 @@ export interface ILoginRequest {
 
 export interface IArtifactSettingsResponse {
     records: IArtifactSettings[];
-    nitsFiledValues: { [key: string]: string };
+    nitsFieldValues: { [key: string]: string };
     projects: { [key: string]: string };
 }
 

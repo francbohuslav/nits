@@ -159,7 +159,7 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
         },
     ];
     const wtmTsConfigPerIssueId: IWtmTsConfigPerIssueKey = {};
-    const report: ISyncReport = { log: [], users: [] };
+    const report: ISyncReport = { log: [], users: [], startedAt: null, timeZone: null };
     const workLog = await jiraModel.filterWorklogsAndAssignWtmConfig(inputWorklogs as Worklog[], issuesById, wtmTsConfigPerIssueId, artifactSetting, report);
     expect(workLog).toHaveLength(4);
     expect(wtmTsConfigPerIssueId).toBeTruthy();

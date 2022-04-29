@@ -10,11 +10,11 @@ export class ProjectRequester {
 
     public async getArtifactSettings(): Promise<IArtifactSettingsResponse> {
         const records = await this.projectController.getArtifactSettings();
-        const nitsFiledValues = await this.projectController.getNitsFieldValues();
+        const nitsFieldValues = await this.projectController.getNitsFieldValues();
         return {
             records,
             projects: await this.projectController.getJiraProjects(),
-            nitsFiledValues,
+            nitsFieldValues,
         } as IArtifactSettingsResponse;
     }
 
