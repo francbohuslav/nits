@@ -11,6 +11,7 @@ import { ProjectDataModel } from "../models/project-data-model";
 import { SystemDataModel } from "../models/system-data-model";
 import { UserDataModel } from "../models/user-data-model";
 import { nitsTimesheetFilter, Timesheet, TimesheetModelFactoryHandler } from "../models/uu/interfaces";
+import { IProjectConfig } from "../project-config";
 import { NotifyController } from "./notify-controller";
 
 @Inject.Singleton
@@ -25,7 +26,8 @@ export class SyncController {
         private notifyController: NotifyController,
         private dropboxCachedFs: CachedFs,
         @Inject.Value("timesheetModelFactory") private timesheetModelFactory: TimesheetModelFactoryHandler,
-        @Inject.Value("syncStorageDir") private storageDir: string
+        @Inject.Value("syncStorageDir") private storageDir: string,
+        @Inject.Value("projectConfig") private projectConfig: IProjectConfig
     ) {}
 
     public async sync(): Promise<ISyncReport> {
@@ -58,15 +60,19 @@ export class SyncController {
         const wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey = {};
         const issuesById = await this.jiraModel.getAllNeededIssues(allWorklogList);
         allWorklogList.forEach((w) => (w.issueKey = issuesById[w.issueId].key));
-        const artifactSettingsList = await this.projectDataModel.getArtifactSettings();
-        allWorklogList = await this.jiraModel.filterWorklogsAndAssignWtmConfig(
-            allWorklogList,
-            issuesById,
-            wtmTsConfigPerIssueKey,
-            artifactSettingsList,
-            report
-        );
 
+        if (this.projectConfig.jira.nitsCustomFieldIsArtifact) {
+            allWorklogList = this.jiraModel.filterWorklogsByArtifactAndAssignWtmConfig(allWorklogList, issuesById, wtmTsConfigPerIssueKey, report);
+        } else {
+            const artifactSettingsList = await this.projectDataModel.getArtifactSettings();
+            allWorklogList = this.jiraModel.filterWorklogsByRulesAndAssignWtmConfig(
+                allWorklogList,
+                issuesById,
+                wtmTsConfigPerIssueKey,
+                artifactSettingsList,
+                report
+            );
+        }
         // Split worklogs by user
         const worklogListPerAccountId: { [accountId: string]: Worklog[] } = {};
         allWorklogList.forEach((w) => {
@@ -167,7 +173,7 @@ export class SyncController {
         const timesheetsToDelete: Timesheet[] = [];
         const notNitsTimesheets: Timesheet[] = [];
         for (const timesheet of exitingTimesheets) {
-            if (nitsTimesheetFilter(timesheet)) {
+            if (nitsTimesheetFilter(timesheet, this.projectConfig.wtmProjectCode)) {
                 timesheetsToDelete.push(timesheet);
             } else {
                 notNitsTimesheets.push(timesheet);

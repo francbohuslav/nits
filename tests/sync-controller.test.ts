@@ -2,8 +2,12 @@ import { IInterval, SyncController } from "../src/server/controllers/sync-contro
 import { TimesheetMapping, TimesheetMappingsPerDay } from "../src/server/models/interfaces";
 import { ITimesheetData, Timesheet } from "../src/server/models/uu/interfaces";
 
+const projectConfig: any = {
+    wtmProjectCode: "TEST",
+};
+
 test("separateTimesheets", async () => {
-    const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+    const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
     const result = syncController.separateTimesheets2([
         {
             data: undefined,
@@ -34,7 +38,7 @@ test("separateTimesheets", async () => {
 
 describe("computeNewTimesheets", () => {
     test("Split to days", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         const result = syncController.computeNewTimesheets2(
             {
                 "2021-10-11": [
@@ -113,7 +117,7 @@ describe("getNextFreeTimeSegment", () => {
     let searchFromTime: Date;
 
     beforeEach(() => {
-        syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         searchFromTime = new Date("2021-10-12T06:00:00Z");
     });
 
@@ -223,12 +227,12 @@ describe("getNextFreeTimeSegment", () => {
 
 describe("computeNewTimesheetsInDay", () => {
     test("empty", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         expect(syncController.computeNewTimesheetsInDay2([], []).length).toBe(0);
     });
 
     test("no_remaining_timesheets", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         const tsmBase = {
             date: "2021-10-12",
             description: "desc",
@@ -280,7 +284,7 @@ describe("computeNewTimesheetsInDay", () => {
     });
 
     test("time_shift_because_of_too_much", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         const tsmBase = {
             date: "2021-10-12",
             description: "desc",
@@ -320,7 +324,7 @@ describe("computeNewTimesheetsInDay", () => {
     });
 
     test("no_space_for_timesheets", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         const tsmBase = {
             date: "2021-10-12",
             description: "desc",
@@ -342,7 +346,7 @@ describe("computeNewTimesheetsInDay", () => {
     });
 
     test("full_test_with_splitted", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         const tsmBase = {
             date: "2021-10-12",
             description: "desc",
@@ -392,14 +396,14 @@ describe("computeNewTimesheetsInDay", () => {
 
 describe("computeNewTimesheetInSegment", () => {
     test("empty", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         const newTimesheets: Timesheet[] = [];
         syncController.computeNewTimesheetInSegment2({ from: new Date("2021-10-12T06:00:00Z"), to: new Date("2021-10-12T06:00:00Z") }, newTimesheets, []);
         expect(newTimesheets.length).toBe(0);
     });
 
     test("timesheet_shorter_then_segment", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         const newTimesheets: Timesheet[] = [];
         const timesheetMappings: TimesheetMapping[] = [
             {
@@ -433,7 +437,7 @@ describe("computeNewTimesheetInSegment", () => {
     });
 
     test("timesheet_longer_then_segment", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         const newTimesheets: Timesheet[] = [];
         const timesheetMappings: TimesheetMapping[] = [
             {
@@ -458,7 +462,7 @@ describe("computeNewTimesheetInSegment", () => {
     });
 
     test("timesheets_exact_as_segment", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         const newTimesheets: Timesheet[] = [];
         const timesheetMappings: TimesheetMapping[] = [
             {
@@ -503,7 +507,7 @@ describe("computeNewTimesheetInSegment", () => {
 
 describe("excludeNotChangedTimesheets", () => {
     test("Empty array", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         const newTimesheets: Timesheet[] = [];
         const timesheetsToDelete: Timesheet[] = [];
 
@@ -514,7 +518,7 @@ describe("excludeNotChangedTimesheets", () => {
     });
 
     test("Some values", () => {
-        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null);
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         const newTimesheets: Timesheet[] = [
             createTimesheet("2022-01-18T00:00:00Z", "2022-01-18T01:00:00Z", "desc", "subject", null),
             createTimesheet("2022-01-18T01:00:00Z", "2022-01-18T02:00:00Z", "desc2", "subject2", { nits: { issueKey: "issuekey", worklogIds: ["123415"] } }),

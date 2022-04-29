@@ -2,12 +2,18 @@ import { CachedFs } from "dropbox-fs";
 import { Inject } from "injector";
 import { join } from "path";
 import { IArtifactSettings } from "../../common/interfaces";
+import { IProjectConfig, ProjectConfigurer } from "../project-config";
 
 @Inject.Singleton
 export class ProjectDataModel {
-    constructor(@Inject.Value("projectStorageDir") private storageDir: string, private dropboxCachedFs: CachedFs) {}
+    constructor(
+        @Inject.Value("projectStorageDir") private storageDir: string,
+        private dropboxCachedFs: CachedFs,
+        @Inject.Value("projectConfig") private projectConfig: IProjectConfig
+    ) {}
 
     public async getArtifactSettings(): Promise<IArtifactSettings[]> {
+        ProjectConfigurer.verifyNitsCustomFieldIsArtifact(this.projectConfig);
         const filePath = this.getFilePath();
         if (!(await this.dropboxCachedFs.fileExists(filePath))) {
             return [];

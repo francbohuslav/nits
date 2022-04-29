@@ -35,13 +35,42 @@ export class JiraModel {
         return await this.jiraApi.searchIssues("id in (" + uniqIds.join(",") + ")", ["project", "parent", this.projectConfig.jira.nitsCustomField]);
     }
 
-    public async filterWorklogsAndAssignWtmConfig(
+    public filterWorklogsByArtifactAndAssignWtmConfig(
+        worklogList: Worklog[],
+        issuesById: { [id: string]: IIssue },
+        wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey,
+        report: ISyncReport
+    ): Worklog[] {
+        const validWorklogs: Worklog[] = [];
+        for (const workglog of worklogList) {
+            const issue = issuesById[workglog.issueId];
+            assert(issue, `Issue ${workglog.issueKey} of worklog ${workglog.toString()} not found`);
+
+            const projectKey = issue.fields.project.key;
+            const nitsField = issue.fields[this.projectConfig.jira.nitsCustomField] as string;
+
+            if (!nitsField) {
+                report.log.push(`Worklog ${workglog.toString()} skipped. Artifact field is not set in issue ${workglog.issueKey}.`);
+                continue;
+            }
+
+            validWorklogs.push(workglog);
+            wtmTsConfigPerIssueKey[issue.key] = {
+                jiraNitsField: nitsField,
+                jiraProjectKey: projectKey,
+                wtmArtifact: nitsField,
+            };
+        }
+        return validWorklogs;
+    }
+
+    public filterWorklogsByRulesAndAssignWtmConfig(
         worklogList: Worklog[],
         issuesById: { [id: string]: IIssue },
         wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey,
         artifactSettingsList: IArtifactSettings[],
         report: ISyncReport
-    ): Promise<Worklog[]> {
+    ): Worklog[] {
         const validProjectCodes = artifactSettingsList.map((p) => p.jiraProjectKey);
 
         const validWorklogs: Worklog[] = [];

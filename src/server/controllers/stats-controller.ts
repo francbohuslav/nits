@@ -8,6 +8,7 @@ import { IWtmTsConfigPerIssueKey, JiraModel } from "../models/jira/jira-model";
 import { ProjectDataModel } from "../models/project-data-model";
 import { UserDataModel } from "../models/user-data-model";
 import { ITimesheetModel, nitsTimesheetFilter, Timesheet, TimesheetModelFactoryHandler } from "../models/uu/interfaces";
+import { IProjectConfig } from "../project-config";
 
 @Inject.Singleton
 export class StatsController {
@@ -15,7 +16,8 @@ export class StatsController {
         private userDataModel: UserDataModel,
         private jiraModel: JiraModel,
         private projectDataModel: ProjectDataModel,
-        @Inject.Value("timesheetModelFactory") private timesheetModelFactory: TimesheetModelFactoryHandler
+        @Inject.Value("timesheetModelFactory") private timesheetModelFactory: TimesheetModelFactoryHandler,
+        @Inject.Value("projectConfig") private projectConfig: IProjectConfig
     ) {}
 
     public async getAdminStats(adminUid: string, month: string): Promise<IStats[]> {
@@ -86,7 +88,10 @@ export class StatsController {
         const timesheets = await timesheetModel.getMyLastTimesheets(dateUtils.toIsoFormat(new Date(from.getFullYear(), from.getMonth(), 1)));
         const stats: IUserStats = {
             lastSynchronization: userData.lastSynchronization,
-            wtmHours: arrayUtils.sumAction(timesheets.filter(nitsTimesheetFilter), (t) => t.getSpentHours()),
+            wtmHours: arrayUtils.sumAction(
+                timesheets.filter((t) => nitsTimesheetFilter(t, this.projectConfig.wtmProjectCode)),
+                (t) => t.getSpentHours()
+            ),
         };
         return stats;
     }
@@ -117,8 +122,12 @@ export class StatsController {
         const wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey = {};
         const issuesById = await this.jiraModel.getAllNeededIssues(allWorklogList);
         allWorklogList.forEach((w) => (w.issueKey = issuesById[w.issueId].key));
-        const artifactSettingsList = await this.projectDataModel.getArtifactSettings();
-        return await this.jiraModel.filterWorklogsAndAssignWtmConfig(allWorklogList, issuesById, wtmTsConfigPerIssueKey, artifactSettingsList, report);
+        if (this.projectConfig.jira.nitsCustomFieldIsArtifact) {
+            return this.jiraModel.filterWorklogsByArtifactAndAssignWtmConfig(allWorklogList, issuesById, wtmTsConfigPerIssueKey, report);
+        } else {
+            const artifactSettingsList = await this.projectDataModel.getArtifactSettings();
+            return this.jiraModel.filterWorklogsByRulesAndAssignWtmConfig(allWorklogList, issuesById, wtmTsConfigPerIssueKey, artifactSettingsList, report);
+        }
     }
 
     private async getWtmTimesheets(
@@ -128,7 +137,13 @@ export class StatsController {
         toExcept: Date
     ): Promise<{ timesheetsPerUser: ITimesheetsPerUser; timesheetsPerUserAndDay: ITimesheetsPerUserAndDay }> {
         const validUserIds = userDataList.map((u) => u.uid);
-        const timesheetsPerUser = await timesheetModel.getTimesheetsOfUsers(validUserIds, since, toExcept, nitsTimesheetFilter);
+        const timesheetsPerUser = await timesheetModel.getTimesheetsOfUsers(
+            validUserIds,
+            since,
+            toExcept,
+            this.projectConfig.wtmProjectCode,
+            nitsTimesheetFilter
+        );
         const timesheetsPerUserAndDay: ITimesheetsPerUserAndDay = {};
         Object.entries(timesheetsPerUser).forEach(
             ([uid, ts]) => (timesheetsPerUserAndDay[uid] = arrayUtils.toGroups(ts, (t) => dateUtils.toIsoFormat(t.datetimeFrom)))

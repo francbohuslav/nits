@@ -31,7 +31,7 @@ import { Header } from "../components/header";
 import { HeaderEnvelope } from "../components/header-envelope";
 import { CheckIcon, CrossIcon } from "../components/icons";
 import { Router } from "../router";
-import React = require("react");
+import React from "react";
 
 const mockData: IAllUsersResponse = null; // require("./users-page-mock.json");
 

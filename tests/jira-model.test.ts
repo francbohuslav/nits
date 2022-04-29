@@ -115,6 +115,7 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
     const jiraModel = new JiraModel(null, {
         cryptoSalt: "test",
         serverAddress: "",
+        wtmProjectCode: "TEST",
         email: {
             password: "",
             sender: "",
@@ -128,6 +129,7 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
             clientSecret: "",
             cloudId: "",
             nitsCustomField: "nitsCustomFiled",
+            nitsCustomFieldIsArtifact: false,
         },
         userDataEncrypted: false,
     });
@@ -160,7 +162,7 @@ test("filterWorklogsAndAssignWtmConfig", async () => {
     ];
     const wtmTsConfigPerIssueId: IWtmTsConfigPerIssueKey = {};
     const report: ISyncReport = { log: [], users: [], startedAt: null, timeZone: null };
-    const workLog = await jiraModel.filterWorklogsAndAssignWtmConfig(inputWorklogs as Worklog[], issuesById, wtmTsConfigPerIssueId, artifactSetting, report);
+    const workLog = jiraModel.filterWorklogsByRulesAndAssignWtmConfig(inputWorklogs as Worklog[], issuesById, wtmTsConfigPerIssueId, artifactSetting, report);
     expect(workLog).toHaveLength(4);
     expect(wtmTsConfigPerIssueId).toBeTruthy();
     expect(wtmTsConfigPerIssueId["CET-1"].wtmArtifact).toBe("CET-WITHOUT-FIELD");

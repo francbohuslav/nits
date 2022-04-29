@@ -15,7 +15,13 @@ export interface ITimesheetModel {
         wtmTsConfigPerIssueKey: IWtmTsConfigPerIssueKey,
         report: ISyncReportUser
     ): TimesheetMappingsPerDay;
-    getTimesheetsOfUsers(userUids: string[], since: Date, toExcept: Date, filter?: (t: Timesheet) => boolean): Promise<ITimesheetPerUser>;
+    getTimesheetsOfUsers(
+        userUids: string[],
+        since: Date,
+        toExcept: Date,
+        projectCode: string,
+        filter?: (t: Timesheet, code: string) => boolean
+    ): Promise<ITimesheetPerUser>;
 }
 
 export class Timesheet {
@@ -46,7 +52,7 @@ export class Timesheet {
         return `UU Timesheet: ${dateUtils.formatDateTime(this.datetimeFrom, true)} - ${dateUtils.formatDateTime(
             this.datetimeTo,
             true
-        )} = ${dateUtils.formatHours(time)} | ${this.description}`;
+        )} = ${dateUtils.formatHours(time)} | ${this.subject} | ${this.description}`;
     }
 }
 
@@ -99,4 +105,4 @@ export interface IMonthlyEvaluation {
 
 export type ITimesheetPerUser = { [uid: string]: Timesheet[] };
 
-export const nitsTimesheetFilter = (t: Timesheet) => t.data?.nits !== undefined;
+export const nitsTimesheetFilter = (t: Timesheet, _wtmProjectCode: string) => t.data?.nits !== undefined;

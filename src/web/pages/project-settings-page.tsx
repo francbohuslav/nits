@@ -27,6 +27,8 @@ import { thisApp } from "../app-provider";
 import { Header } from "../components/header";
 import { Router } from "../router";
 
+const enableArtifacts = false;
+
 export const ProjectSettingsPage = () => {
     const [artifactSettings, setArtifactSettings] = useState<IArtifactSettings[]>(null);
     const [nitsFieldValues, setNitsFieldValues] = useState<{ [id: string]: string }>({});
@@ -53,10 +55,10 @@ export const ProjectSettingsPage = () => {
 
     const loadData = async () => {
         setIsLoading(true);
-        const res = await ajax.get<IArtifactSettingsResponse>("/server/project-settings/get-artifacts");
+        const res = enableArtifacts ? await ajax.get<IArtifactSettingsResponse>("/server/project-settings/get-artifacts") : null;
         const res2 = await ajax.get<ISystemConfig>("/server/project-settings/get-config");
         const res3 = await ajax.get<IAllUsersResponse>("/server/admin-users/get");
-        if (res.isOk) {
+        if (enableArtifacts && res.isOk) {
             setArtifactSettings(res.data.records);
             setNitsFieldValues(res.data.nitsFieldValues);
             setProjects(res.data.projects);
@@ -71,7 +73,7 @@ export const ProjectSettingsPage = () => {
         setIsLoading(false);
     };
 
-    const onSave = async () => {
+    const onSaveArtifacts = async () => {
         setIsLoading(true);
         const res = await ajax.post<boolean>("/server/project-settings/set-artifacts", artifactSettings);
         setIsLoading(false);
@@ -167,37 +169,39 @@ export const ProjectSettingsPage = () => {
                 <LinearProgress />
             ) : (
                 <>
-                    {rows && (
+                    {(!enableArtifacts || rows) && systemConfig && (
                         <>
-                            <Box mb={3}>
-                                <Card>
-                                    <CardContent>
-                                        <Typography variant="h6" paragraph>
-                                            Artefakty
-                                        </Typography>
-                                        <Typography paragraph>
-                                            <DataGrid
-                                                columns={columns}
-                                                rows={rows}
-                                                density="compact"
-                                                autoHeight
-                                                disableColumnMenu
-                                                hideFooterPagination
-                                                hideFooter
-                                                onCellEditCommit={handleCellEditCommit}
-                                            />
-                                        </Typography>
-                                        <Box display="flex">
-                                            <Box flexGrow={1}></Box>
-                                            <Box>
-                                                <Button variant="contained" color="primary" onClick={onSave}>
-                                                    Uložit
-                                                </Button>
+                            {enableArtifacts && (
+                                <Box mb={3}>
+                                    <Card>
+                                        <CardContent>
+                                            <Typography variant="h6" paragraph>
+                                                Artefakty
+                                            </Typography>
+                                            <Typography paragraph>
+                                                <DataGrid
+                                                    columns={columns}
+                                                    rows={rows}
+                                                    density="compact"
+                                                    autoHeight
+                                                    disableColumnMenu
+                                                    hideFooterPagination
+                                                    hideFooter
+                                                    onCellEditCommit={handleCellEditCommit}
+                                                />
+                                            </Typography>
+                                            <Box display="flex">
+                                                <Box flexGrow={1}></Box>
+                                                <Box>
+                                                    <Button variant="contained" color="primary" onClick={onSaveArtifacts}>
+                                                        Uložit
+                                                    </Button>
+                                                </Box>
                                             </Box>
-                                        </Box>
-                                    </CardContent>
-                                </Card>
-                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                </Box>
+                            )}
                             <Box mb={3}>
                                 <Card>
                                     <CardContent>

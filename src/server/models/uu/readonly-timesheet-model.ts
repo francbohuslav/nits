@@ -45,7 +45,13 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
         return timesheets;
     }
 
-    public async getTimesheetsOfUsers(userUids: string[], since: Date, toExcept: Date, filter?: (t: Timesheet) => boolean): Promise<ITimesheetPerUser> {
+    public async getTimesheetsOfUsers(
+        userUids: string[],
+        since: Date,
+        toExcept: Date,
+        projectcode: string,
+        filter?: (t: Timesheet, projectCode: string) => boolean
+    ): Promise<ITimesheetPerUser> {
         assert(this.accessCode1);
         assert(this.accessCode2);
         const tokenResponse = await this.uuUserModel.getToken(this.accessCode1, this.accessCode2);
@@ -69,7 +75,7 @@ export class ReadOnlyTimesheetModel implements ITimesheetModel {
                     const items = await this.wtmApi.listTimesheetItemsByMonthlyEvaluation(tokenResponse.id_token, evaluation.id);
                     items
                         .filter((t) => dateUtils.toIsoFormat(t.datetimeFrom) >= fromStr && dateUtils.toIsoFormat(t.datetimeFrom) <= toStr)
-                        .filter((t) => (filter ? filter(t) : true))
+                        .filter((t) => (filter ? filter(t, projectcode) : true))
                         .map((t) => timesheetsPerUser[evaluation.workerUuIdentity].push(t));
                 }
             } catch (ex) {
