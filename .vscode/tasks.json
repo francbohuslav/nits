@@ -55,6 +55,15 @@
             "group": "test",
             "problemMatcher": [],
             "label": "Test"
+        },
+        {
+            "type": "shell",
+            "command": "./publish-develop.cmd",
+            "options": {
+                "cwd": ".."
+            },
+            "label": "Publish develop",
+            "problemMatcher": []
         }
     ]
 }
