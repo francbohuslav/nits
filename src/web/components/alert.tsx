@@ -1,18 +1,17 @@
-import React = require("react");
-import { useEffect, useState } from "react";
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Button,
     Dialog,
-    DialogTitle,
+    DialogActions,
     DialogContent,
     DialogContentText,
-    DialogActions,
-    Button,
-    Accordion,
-    AccordionSummary,
+    DialogTitle,
     Typography,
-    AccordionDetails,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import React, { useEffect, useState } from "react";
 
 export interface IAlertProps {
     message?: string;

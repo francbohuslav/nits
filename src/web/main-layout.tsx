@@ -1,11 +1,10 @@
 import { AppBar, Box, Button, Container, makeStyles, Toolbar, Tooltip, Typography } from "@material-ui/core";
 import EmaiIcon from "@material-ui/icons/Email";
 import SyncIcon from "@material-ui/icons/Sync";
-import { useContext } from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { DataContext, IDataContextValue } from "./data-context";
 import { Router } from "./router";
-import React = require("react");
 
 const useStyles = makeStyles({
     leftPart: {

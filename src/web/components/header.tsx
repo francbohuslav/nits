@@ -1,6 +1,5 @@
-import React = require("react");
 import { Typography } from "@material-ui/core";
-import { PropsWithChildren } from "react";
+import React, { PropsWithChildren } from "react";
 
 export interface IHeaderProps {
     header: string;

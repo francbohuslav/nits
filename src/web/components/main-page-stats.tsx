@@ -1,6 +1,5 @@
-import React = require("react");
 import { Box, LinearProgress, Typography } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import dateUtils from "../../common/date-utils";
 import { IUserStats } from "../../common/interfaces";
 import { useAjax } from "../ajax";

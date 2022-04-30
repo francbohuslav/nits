@@ -1,11 +1,10 @@
-import React = require("react");
-import { TextField, Button, Typography, Container, Box } from "@material-ui/core";
+import { Box, Button, Container, TextField, Typography } from "@material-ui/core";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { useState } from "react";
-import { Router } from "./router";
 import { ILoginRequest } from "../common/ajax-interfaces";
-import { thisApp } from "./app-provider";
 import { useAjax } from "./ajax";
+import { thisApp } from "./app-provider";
+import { Router } from "./router";
 
 export const Login = () => {
     const [accessCodes, setAccessCodes] = useState<ILoginRequest>({ accessCode1: null, accessCode2: null });

@@ -1,7 +1,6 @@
-import React = require("react");
-import { useEffect, useState } from "react";
 import { Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
+import React, { useEffect, useState } from "react";
 
 export type IToastSeverity = "success" | "warning" | "error";
 export interface IToastProps {

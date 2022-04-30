@@ -1,8 +1,7 @@
-import React = require("react");
-import { IAlertProps, Alert } from "./components/alert";
-import { IToastProps, IToastSeverity, Toast } from "./components/toast";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import { Alert, IAlertProps } from "./components/alert";
+import { IToastProps, IToastSeverity, Toast } from "./components/toast";
 import { Router } from "./router";
 
 interface IAppProviderProps {

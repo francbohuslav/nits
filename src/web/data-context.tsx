@@ -1,7 +1,6 @@
-import React = require("react");
-import { useState } from "react";
-import { useAjax } from "./ajax";
+import React, { useState } from "react";
 import { IProjectConfigPublic, IUserPublicData } from "../common/interfaces";
+import { useAjax } from "./ajax";
 
 interface IDataContextProps {
     children: any;

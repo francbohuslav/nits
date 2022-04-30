@@ -1,5 +1,5 @@
 import { Button, LinearProgress, Typography } from "@material-ui/core";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { IUserPublicData } from "../../common/interfaces";
 import { useAjax } from "../ajax";
@@ -7,7 +7,6 @@ import { thisApp } from "../app-provider";
 import { Header } from "../components/header";
 import { DataContext, IDataContextValue } from "../data-context";
 import { Router } from "../router";
-import React = require("react");
 // import process from "process";
 
 export const JiraSettingsPage = () => {

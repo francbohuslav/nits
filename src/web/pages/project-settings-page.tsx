@@ -18,18 +18,18 @@ import {
 import { DataGrid, GridCellEditCommitParams, GridColumns } from "@material-ui/data-grid";
 import AddIcon from "@material-ui/icons/AddCircleRounded";
 import CloseIcon from "@material-ui/icons/Close";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { IAllUsersResponse, IArtifactSettingsResponse } from "../../common/ajax-interfaces";
 import { IArtifactSettings, ISystemConfig, IUserPublicData } from "../../common/interfaces";
 import { useAjax } from "../ajax";
 import { thisApp } from "../app-provider";
 import { Header } from "../components/header";
+import { DataContext, IDataContextValue } from "../data-context";
 import { Router } from "../router";
 
-const enableArtifacts = false;
-
 export const ProjectSettingsPage = () => {
+    const { projectConfig } = useContext<IDataContextValue>(DataContext);
     const [artifactSettings, setArtifactSettings] = useState<IArtifactSettings[]>(null);
     const [nitsFieldValues, setNitsFieldValues] = useState<{ [id: string]: string }>({});
     const [users, setUsers] = useState<IUserPublicData[]>([]);
@@ -55,10 +55,10 @@ export const ProjectSettingsPage = () => {
 
     const loadData = async () => {
         setIsLoading(true);
-        const res = enableArtifacts ? await ajax.get<IArtifactSettingsResponse>("/server/project-settings/get-artifacts") : null;
+        const res = projectConfig.enableArtifacts ? await ajax.get<IArtifactSettingsResponse>("/server/project-settings/get-artifacts") : null;
         const res2 = await ajax.get<ISystemConfig>("/server/project-settings/get-config");
         const res3 = await ajax.get<IAllUsersResponse>("/server/admin-users/get");
-        if (enableArtifacts && res.isOk) {
+        if (projectConfig.enableArtifacts && res.isOk) {
             setArtifactSettings(res.data.records);
             setNitsFieldValues(res.data.nitsFieldValues);
             setProjects(res.data.projects);
@@ -111,8 +111,10 @@ export const ProjectSettingsPage = () => {
     };
 
     useEffect(() => {
-        loadData();
-    }, []);
+        if (projectConfig) {
+            loadData();
+        }
+    }, [projectConfig]);
 
     const columns: GridColumns = [
         {
@@ -169,9 +171,9 @@ export const ProjectSettingsPage = () => {
                 <LinearProgress />
             ) : (
                 <>
-                    {(!enableArtifacts || rows) && systemConfig && (
+                    {projectConfig && (!projectConfig.enableArtifacts || rows) && systemConfig && (
                         <>
-                            {enableArtifacts && (
+                            {projectConfig.enableArtifacts && (
                                 <Box mb={3}>
                                     <Card>
                                         <CardContent>

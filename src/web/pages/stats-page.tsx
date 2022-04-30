@@ -1,7 +1,7 @@
 import { Box, Button, LinearProgress, Link, List, ListItem, ListItemText, makeStyles, Paper, Tab, Tabs, Tooltip, Typography } from "@material-ui/core";
 import { DataGrid, GridColumns, GridRowData } from "@material-ui/data-grid";
 import MuiAlert from "@material-ui/lab/Alert";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import arrayUtils from "../../common/array-utils";
 import dateUtils from "../../common/date-utils";
@@ -12,7 +12,6 @@ import { HeaderEnvelope } from "../components/header-envelope";
 import { CheckIcon, CrossIcon, FailedIcon, PlannedIcon } from "../components/icons";
 import { StatsStatus } from "../components/stats-status";
 import { Router } from "../router";
-import React = require("react");
 
 const mockData: IStats[] = null; // require("./stats-page-mock.json");
 

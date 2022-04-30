@@ -1,5 +1,5 @@
 import { Box, Button, LinearProgress, TextField } from "@material-ui/core";
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { IUserPublicData } from "../../common/interfaces";
 import { useAjax } from "../ajax";
@@ -7,7 +7,6 @@ import { thisApp } from "../app-provider";
 import { Header } from "../components/header";
 import { DataContext, IDataContextValue } from "../data-context";
 import { Router } from "../router";
-import React = require("react");
 
 export const NotifySettingsPage = () => {
     const { projectConfig } = useContext<IDataContextValue>(DataContext);

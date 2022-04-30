@@ -83,6 +83,7 @@ export interface IProjectConfigPublic {
     serverAddress: string;
     /** Email settings are set and can use emailing */
     emailIsActive: boolean;
+    enableArtifacts: boolean;
 }
 export type IUserState = "disabled" | "readonly" | "active";
 

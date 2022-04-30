@@ -116,6 +116,7 @@ const methods: IServerMethod[] = [
                 jiraClientId: projectConfig.jira?.clientId,
                 serverAddress: projectConfig.serverAddress,
                 emailIsActive: !!(projectConfig.email?.user && projectConfig.email?.password),
+                enableArtifacts: !projectConfig.jira.nitsCustomFieldIsArtifact,
             };
             return ret;
         },

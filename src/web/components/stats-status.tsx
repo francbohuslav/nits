@@ -1,7 +1,7 @@
-import React = require("react");
 import { makeStyles } from "@material-ui/core";
-import red from "@material-ui/core/colors/red";
 import green from "@material-ui/core/colors/green";
+import red from "@material-ui/core/colors/red";
+import React from "react";
 
 interface IStatsStatusProps {
     isOk: boolean;

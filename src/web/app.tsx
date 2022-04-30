@@ -1,4 +1,5 @@
 import { createTheme, ThemeProvider } from "@material-ui/core";
+import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { AppProvider } from "./app-provider";
 import { DataProvider } from "./data-context";
@@ -11,7 +12,6 @@ import { ProjectSettingsPage } from "./pages/project-settings-page";
 import { StatsPage } from "./pages/stats-page";
 import { UsersPage } from "./pages/users-page";
 import { Router } from "./router";
-import React = require("react");
 
 const theme = createTheme({
     typography: {

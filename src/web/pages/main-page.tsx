@@ -6,7 +6,7 @@ import InfoIcon from "@material-ui/icons/Info";
 import PeopleIcon from "@material-ui/icons/People";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { makeStyles } from "@material-ui/styles";
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useAjax } from "../ajax";
 import { CheckIcon, CrossIcon } from "../components/icons";
@@ -14,7 +14,6 @@ import { Info } from "../components/info";
 import { MainPageStats } from "../components/main-page-stats";
 import { DataContext, IDataContextValue } from "../data-context";
 import { Router } from "../router";
-import React = require("react");
 
 const useStyles = makeStyles({
     button: {

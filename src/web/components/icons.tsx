@@ -5,7 +5,7 @@ import CheckIconM from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 import ErrorIcon from "@material-ui/icons/Error";
 import QueryBuilderIcon from "@material-ui/icons/QueryBuilder";
-import React = require("react");
+import React from "react";
 
 export const CheckIcon = ({ tooltip, mt = 0, color = "green" }: { tooltip: string; mt?: number; color?: string }) => {
     return (

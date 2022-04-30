@@ -1,6 +1,6 @@
 import { Tooltip } from "@material-ui/core";
 import EmailIcon from "@material-ui/icons/Email";
-import React = require("react");
+import React from "react";
 
 export const HeaderEnvelope = ({ tooltip }: { tooltip: string }) => {
     return (

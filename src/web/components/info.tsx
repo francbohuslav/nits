@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import React = require("react");
+import React from "react";
 
 const useStyles = makeStyles({
     img: {
