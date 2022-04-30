@@ -47,7 +47,14 @@
             "script": "test-watch",
             "group": "build",
             "problemMatcher": [],
-            "label": "npm: test-watch"
+            "label": "Test watch"
+        },
+        {
+            "type": "npm",
+            "script": "test",
+            "group": "test",
+            "problemMatcher": [],
+            "label": "Test"
         }
     ]
 }

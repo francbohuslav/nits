@@ -169,6 +169,11 @@ export class SyncController {
         return JSON.parse(content);
     }
 
+    /**
+     * Separates WTM timesheets if it is NITS timesheet for specific project
+     * @param exitingTimesheets
+     * @returns
+     */
     protected separateTimesheets(exitingTimesheets: Timesheet[]): { timesheetsToDelete: Timesheet[]; notNitsTimesheets: Timesheet[] } {
         const timesheetsToDelete: Timesheet[] = [];
         const notNitsTimesheets: Timesheet[] = [];
@@ -242,6 +247,7 @@ export class SyncController {
         ts.subject = tsm.wtmArtifact.match(/^ues:/) ? tsm.wtmArtifact : `ues:${tsm.wtmArtifact}`;
         ts.data = {
             nits: {
+                project: this.projectConfig.wtmProjectCode,
                 issueKey: tsm.jiraIssueKey,
                 worklogIds: tsm.jiraWorklogs.map((w) => w.id),
             },

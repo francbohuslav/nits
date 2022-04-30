@@ -58,6 +58,7 @@ export class Timesheet {
 
 export interface ITimesheetData {
     nits: {
+        project: string;
         issueKey: string;
         worklogIds: string[];
     };
@@ -105,4 +106,10 @@ export interface IMonthlyEvaluation {
 
 export type ITimesheetPerUser = { [uid: string]: Timesheet[] };
 
-export const nitsTimesheetFilter = (t: Timesheet, _wtmProjectCode: string) => t.data?.nits !== undefined;
+export const nitsTimesheetFilter = (t: Timesheet, wtmProjectCode: string) => {
+    if (!wtmProjectCode) {
+        throw Error("Project code is not set. Contact author of this app and provide him screen of this error.");
+    }
+    const dataProject = t.data?.nits?.project || "NITS";
+    return t.data?.nits !== undefined && dataProject === wtmProjectCode;
+};

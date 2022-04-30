@@ -3,37 +3,110 @@ import { TimesheetMapping, TimesheetMappingsPerDay } from "../src/server/models/
 import { ITimesheetData, Timesheet } from "../src/server/models/uu/interfaces";
 
 const projectConfig: any = {
-    wtmProjectCode: "TEST",
+    wtmProjectCode: "NITS",
 };
 
-test("separateTimesheets", async () => {
-    const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
-    const result = syncController.separateTimesheets2([
+describe("computeNewTimesheets", () => {
+    const timesheets = [
+        // Remain
         {
+            id: "Delete1",
             data: undefined,
         } as Partial<Timesheet>,
+        // Remain
         {
+            id: "Delete2",
             data: {
                 unknown: 1,
             },
         } as any,
+        // For NITS project
         {
+            id: "NITS1",
             data: {
                 nits: null,
             },
         } as Partial<Timesheet>,
+        // For NITS project
         {
+            id: "NITS2",
             data: {
                 nits: {},
             },
         } as Partial<Timesheet>,
-    ] as any);
-    expect(result.timesheetsToDelete).toHaveLength(2);
-    expect(result.timesheetsToDelete[0].data.nits).toBeNull();
-    expect(result.timesheetsToDelete[1].data.nits).toBeTruthy();
-    expect(result.notNitsTimesheets).toHaveLength(2);
-    expect(result.notNitsTimesheets[0].data).toBeUndefined();
-    expect(result.notNitsTimesheets[1].data.nits).toBeUndefined();
+        // For NITS project
+        {
+            id: "NITS3",
+            data: {
+                nits: {
+                    project: "",
+                },
+            },
+        } as Partial<Timesheet>,
+        // For NITS project
+        {
+            id: "NITS4",
+            data: {
+                nits: {
+                    project: "NITS",
+                },
+            },
+        } as Partial<Timesheet>,
+        // For ASW project
+        {
+            id: "ASW1",
+            data: {
+                nits: {
+                    project: "ASW",
+                },
+            },
+        } as Partial<Timesheet>,
+    ] as any;
+
+    const expectNitsProject = (result: { timesheetsToDelete: Timesheet[]; notNitsTimesheets: Timesheet[] }) => {
+        expect(result.timesheetsToDelete).toHaveLength(4);
+        expect(result.timesheetsToDelete[0].id).toBe("NITS1");
+        expect(result.timesheetsToDelete[1].id).toBe("NITS2");
+        expect(result.timesheetsToDelete[2].id).toBe("NITS3");
+        expect(result.timesheetsToDelete[3].id).toBe("NITS4");
+        expect(result.notNitsTimesheets).toHaveLength(3);
+        expect(result.notNitsTimesheets[0].id).toBe("Delete1");
+        expect(result.notNitsTimesheets[1].id).toBe("Delete2");
+        expect(result.notNitsTimesheets[2].id).toBe("ASW1");
+    };
+
+    test("separateTimesheets for original NITS project without project specified", async () => {
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, {
+            wtmProjectCode: "",
+        } as any);
+        expect(() => syncController.separateTimesheets2(timesheets)).toThrowError(
+            "Project code is not set. Contact author of this app and provide him screen of this error."
+        );
+    });
+
+    test("separateTimesheets for original NITS project with project specified", async () => {
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, {
+            wtmProjectCode: "NITS",
+        } as any);
+        const result = syncController.separateTimesheets2(timesheets);
+        expectNitsProject(result);
+    });
+
+    test("separateTimesheets for ASW", async () => {
+        const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, {
+            wtmProjectCode: "ASW",
+        } as any);
+        const result = syncController.separateTimesheets2(timesheets);
+        expect(result.timesheetsToDelete).toHaveLength(1);
+        expect(result.timesheetsToDelete[0].id).toBe("ASW1");
+        expect(result.notNitsTimesheets).toHaveLength(6);
+        expect(result.notNitsTimesheets[0].id).toBe("Delete1");
+        expect(result.notNitsTimesheets[1].id).toBe("Delete2");
+        expect(result.notNitsTimesheets[2].id).toBe("NITS1");
+        expect(result.notNitsTimesheets[3].id).toBe("NITS2");
+        expect(result.notNitsTimesheets[4].id).toBe("NITS3");
+        expect(result.notNitsTimesheets[5].id).toBe("NITS4");
+    });
 });
 
 describe("computeNewTimesheets", () => {
@@ -428,6 +501,7 @@ describe("computeNewTimesheetInSegment", () => {
             subject: "ues:UNI-BT:1",
             data: {
                 nits: {
+                    project: "NITS",
                     issueKey: "C-1",
                     worklogIds: ["1"],
                 },
@@ -496,6 +570,7 @@ describe("computeNewTimesheetInSegment", () => {
             subject: "ues:UNI-BT:1",
             data: {
                 nits: {
+                    project: "NITS",
                     issueKey: "C-1",
                     worklogIds: ["1"],
                 },
@@ -521,12 +596,16 @@ describe("excludeNotChangedTimesheets", () => {
         const syncController = new TestingSyncController(null, null, null, null, null, null, null, null, projectConfig);
         const newTimesheets: Timesheet[] = [
             createTimesheet("2022-01-18T00:00:00Z", "2022-01-18T01:00:00Z", "desc", "subject", null),
-            createTimesheet("2022-01-18T01:00:00Z", "2022-01-18T02:00:00Z", "desc2", "subject2", { nits: { issueKey: "issuekey", worklogIds: ["123415"] } }),
+            createTimesheet("2022-01-18T01:00:00Z", "2022-01-18T02:00:00Z", "desc2", "subject2", {
+                nits: { project: "", issueKey: "issuekey", worklogIds: ["123415"] },
+            }),
             createTimesheet("2022-01-18T02:00:00Z", "2022-01-18T03:00:00Z", "desc3", "subject", null),
         ];
         const timesheetsToDelete: Timesheet[] = [
             createTimesheet("2022-01-18T00:00:00Z", "2022-01-18T01:00:00Z", "desc", "subject", null),
-            createTimesheet("2022-01-18T01:00:00Z", "2022-01-18T02:00:00Z", "desc2", "subject2", { nits: { issueKey: "issuekey", worklogIds: ["123415"] } }),
+            createTimesheet("2022-01-18T01:00:00Z", "2022-01-18T02:00:00Z", "desc2", "subject2", {
+                nits: { project: "", issueKey: "issuekey", worklogIds: ["123415"] },
+            }),
             createTimesheet("2022-01-18T03:00:00Z", "2022-01-18T04:00:00Z", "desc4", "subject", null),
         ];
 

@@ -32,7 +32,7 @@ export class ProjectConfigurer {
                 cryptoSalt: process.env.NITS_CRYPTO_SALT,
                 userDataEncrypted: true,
                 serverAddress: process.env.NITS_SERVER_ADDRESS,
-                wtmProjectCode: process.env.NITS_WTM_PROJECT || "",
+                wtmProjectCode: process.env.NITS_WTM_PROJECT || "NITS",
                 jira: {
                     nitsCustomField: process.env.NITS_JIRA_CUSTOM_FIELD,
                     nitsCustomFieldIsArtifact: process.env.NITS_JIRA_CUSTOM_FIELD_IS_ARTIFACT == "true",
