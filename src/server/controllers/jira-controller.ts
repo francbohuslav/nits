@@ -50,8 +50,8 @@ export class JiraController {
         );
         console.log("Get current user");
         const account = await jiraApi.getCurrentUser();
-
         const userData = await this.userDataModel.getUserData(uid);
+
         userData.jiraAccountId = account.accountId;
         userData.jiraName = account.displayName;
 
