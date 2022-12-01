@@ -12,7 +12,7 @@ import { IAccount, IIssue, IIssueCustomField, Worklog } from "./interfaces";
 export class JiraModel {
   constructor(private jiraApi: JiraApi, @Inject.Value("projectConfig") private projectConfig: IProjectConfig) {}
 
-  public async getLastWorklogs(since: Date, toExcept: Date): Promise<Worklog[]> {
+  public async getLastWorklogs(since: Date, toExcept: Date, log: string[] = []): Promise<Worklog[]> {
     // Fetch data from earlier date because some fools can create worklog to future.
     const sinceForFetch = dateUtils.increaseDay(since, -7);
     const worklogIdList = await this.jiraApi.getUpdatedWorklogIds(sinceForFetch, toExcept);
@@ -20,7 +20,18 @@ export class JiraModel {
     worklogList.forEach((w) => {
       w.startedDate = new Date(w.started);
     });
-    worklogList = worklogList.filter((w) => dateUtils.isLowerThen(w.startedDate, toExcept) && dateUtils.isLowerOrEqualsThen(since, w.startedDate));
+    worklogList = worklogList.filter((w) => {
+      if (dateUtils.isLowerThen(w.startedDate, toExcept) && dateUtils.isLowerOrEqualsThen(since, w.startedDate)) {
+        return true;
+      } else {
+        // Log only if created fit into range
+        const createdDate = new Date(w.created);
+        if (dateUtils.isLowerThen(createdDate, toExcept) && dateUtils.isLowerOrEqualsThen(since, createdDate)) {
+          log.push(`Worklog (ID: ${w.id}, ${w.author.displayName}, started: ${w.started}, created: ${w.created}) is out of range.`);
+        }
+        return false;
+      }
+    });
     worklogList.forEach((w) => {
       w.commentAsText = this.convertCommentToText(w);
     });

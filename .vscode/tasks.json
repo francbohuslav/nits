@@ -1,69 +1,69 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "type": "npm",
-            "script": "build",
-            "group": "build",
-            "problemMatcher": [],
-            "label": "Build"
-        },
-        {
-            "type": "npm",
-            "script": "browser-sync",
-            "problemMatcher": [],
-            "label": "npm: browser-sync"
-        },
-        {
-            "type": "npm",
-            "script": "start",
-            "problemMatcher": [],
-            "label": "npm: start"
-        },
-        {
-            "type": "npm",
-            "script": "watch",
-            "group": "build",
-            "problemMatcher": [],
-            "label": "npm: watch"
-        },
-        {
-            "type": "npm",
-            "script": "watch-node",
-            "group": "build",
-            "problemMatcher": [],
-            "label": "npm: watch-node"
-        },
-        {
-            "type": "npm",
-            "script": "watch-server",
-            "problemMatcher": ["$tsc-watch"],
-            "group": "build",
-            "label": "npm: watch-server",
-            "isBackground": true
-        },
-        {
-            "type": "npm",
-            "script": "test-watch",
-            "group": "build",
-            "problemMatcher": [],
-            "label": "Test watch"
-        },
-        {
-            "type": "npm",
-            "script": "test",
-            "group": "test",
-            "problemMatcher": [],
-            "label": "Test"
-        },
-        {
-            "type": "shell",
-            "command": "./publish-develop.cmd",
-            "options": {
-                "cwd": ".."
-            },
-            "label": "Publish develop",
-            "problemMatcher": []
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "build",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "Build"
+    },
+    {
+      "type": "npm",
+      "script": "browser-sync",
+      "problemMatcher": [],
+      "label": "npm: browser-sync"
+    },
+    {
+      "type": "npm",
+      "script": "start",
+      "problemMatcher": [],
+      "label": "npm: start"
+    },
+    {
+      "type": "npm",
+      "script": "watch",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm: watch"
+    },
+    {
+      "type": "npm",
+      "script": "watch-node",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm: watch-node"
+    },
+    {
+      "type": "npm",
+      "script": "watch-server",
+      "problemMatcher": ["$tsc-watch"],
+      "group": "build",
+      "label": "npm: watch-server",
+      "isBackground": true
+    },
+    {
+      "type": "npm",
+      "script": "test-watch",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "Test watch"
+    },
+    {
+      "type": "npm",
+      "script": "test",
+      "group": "test",
+      "problemMatcher": [],
+      "label": "Test"
+    },
+    {
+      "type": "shell",
+      "command": "./publish-develop.cmd",
+      "options": {
+        "cwd": ".."
+      },
+      "label": "Publish develop",
+      "problemMatcher": []
+    }
+  ]
 }
